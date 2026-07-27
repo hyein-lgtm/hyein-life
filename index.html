@@ -441,6 +441,29 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .subhd .gcnt{margin-left:auto;font-size:11px;color:#a3b0c6;font-weight:600}
 .titem .x.mv{font-size:10px;opacity:.45}
 .titem .x.mv:hover{opacity:1}
+/* --- 못 한 할 일 이월 --- */
+.rollb{flex:none;font-size:10px;font-weight:800;color:#c2733a;background:#fff3e4;border:1px solid #ffd9ad;
+  border-radius:6px;padding:1px 5px;letter-spacing:-.2px}
+.rollb.hot{color:#c0392b;background:#ffe9e6;border-color:#ffc4bc}
+.titem.on .rollb{opacity:.3}
+.rollbar{display:flex;align-items:center;gap:7px;margin:0 0 10px;padding:9px 12px;border-radius:12px;
+  background:linear-gradient(135deg,#fff6ea,#fff0dd);border:1px solid #ffdfb8;color:#a05f22;
+  font-size:12.5px;font-weight:700;line-height:1.45}
+.rollbar b{color:#e07b1f;font-weight:900}
+.stuck{margin:0 0 12px;padding:12px 13px;border-radius:14px;background:#fff;
+  border:1.5px solid #ffc9c0;box-shadow:0 4px 14px rgba(214,69,50,.08)}
+.stuck .sh{font-size:12.5px;font-weight:900;color:#c0392b;margin-bottom:3px}
+.stuck .ss{font-size:11.5px;color:#8a94a6;margin-bottom:8px;line-height:1.55}
+.stuckrow{padding:9px 0 3px;border-top:1px dashed #ffdcd6}
+.stuckrow .st{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:7px;word-break:break-all}
+.stuckrow .st em{font-style:normal;font-size:10.5px;font-weight:800;color:#c0392b;margin-left:6px}
+.sbt{display:flex;gap:6px;flex-wrap:wrap}
+.sbt button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 11px;
+  font-size:11.5px;font-weight:800;color:#5b6779;cursor:pointer;font-family:inherit}
+.sbt button:hover{background:var(--blue-xl);border-color:var(--blue)}
+.sbt button.go{background:#f6538d;border-color:#f6538d;color:#fff}
+.sbt button.go:hover{background:#e4457d}
+.sbt button.dl:hover{border-color:var(--danger);color:var(--danger);background:#fff5f4}
 .erow .spl{width:auto;padding:0 8px;height:26px;border-radius:8px;border:1px solid var(--line);
   background:#fff;color:#a3b0c6;font-size:11px;line-height:1;cursor:pointer}
 .erow .spl.on{border-color:#bed3f7;color:var(--blue);background:var(--blue-xl)}
@@ -1210,7 +1233,7 @@ function normalize(d){
     if(s.type==="daily"){
       s.cats=(s.cats&&s.cats.length)?s.cats:JSON.parse(JSON.stringify(SEED.daily.cats));
       s.days=s.days||{};
-      Object.keys(s.days).forEach(dk=>{ s.days[dk]=(s.days[dk]||[]).map(t=>({id:t.id||("d"+Math.random().toString(36).slice(2,8)),cat:t.cat,part:(t.part==="pm"?"pm":"am"),text:t.text||"",done:!!t.done})); });
+      Object.keys(s.days).forEach(dk=>{ s.days[dk]=(s.days[dk]||[]).map(t=>({id:t.id||("d"+Math.random().toString(36).slice(2,8)),cat:t.cat,part:(t.part==="pm"?"pm":"am"),text:t.text||"",done:!!t.done,roll:+t.roll||0,from:t.from||""})); });
       s.items=[];
     }
     if(s.type==="habit"){
@@ -1428,7 +1451,7 @@ function dailyList(){
   if(filter==="ALL"&&orphan.length) bk=bk.concat([{id:"__etc",name:"기타",color:"#94a3b8"}]);
   const row=(t,c,sp)=>`<label class="titem ${t.done?"on":""}">
       <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
-      <span class="ttx">${esc(t.text)}</span>
+      <span class="ttx">${esc(t.text)}</span>${rollBadge(t)}
       ${sp?`<button class="x mv" title="${t.part==="pm"?"오전으로 옮기기":"오후로 옮기기"}" onclick="event.preventDefault();movePart('${t.id}')">${t.part==="pm"?"☀":"🌙"}</button>`:""}
       <button class="x" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`;
   const addrow=(c,part)=>`<div class="gadd"><span class="plus">＋</span>
@@ -1457,13 +1480,77 @@ function dailyList(){
   }).join("");
   if(filter==="ALL") groups+=`<button class="tgroup newcat" onclick="openCats()">＋ 카테고리 추가·관리</button>`;
   const yst=dayTodos(addDays(daySel,-1)).length;
+  const rolled=all.filter(t=>(+t.roll||0)>0&&!t.done);
+  const stuck=rolled.filter(t=>(+t.roll||0)>=3);
+  const rbar=rolled.length?`<div class="rollbar">↻ 지난 날에서 넘어온 일 <b>${rolled.length}개</b> · 오늘 리스트에 같이 있어요</div>`:"";
   return `<div class="dayhead">
       <div class="dhtx"><div class="dh1">${korDate(daySel)}${daySel===todayStr()?`<span class="tdbadge">오늘</span>`:""}</div>
       <div class="dh2">${done} / ${all.length} 완료</div></div>
       <div class="dring" style="--p:${pct}"><b>${pct}<i>%</i></b></div>
     </div>
+    ${rbar}${stuckBox(stuck)}
     <div class="tlist">${groups}</div>
-    ${yst?`<button class="btn sm ghost wide2" onclick="copyYesterday()">↩ 어제 할 일 ${yst}개 가져오기</button>`:""}`;
+    ${yst?`<button class="btn sm ghost wide2" onclick="copyYesterday()">↩ 어제 한 일 ${yst}개 그대로 가져오기</button>`:""}`;
+}
+/* ---- 못 한 할 일 자동 이월 ---- */
+const ROLLDAYS=14;
+function autoRoll(){
+  const s=ds(); if(!s.days) s.days={};
+  const t=todayStr(), lim=addDays(t,-ROLLDAYS);
+  let n=0;
+  Object.keys(s.days).forEach(k=>{
+    if(k>=t||k<lim) return;
+    const src=s.days[k]||[], stay=src.filter(x=>x.done), go=src.filter(x=>!x.done);
+    if(!go.length) return;
+    if(!s.days[t]) s.days[t]=[];
+    const have=s.days[t].map(x=>x.text);
+    go.forEach(x=>{
+      if(have.indexOf(x.text)>=0) return;
+      x.roll=(+x.roll||0)+1; x.from=x.from||k;
+      s.days[t].push(x); have.push(x.text); n++;
+    });
+    s.days[k]=stay;
+  });
+  return n;
+}
+function rollFind(id){return dayTodos(daySel).find(x=>x.id===id);}
+function rollDrop(id){
+  const s=ds(); s.days[daySel]=dayTodos(daySel).filter(x=>x.id!==id);
+  try{toast("🧹 놓아줬어요. 그것도 좋은 결정!");}catch(e){}
+  render();
+}
+function rollKeep(id){
+  const t=rollFind(id); if(!t) return; t.roll=0; t.from="";
+  try{toast("💪 오늘 이건 꼭!");}catch(e){}
+  render();
+}
+function rollToProject(id){
+  const t=rollFind(id); if(!t) return;
+  const o={id:uid(),title:t.text,tag:(DATA.project.tags||[])[0]||"개인",status:"할일",progress:0,
+    start:todayStr(),due:"",owner:"혜인",goal:"",
+    desc:"데일리 투두에서 "+(+t.roll||0)+"번 밀려서 옮겨온 일",
+    todos:[],milestones:[],links:[],logs:[],quotes:[],note:""};
+  DATA.project.items.unshift(o);
+  const s=ds(); s.days[daySel]=dayTodos(daySel).filter(x=>x.id!==id);
+  try{toast("📦 프로젝트 탭으로 옮겼어요");}catch(e){}
+  render();
+}
+function rollBadge(t){
+  const r=+t.roll||0; if(!r) return "";
+  return `<span class="rollb ${r>=3?"hot":""}" title="${r}번 밀린 할 일">↻${r}</span>`;
+}
+function stuckBox(list){
+  if(!list.length) return "";
+  return `<div class="stuck">
+    <div class="sh">🔁 ${list.length}개가 3번 넘게 밀렸어요</div>
+    <div class="ss">계속 밀린다는 건 오늘 5분 안에 끝낼 일이 아니거나, 사실 안 해도 되는 일일 수 있어요. 하나만 골라주세요.</div>
+    ${list.map(t=>`<div class="stuckrow"><div class="st">${esc(t.text)}<em>${+t.roll||0}번 밀림</em></div>
+      <div class="sbt">
+        <button class="go" onclick="rollKeep('${t.id}')">오늘 꼭 하기</button>
+        <button onclick="rollToProject('${t.id}')">프로젝트로 옮기기</button>
+        <button class="dl" onclick="rollDrop('${t.id}')">지우기</button>
+      </div></div>`).join("")}
+  </div>`;
 }
 function addDaily(cid,part){
   const eid="a_"+cid+(part==="pm"?"_pm":"");
@@ -1563,7 +1650,7 @@ function dailyMonth(){
       <span>0 → 100%</span></div>
   </div>`;
 }
-function dailyView(){ return weekStrip()+dailyList()+dailyMonth(); }
+function dailyView(){ autoRoll(); return weekStrip()+dailyList()+dailyMonth(); }
 
 /* ---- 인플루언서(muse) 탭 ---- */
 function statusList(){return DATA[cur]&&DATA[cur].type==="muse"?MSTATUS:STATUSES;}
