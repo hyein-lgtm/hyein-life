@@ -424,6 +424,17 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .erow .x.cp{color:#8394b3}
 .erow .x.cp:hover{color:var(--blue);border-color:#bed3f7}
 @media(max-width:720px){.card .head .acts{opacity:1}}
+/* --- 투두 오전/오후 --- */
+.tgroup .subg{border-top:1px dashed var(--line);margin-top:6px;padding-top:6px}
+.tgroup .subg:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.subhd{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+  color:#8394b3;letter-spacing:-.01em;padding:4px 2px 2px}
+.subhd .gcnt{margin-left:auto;font-size:11px;color:#a3b0c6;font-weight:600}
+.titem .x.mv{font-size:10px;opacity:.45}
+.titem .x.mv:hover{opacity:1}
+.erow .spl{width:auto;padding:0 8px;height:26px;border-radius:8px;border:1px solid var(--line);
+  background:#fff;color:#a3b0c6;font-size:11px;line-height:1;cursor:pointer}
+.erow .spl.on{border-color:#bed3f7;color:var(--blue);background:var(--blue-xl)}
 /* --- 마중 캐릭터 --- */
 .ch{display:block;object-fit:contain;image-rendering:auto;-webkit-user-drag:none;user-select:none}
 .brand .logo{overflow:hidden;background:linear-gradient(160deg,#f3f7ee,#e4eddc);padding:2px}
@@ -679,7 +690,7 @@ const SEED = {
     label:"🌱 데일리 투두", icon:"🌱", type:"daily",
     cats:[
       {id:"c1",name:"루틴",color:"#2563eb"},
-      {id:"c2",name:"업무",color:"#7c3aed"},
+      {id:"c2",name:"업무",color:"#7c3aed",split:true},
       {id:"c3",name:"건강",color:"#0ea472"},
       {id:"c4",name:"공부",color:"#f59e0b"},
       {id:"c5",name:"집안일",color:"#e11d48"}
@@ -688,8 +699,8 @@ const SEED = {
       "2026-07-27":[
         {id:"d1",cat:"c1",text:"아침 물 한 잔",done:true},
         {id:"d2",cat:"c1",text:"이불 정리",done:true},
-        {id:"d3",cat:"c2",text:"주간 보고 초안",done:false},
-        {id:"d4",cat:"c2",text:"메일 정리 15분",done:false},
+        {id:"d3",cat:"c2",part:"am",text:"주간 보고 초안",done:false},
+        {id:"d4",cat:"c2",part:"pm",text:"메일 정리 15분",done:false},
         {id:"d5",cat:"c3",text:"모닝 스트레칭 15분",done:true},
         {id:"d6",cat:"c4",text:"부동산 강의 1강",done:false},
         {id:"d7",cat:"c5",text:"세탁기 돌리기",done:false}
@@ -871,7 +882,7 @@ function normalize(d){
     if(s.type==="daily"){
       s.cats=(s.cats&&s.cats.length)?s.cats:JSON.parse(JSON.stringify(SEED.daily.cats));
       s.days=s.days||{};
-      Object.keys(s.days).forEach(dk=>{ s.days[dk]=(s.days[dk]||[]).map(t=>({id:t.id||("d"+Math.random().toString(36).slice(2,8)),cat:t.cat,text:t.text||"",done:!!t.done})); });
+      Object.keys(s.days).forEach(dk=>{ s.days[dk]=(s.days[dk]||[]).map(t=>({id:t.id||("d"+Math.random().toString(36).slice(2,8)),cat:t.cat,part:(t.part==="pm"?"pm":"am"),text:t.text||"",done:!!t.done})); });
       s.items=[];
     }
     if(s.type==="habit"){
@@ -1083,21 +1094,33 @@ function dailyList(){
   const orphan=all.filter(t=>ids.indexOf(t.cat)<0&&mt(t));
   let bk=(s.cats||[]).filter(c=>filter==="ALL"||filter===c.id);
   if(filter==="ALL"&&orphan.length) bk=bk.concat([{id:"__etc",name:"기타",color:"#94a3b8"}]);
-  const row=(t,c)=>`<label class="titem ${t.done?"on":""}">
+  const row=(t,c,sp)=>`<label class="titem ${t.done?"on":""}">
       <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
       <span class="ttx">${esc(t.text)}</span>
+      ${sp?`<button class="x mv" title="${t.part==="pm"?"오전으로 옮기기":"오후로 옮기기"}" onclick="event.preventDefault();movePart('${t.id}')">${t.part==="pm"?"☀":"🌙"}</button>`:""}
       <button class="x" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`;
+  const addrow=(c,part)=>`<div class="gadd"><span class="plus">＋</span>
+      <input id="a_${c.id}${part==="pm"?"_pm":""}" autocomplete="off" placeholder="${part==="pm"?"오후 할 일 추가":part==="am"?"오전 할 일 추가":"할 일 추가"}"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();addDaily('${c.id}','${part||""}')}"
+        onblur="addDaily('${c.id}','${part||""}')"></div>`;
   let groups=bk.map(c=>{
     const g=c.id==="__etc"?orphan:all.filter(t=>t.cat===c.id&&mt(t));
     const gd=g.filter(t=>t.done).length;
-    return `<div class="tgroup" style="--cc:${c.color}">
+    let body;
+    if(c.split){
+      body=[["am","☀ 오전"],["pm","🌙 오후"]].map(h=>{
+        const l=g.filter(t=>(t.part==="pm"?"pm":"am")===h[0]);
+        const d=l.filter(t=>t.done).length;
+        return `<div class="subg"><div class="subhd">${h[1]}<span class="gcnt">${d}/${l.length}</span></div>
+          ${l.map(t=>row(t,c,1)).join("")}${addrow(c,h[0])}</div>`;
+      }).join("");
+    }else{
+      body=g.map(t=>row(t,c)).join("")+(c.id==="__etc"?"":addrow(c,""));
+    }
+    return `<div class="tgroup ${c.split?"hassub":""}" style="--cc:${c.color}">
       <div class="ghd"><span class="cdot" style="background:${c.color}"></span>${esc(c.name)}
         <span class="gcnt">${gd}/${g.length}</span></div>
-      ${g.map(t=>row(t,c)).join("")}
-      ${c.id==="__etc"?"":`<div class="gadd"><span class="plus">＋</span>
-        <input id="a_${c.id}" autocomplete="off" placeholder="할 일 추가"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();addDaily('${c.id}')}"
-          onblur="addDaily('${c.id}')"></div>`}
+      ${body}
     </div>`;
   }).join("");
   if(filter==="ALL") groups+=`<button class="tgroup newcat" onclick="openCats()">＋ 카테고리 추가·관리</button>`;
@@ -1110,15 +1133,20 @@ function dailyList(){
     <div class="tlist">${groups}</div>
     ${yst?`<button class="btn sm ghost wide2" onclick="copyYesterday()">↩ 어제 할 일 ${yst}개 가져오기</button>`:""}`;
 }
-function addDaily(cid){
-  const el=document.getElementById("a_"+cid); if(!el) return;
+function addDaily(cid,part){
+  const eid="a_"+cid+(part==="pm"?"_pm":"");
+  const el=document.getElementById(eid); if(!el) return;
   const v=(el.value||"").trim(); if(!v) return;
   el.value="";
   const s=ds(); if(!s.days) s.days={};
   if(!s.days[daySel]) s.days[daySel]=[];
-  s.days[daySel].push({id:uid(),cat:cid,text:v,done:false});
+  s.days[daySel].push({id:uid(),cat:cid,part:(part==="pm"?"pm":"am"),text:v,done:false});
   render();
-  const n=document.getElementById("a_"+cid); if(n) n.focus();
+  const n=document.getElementById(eid); if(n) n.focus();
+}
+function movePart(id){
+  const t=dayTodos(daySel).find(x=>x.id===id); if(!t) return;
+  t.part=(t.part==="pm")?"am":"pm"; render();
 }
 function togDaily(id){
   const t=dayTodos(daySel).find(x=>x.id===id); if(!t) return;
@@ -1131,7 +1159,7 @@ function copyYesterday(){
   const y=addDays(daySel,-1),src=dayTodos(y); if(!src.length) return;
   const s=ds(); if(!s.days) s.days={}; if(!s.days[daySel]) s.days[daySel]=[];
   const have=dayTodos(daySel).map(x=>x.text);
-  src.forEach(x=>{ if(have.indexOf(x.text)<0) s.days[daySel].push({id:uid(),cat:x.cat,text:x.text,done:false}); });
+  src.forEach(x=>{ if(have.indexOf(x.text)<0) s.days[daySel].push({id:uid(),cat:x.cat,part:(x.part==="pm"?"pm":"am"),text:x.text,done:false}); });
   render();
 }
 /* 카테고리 관리 */
@@ -1141,6 +1169,7 @@ function openCats(){
   const rows=(s.cats||[]).map(c=>`<div class="erow">
     <input class="tcol" type="color" value="${c.color}" onchange="setCatColor('${c.id}',this.value)">
     <input class="tname" value="${esc(c.name)}" onchange="setCatName('${c.id}',this.value)">
+    <button class="spl ${c.split?"on":""}" title="오전·오후로 나누기" onclick="toggleSplit('${c.id}')">☀/🌙</button>
     <button class="x" onclick="delCat('${c.id}')">✕</button></div>`).join("");
   document.getElementById("mForm").innerHTML=`<div class="elist">${rows}</div>
     <div class="two">
@@ -1148,7 +1177,7 @@ function openCats(){
       <div class="field"><label>색</label><input id="f_ccolor" type="color" value="#0891b2"></div>
     </div>
     <button class="btn primary wide" onclick="addCat()">＋ 카테고리 추가</button>
-    <div class="hint2">색은 투두 목록의 점·체크박스에 그대로 반영돼요.</div>`;
+    <div class="hint2">색은 투두 목록의 점·체크박스에 그대로 반영돼요. ☀/🌙 를 켜면 그 카테고리가 오전·오후로 나뉘어요.</div>`;
   document.getElementById("mIc").innerHTML=chImg("daily");
   document.getElementById("mSave").style.display="none";
   document.getElementById("overlay").classList.add("on");
@@ -1159,6 +1188,10 @@ function addCat(){
   const c=document.getElementById("f_ccolor").value||"#0891b2";
   ds().cats.push({id:uid(),name:n,color:c});
   save(); openCats(); render();
+}
+function toggleSplit(id){
+  const c=ds().cats.find(x=>x.id===id); if(!c) return;
+  c.split=!c.split; save(); openCats(); render();
 }
 function setCatName(id,v){const c=ds().cats.find(x=>x.id===id); if(c){c.name=v.trim()||c.name;} save(); renderFilters();}
 function setCatColor(id,v){const c=ds().cats.find(x=>x.id===id); if(c) c.color=v; save(); renderFilters();}
