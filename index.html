@@ -8,12 +8,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Work OS">
+<meta name="apple-mobile-web-app-title" content="Life OS">
 <meta name="description" content="프로젝트·업무·독서·운동·브랜드·부동산을 한 곳에서 관리하는 개인 대시보드">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>My Work OS — hyein</title>
+<title>My Life OS — hyein</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 :root{
@@ -375,6 +375,19 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   border-style:dashed;background:transparent;box-shadow:none;color:#9aabc6;
   font-size:12.5px;font-weight:700;font-family:inherit;padding:14px}
 .tgroup.newcat:hover{border-color:#bed3f7;color:var(--blue);background:var(--blue-xl)}
+/* --- 탭 순서 바꾸기 --- */
+.tab{touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.tabs.reorder .tab{transition:transform .16s ease, opacity .16s ease}
+.tab.dragging{opacity:.55;transform:scale(1.06);box-shadow:0 10px 22px rgba(15,27,51,.2);
+  outline:2px dashed var(--blue);outline-offset:2px}
+.ordlist{display:flex;flex-direction:column;gap:7px}
+.ordrow{display:flex;align-items:center;gap:9px;border:1px solid var(--line);
+  border-radius:12px;padding:7px 9px;background:#fbfcff}
+.ordrow .on{width:28px;height:28px;flex:none;border-radius:50%;overflow:hidden;background:#f3f7ee;padding:1px}
+.ordrow .on .ch{width:100%;height:100%}
+.ordrow b{flex:1;min-width:0;font-size:13px;font-weight:700;color:#41546f}
+.ordrow .btn{padding:5px 10px}
+.ordrow .btn:disabled{opacity:.35;cursor:default}
 /* --- 마중 캐릭터 --- */
 .ch{display:block;object-fit:contain;image-rendering:auto;-webkit-user-drag:none;user-select:none}
 .brand .logo{overflow:hidden;background:linear-gradient(160deg,#f3f7ee,#e4eddc);padding:2px}
@@ -501,7 +514,7 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   <div class="topbar">
     <div class="brand">
       <div class="logo" id="tbLogo"></div>
-      <div><h1>My Work OS</h1><p>hyein's workspace · 2026</p></div>
+      <div><h1>My Life OS</h1><p>hyein's workspace · 2026</p></div>
     </div>
     <div class="topmeta"><span id="tbNow">workspace</span><span class="dot"></span><span id="clock">00:00</span></div>
   </div>
@@ -522,6 +535,7 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
       <button class="btn primary" id="btnNew" onclick="openEdit()">＋ 새 카드</button>
       <button class="btn" onclick="exportJSON()">백업</button>
       <button class="btn" onclick="document.getElementById('imp').click()">복원</button>
+      <button class="btn" onclick="openOrder()">⇅ 탭 순서</button>
       <button class="btn" onclick="openSync()">기기 간 옮기기</button>
       <input type="file" id="imp" accept="application/json" style="display:none" onchange="importJSON(event)">
       <button class="btn danger" onclick="resetAll()">샘플로 초기화</button>
@@ -533,7 +547,7 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   </div>
 </div>
 
-<div class="credit">© 2026 hyein · My Work OS</div>
+<div class="credit">© 2026 hyein · My Life OS</div>
 
 <div class="overlay" id="overlay">
   <div class="modal">
@@ -794,6 +808,7 @@ const WD=["월","화","수","목","금","토","일"];
 let DATA=load(), cur="project", filter="ALL", editing=null, detailId=null;
 let calY=new Date().getFullYear(), calM=new Date().getMonth(), dayCur=null;
 let daySel=todayStr();
+let noClick=false;
 
 function load(){
   try{const raw=localStorage.getItem(KEY)||localStorage.getItem("hyein_work_os_v2");
@@ -801,9 +816,10 @@ function load(){
   return normalize(JSON.parse(JSON.stringify(SEED)));
 }
 function normalize(d){
+  const ord=Array.isArray(d.__order)?d.__order:null;
   const m={};                       // SEED 순서 유지 + 새로 생긴 탭 자동 추가
   Object.keys(SEED).forEach(k=>{ m[k]= d[k] || JSON.parse(JSON.stringify(SEED[k])); });
-  Object.keys(d).forEach(k=>{ if(!m[k]) m[k]=d[k]; });
+  Object.keys(d).forEach(k=>{ if(k.indexOf("__")!==0 && !m[k]) m[k]=d[k]; });
   d=m;
   Object.keys(d).forEach(k=>{
     const s=d[k];
@@ -851,6 +867,9 @@ function normalize(d){
       return i;
     });
   });
+  const keys=Object.keys(d);
+  d.__order=(ord||[]).filter(k=>keys.indexOf(k)>=0)
+    .concat(keys.filter(k=>!ord||ord.indexOf(k)<0));
   return d;
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(DATA));}catch(e){}}
@@ -875,7 +894,7 @@ function find(id,key){return (DATA[key||cur].items||[]).find(x=>x.id===id);}
 /* ---- 월 캘린더 계산 ---- */
 function monthDays(y,m){return new Date(y,m+1,0).getDate();}
 function firstIdx(y,m){return (new Date(y,m,1).getDay()+6)%7;} // 월=0
-function hs(){return Object.keys(DATA).map(k=>DATA[k]).find(x=>x.type==="habit");}
+function hs(){return tabKeys().map(k=>DATA[k]).find(x=>x.type==="habit");}
 function typeOf(id){const s=hs();return (s.types||[]).find(t=>t.id===id)||{id:id,name:"기타",color:"#94a3b8"};}
 function dayKey(y,m,d){return y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");}
 function dEnt(k){const s=hs();return (s.entries[k]||[]).filter(e=>filter==="ALL"||e.type===filter);}
@@ -899,6 +918,87 @@ function streakDays(){
 }
 
 /* ---- 렌더 ---- */
+/* ---- 탭 순서 ---- */
+function tabKeys(){
+  const o=DATA.__order;
+  if(o&&o.length) return o.filter(k=>DATA[k]);
+  return Object.keys(DATA).filter(k=>k.indexOf("__")!==0);
+}
+function setOrder(a){DATA.__order=a;save();renderTabs();}
+function moveTab(k,dir){
+  const a=tabKeys(),i=a.indexOf(k),j=i+dir;
+  if(i<0||j<0||j>=a.length)return;
+  a.splice(j,0,a.splice(i,1)[0]);
+  setOrder(a);openOrder();
+}
+function openOrder(){
+  document.getElementById("mTitle").textContent="⇅ 탭 순서 바꾸기";
+  const a=tabKeys();
+  document.getElementById("mForm").innerHTML=
+    `<div class="hint2" style="margin:0 0 10px">탭을 길게 눌러 끌어도 순서가 바뀌어요.</div>
+     <div class="ordlist">${a.map((k,i)=>`<div class="ordrow">
+       <span class="on">${chImg(k)}</span>
+       <b>${esc(DATA[k].label.replace(/^\S+\s/,""))}</b>
+       <button class="btn sm" ${i===0?"disabled":""} onclick="moveTab('${k}',-1)">↑</button>
+       <button class="btn sm" ${i===a.length-1?"disabled":""} onclick="moveTab('${k}',1)">↓</button>
+     </div>`).join("")}</div>
+     <button class="btn wide" onclick="setOrder(Object.keys(SEED));openOrder()">기본 순서로 되돌리기</button>`;
+  document.getElementById("mIc").innerHTML=chImg("muse");
+  document.getElementById("mSave").style.display="none";
+  document.getElementById("overlay").classList.add("on");
+}
+/* 길게 눌러 끌기 */
+let DRAG=null;
+function tabDown(ev,k){
+  if(DRAG)return;
+  DRAG={k:k,sx:ev.clientX,sy:ev.clientY,on:false,touch:ev.pointerType!=="mouse",t:null};
+  DRAG.t=DRAG.touch?setTimeout(startDrag,260):null;   // 마우스는 6px 이동해야 시작
+  document.addEventListener("pointermove",dragMove);
+  document.addEventListener("pointerup",dragUp);
+  document.addEventListener("pointercancel",dragUp);
+  document.addEventListener("touchmove",blockScroll,{passive:false});
+}
+function startDrag(){
+  if(!DRAG||DRAG.on)return;
+  DRAG.on=true;
+  const el=document.querySelector('.tab[data-k="'+DRAG.k+'"]');
+  if(el)el.classList.add("dragging");
+  document.getElementById("tabs").classList.add("reorder");
+  if(navigator.vibrate)try{navigator.vibrate(12);}catch(e){}
+}
+function blockScroll(ev){if(DRAG&&DRAG.on&&ev.cancelable)ev.preventDefault();}
+function dragMove(ev){
+  if(!DRAG)return;
+  if(!DRAG.on){
+    const dist=Math.abs(ev.clientX-DRAG.sx)+Math.abs(ev.clientY-DRAG.sy);
+    if(DRAG.touch){ if(dist>10){clearTimeout(DRAG.t);endDrag();} return; }
+    if(dist>6) startDrag(); else return;
+  }
+  if(!document.elementFromPoint)return;
+  const el=document.elementFromPoint(ev.clientX,ev.clientY);
+  const tab=el&&el.closest?el.closest(".tab"):null;
+  if(!tab||!tab.dataset.k||tab.dataset.k===DRAG.k)return;
+  const a=tabKeys(),i=a.indexOf(DRAG.k),j=a.indexOf(tab.dataset.k);
+  if(i<0||j<0)return;
+  a.splice(j,0,a.splice(i,1)[0]);
+  DATA.__order=a;save();renderTabs();
+  const nw=document.querySelector('.tab[data-k="'+DRAG.k+'"]');
+  if(nw)nw.classList.add("dragging");
+  document.getElementById("tabs").classList.add("reorder");
+}
+function dragUp(){ if(DRAG&&DRAG.on){noClick=true;setTimeout(()=>{noClick=false;},350);} endDrag(); }
+function endDrag(){
+  if(DRAG&&DRAG.t)clearTimeout(DRAG.t);
+  document.removeEventListener("pointermove",dragMove);
+  document.removeEventListener("pointerup",dragUp);
+  document.removeEventListener("pointercancel",dragUp);
+  document.removeEventListener("touchmove",blockScroll);
+  const wasOn=DRAG&&DRAG.on;DRAG=null;
+  const t=document.getElementById("tabs");
+  if(t){t.classList.remove("reorder");[...t.querySelectorAll(".dragging")].forEach(x=>x.classList.remove("dragging"));}
+  if(wasOn)setTimeout(()=>{},0);
+}
+
 /* ---- 데일리 투두 ---- */
 function ds(){return DATA.daily;}
 function catOf(id){const s=ds();return (s.cats||[]).find(c=>c.id===id)||{id:id,name:"기타",color:"#94a3b8"};}
@@ -1175,7 +1275,7 @@ function applySync(){
   if(!confirm("이 기기의 현재 데이터를 덮어씁니다. 진행할까요?"))return;
   try{
     DATA=normalize(JSON.parse(v));save();closeEdit();
-    cur=Object.keys(DATA)[0];render();alert("옮겨왔어요!");
+    cur=tabKeys()[0];render();alert("옮겨왔어요!");
   }catch(e){alert("형식이 올바르지 않아요. 코드 전체를 복사했는지 확인해주세요.");}
 }
 function openGoals(){
@@ -1235,12 +1335,12 @@ function cheerMsg(){
 }
 const SHORT={project:"프로젝트",work:"업무",daily:"투두",book:"독서",habit:"운동",muse:"브랜드",estate:"부동산"};
 function renderTabs(){
-  document.getElementById("tabs").innerHTML=Object.keys(DATA).map(k=>{
+  document.getElementById("tabs").innerHTML=tabKeys().map(k=>{
     const full=esc(DATA[k].label.replace(/^\S+\s/,""));
-    return `<button class="tab ${k===cur?"on":""}" onclick="go('${k}')">${chImg(k)}<span class="tfull">${full}</span><span class="tshort">${esc(SHORT[k]||full)}</span></button>`;
+    return `<button class="tab ${k===cur?"on":""}" data-k="${k}" onclick="go('${k}')" onpointerdown="tabDown(event,'${k}')">${chImg(k)}<span class="tfull">${full}</span><span class="tshort">${esc(SHORT[k]||full)}</span></button>`;
   }).join("");
 }
-function go(k){cur=k;filter="ALL";document.getElementById("q").value="";render();}
+function go(k){if(noClick)return;cur=k;filter="ALL";document.getElementById("q").value="";render();}
 
 function renderStats(){
   const s=DATA[cur],its=s.items;let cells;
@@ -1682,7 +1782,7 @@ function exportJSON(){
 function importJSON(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=()=>{try{DATA=normalize(JSON.parse(r.result));cur=Object.keys(DATA)[0];render();alert("복원 완료 ✓");}
+  r.onload=()=>{try{DATA=normalize(JSON.parse(r.result));cur=tabKeys()[0];render();alert("복원 완료 ✓");}
     catch(err){alert("파일을 읽을 수 없어요.");}};
   r.readAsText(f);e.target.value="";
 }
