@@ -408,6 +408,22 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   width:24px;height:24px;border:1px solid var(--line);border-radius:8px;background:#fff;
   color:#9aabc6;font-size:12px;text-decoration:none}
 .card .head .acts a.lnk:hover{border-color:#bed3f7;color:var(--blue);background:var(--blue-xl)}
+/* --- 카드 드래그 정렬 --- */
+.card{touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.card h3,.card .note,.card .hookline{-webkit-user-select:text;user-select:text}
+.card .head .acts button.drag{cursor:grab;touch-action:none;letter-spacing:-1px}
+.card .head .acts button.drag:active{cursor:grabbing}
+.grid.reorder .card{transition:transform .12s ease,box-shadow .12s ease}
+.grid.reorder .card:hover{transform:none}
+.card.dragging{opacity:.55;transform:scale(.97) !important;
+  border-color:var(--blue) !important;box-shadow:0 10px 26px rgba(37,99,235,.22) !important}
+/* --- 운동 기록 복붙 --- */
+.dayops{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+.erow .ememo{font-size:11.5px;color:#8394b3;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;max-width:120px}
+.erow .x.cp{color:#8394b3}
+.erow .x.cp:hover{color:var(--blue);border-color:#bed3f7}
+@media(max-width:720px){.card .head .acts{opacity:1}}
 /* --- 마중 캐릭터 --- */
 .ch{display:block;object-fit:contain;image-rendering:auto;-webkit-user-drag:none;user-select:none}
 .brand .logo{overflow:hidden;background:linear-gradient(160deg,#f3f7ee,#e4eddc);padding:2px}
@@ -1290,9 +1306,9 @@ function museCard(i){
       <span>❤ ${nfm(st.likes)}</span><span>💬 ${nfm(st.comments)}</span>
       ${+st.saves?`<span>🔖 ${nfm(st.saves)}</span>`:""}
       <span>↗ ${nfm(st.shares)}</span>${+st.follows?`<span>👤 +${nfm(st.follows)}</span>`:""}</div>`:"";
-  return `<div class="card">
+  return `<div class="card" data-id="${i.id}" onpointerdown="cardDown(event,'${i.id}')">
     <div class="head"><span class="t">${chImg("muse")}${esc(i.tag||"")}</span>
-      <div class="acts">${i.url?`<a class="lnk" title="인스타에서 보기" href="${esc(i.url)}" target="_blank" rel="noopener">↗</a>`:""}<button title="상세" onclick="openDetail('${i.id}')">⤢</button>
+      <div class="acts"><button class="drag" title="순서 이동 (누른 채 움직이기)" onpointerdown="cardDown(event,'${i.id}',1)">⠿</button>${i.url?`<a class="lnk" title="인스타에서 보기" href="${esc(i.url)}" target="_blank" rel="noopener">↗</a>`:""}<button title="상세" onclick="openDetail('${i.id}')">⤢</button>
       <button title="삭제" onclick="delItem('${i.id}')">✕</button></div></div>
     <div class="body">
       <h3 class="clickable" onclick="openDetail('${i.id}')">${esc(i.title)}</h3>
@@ -1491,6 +1507,36 @@ function habitView(){
     <div class="cheer ${cm[0]}">${chImg("habit")}<div class="msg">${cm[1]}</div></div>
     <div class="legend">날짜를 클릭해 운동 종류와 시간을 기록하세요 · 파란 테두리가 오늘</div></div>`;
 }
+let HCLIP=null,HCLIPD="";
+function lastEntryDay(k){
+  const s=hs();
+  return Object.keys(s.entries||{}).filter(d=>d<k&&(s.entries[d]||[]).length).sort().pop()||"";
+}
+function copyDay(){
+  const s=hs(),k=dayCur,es=(s.entries[k]||[]);
+  if(!es.length){alert("복사할 기록이 없어요.");return;}
+  HCLIP=es.map(e=>({type:e.type,min:+e.min||0,memo:e.memo||""}));
+  HCLIPD=k;openDay(k);
+}
+function pasteList(l){
+  const s=hs(),k=dayCur;
+  if(!k||!l||!l.length)return;
+  s.entries[k]=s.entries[k]||[];
+  l.forEach(e=>{s.entries[k].push({id:uid(),type:e.type,min:+e.min||0,memo:e.memo||""});});
+  save();openDay(k);render();
+}
+function pasteDay(){pasteList(HCLIP);}
+function pasteFrom(d){
+  const s=hs();
+  pasteList((s.entries[d]||[]).map(e=>({type:e.type,min:+e.min||0,memo:e.memo||""})));
+}
+function dupEntry(id){
+  const s=hs(),k=dayCur,e=(s.entries[k]||[]).find(x=>x.id===id);
+  if(!e)return;
+  s.entries[k].push({id:uid(),type:e.type,min:e.min,memo:e.memo||""});
+  save();openDay(k);render();
+}
+
 function openDay(k){
   dayCur=k;
   const s=hs(),es=s.entries[k]||[];
@@ -1498,14 +1544,23 @@ function openDay(k){
   const rows=es.length?es.map(e=>{const ty=typeOf(e.type);
     return `<div class="erow"><span class="dot" style="background:${ty.color}"></span>
       <b>${esc(ty.name)}</b><span class="emin">${e.min?hhmm(e.min):"-"}</span>
+      ${e.memo?`<span class="ememo">${esc(e.memo)}</span>`:""}
+      <button class="x cp" title="이 기록 복제" onclick="dupEntry('${e.id}')">⧉</button>
       <button class="x" onclick="delEntry('${e.id}')">✕</button></div>`;}).join("")
     :`<div class="ehint">아직 기록이 없어요.</div>`;
   const opts=(s.types||[]).map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("");
-  document.getElementById("mForm").innerHTML=`<div class="elist">${rows}</div>
+  const prev=lastEntryDay(k);
+  const ops=`<div class="dayops">
+    ${es.length?`<button class="btn sm" onclick="copyDay()">📋 이 날 복사</button>`:""}
+    ${(HCLIP&&HCLIP.length)?`<button class="btn sm primary" onclick="pasteDay()">📥 붙여넣기 (${HCLIPD.slice(5)} · ${HCLIP.length}개)</button>`:""}
+    ${prev?`<button class="btn sm ghost" onclick="pasteFrom('${prev}')">↩ ${prev.slice(5)} 기록 가져오기</button>`:""}
+  </div>`;
+  document.getElementById("mForm").innerHTML=`<div class="elist">${rows}</div>${ops}
     <div class="two">
       <div class="field"><label>종류</label><select id="f_etype">${opts}</select></div>
       <div class="field"><label>운동 시간 (분)</label><input id="f_emin" type="number" min="0" step="5" value="30"></div>
     </div>
+    <div class="field"><label>메모</label><input id="f_ememo" placeholder="예: 하체 위주 / 러닝 5km" onkeydown="if(event.key==='Enter'){event.preventDefault();addEntry()}"></div>
     <button class="btn primary wide" onclick="addEntry()">＋ 기록 추가</button>`;
   document.getElementById("mIc").innerHTML=chImg("habit");
   document.getElementById("mSave").style.display="none";
@@ -1514,7 +1569,8 @@ function openDay(k){
 function addEntry(){
   const s=hs(),k=dayCur;if(!k)return;
   s.entries[k]=s.entries[k]||[];
-  s.entries[k].push({id:uid(),type:document.getElementById("f_etype").value,min:Math.max(0,+document.getElementById("f_emin").value||0),memo:""});
+  const mm=document.getElementById("f_ememo");
+  s.entries[k].push({id:uid(),type:document.getElementById("f_etype").value,min:Math.max(0,+document.getElementById("f_emin").value||0),memo:((mm&&mm.value)||"").trim()});
   save();openDay(k);render();
 }
 function delEntry(id){
@@ -1563,13 +1619,80 @@ function delType(id){
   save();openTypes();render();
 }
 
+/* ---- 카드 순서 드래그 ---- */
+let CDRAG=null;
+function cardsArr(){return (DATA[cur]&&DATA[cur].items)||[];}
+function cardDown(ev,id,now){
+  if(CDRAG)return;
+  if(!now){
+    const t=ev.target;
+    if(t&&t.closest&&t.closest("button,a,input,textarea,select,label"))return;
+  }
+  CDRAG={id:id,sx:ev.clientX,sy:ev.clientY,on:false,touch:ev.pointerType!=="mouse",t:null};
+  if(now){cStart();}
+  else{CDRAG.t=CDRAG.touch?setTimeout(cStart,300):null;}
+  document.addEventListener("pointermove",cMove);
+  document.addEventListener("pointerup",cUp);
+  document.addEventListener("pointercancel",cUp);
+  document.addEventListener("touchmove",cBlock,{passive:false});
+}
+function cStart(){
+  if(!CDRAG)return;
+  CDRAG.on=true;
+  const g=document.querySelector(".grid");if(g)g.classList.add("reorder");
+  const el=document.querySelector('.card[data-id="'+CDRAG.id+'"]');if(el)el.classList.add("dragging");
+  if(navigator.vibrate){try{navigator.vibrate(12);}catch(e){}}
+}
+function cBlock(ev){if(CDRAG&&CDRAG.on&&ev.cancelable)ev.preventDefault();}
+function cardsPaint(){
+  const g=document.querySelector(".grid");if(!g)return;
+  const mk=DATA[cur].type==="muse"?museCard:taskCard;
+  g.innerHTML=visible().map(mk).join("");
+  g.classList.add("reorder");
+  if(CDRAG){const nw=g.querySelector('.card[data-id="'+CDRAG.id+'"]');if(nw)nw.classList.add("dragging");}
+}
+function cMove(ev){
+  if(!CDRAG)return;
+  if(!CDRAG.on){
+    const d=Math.abs(ev.clientX-CDRAG.sx)+Math.abs(ev.clientY-CDRAG.sy);
+    if(CDRAG.touch){if(d>10){clearTimeout(CDRAG.t);cEnd();}return;}
+    if(d>6){cStart();}else{return;}
+  }
+  if(!document.elementFromPoint)return;
+  const el=document.elementFromPoint(ev.clientX,ev.clientY);
+  const c=el&&el.closest?el.closest(".card"):null;
+  if(!c||!c.dataset.id||c.dataset.id===CDRAG.id)return;
+  const a=cardsArr();
+  let i=-1,j=-1;
+  a.forEach((x,n)=>{if(x.id===CDRAG.id)i=n;if(x.id===c.dataset.id)j=n;});
+  if(i<0||j<0)return;
+  a.splice(j,0,a.splice(i,1)[0]);
+  save();cardsPaint();
+}
+function cUp(){
+  if(CDRAG&&CDRAG.on){noClick=true;setTimeout(function(){noClick=false;},350);}
+  const moved=!!(CDRAG&&CDRAG.on);
+  cEnd();
+  if(moved)render();
+}
+function cEnd(){
+  if(CDRAG&&CDRAG.t)clearTimeout(CDRAG.t);
+  CDRAG=null;
+  document.removeEventListener("pointermove",cMove);
+  document.removeEventListener("pointerup",cUp);
+  document.removeEventListener("pointercancel",cUp);
+  document.removeEventListener("touchmove",cBlock);
+  const g=document.querySelector(".grid");if(g)g.classList.remove("reorder");
+  const d=document.querySelector(".card.dragging");if(d)d.classList.remove("dragging");
+}
+
 function taskCard(i){
   const s=DATA[cur],pct=Math.max(0,Math.min(100,+i.progress||0));
   const td=i.todos.length?` <span class="pill">☑ ${i.todos.filter(t=>t.done).length}/${i.todos.length}</span>`:"";
   const qz=(i.quotes||[]).length?` <span class="pill">✍ ${i.quotes.length}</span>`:"";
-  return `<div class="card">
+  return `<div class="card" data-id="${i.id}" onpointerdown="cardDown(event,'${i.id}')">
     <div class="head"><span class="t">${chImg(cur)}${esc(i.tag||"")}</span>
-      <div class="acts"><button title="상세" onclick="openDetail('${i.id}')">⤢</button>
+      <div class="acts"><button class="drag" title="순서 이동 (누른 채 움직이기)" onpointerdown="cardDown(event,'${i.id}',1)">⠿</button><button title="상세" onclick="openDetail('${i.id}')">⤢</button>
       <button title="빠른수정" onclick="openEdit('${i.id}')">✎</button>
       <button title="삭제" onclick="delItem('${i.id}')">✕</button></div></div>
     <div class="body">
@@ -1618,6 +1741,7 @@ function delItem(id){
 
 /* ---- 빠른 편집 모달 ---- */
 function openEdit(id){
+  if(noClick&&id)return;
   const s=DATA[cur];
   if(s.type==="habit"){openDay(todayStr());return;}
   if(s.type==="daily"){const c=(ds().cats||[])[0];const el=c&&document.getElementById("a_"+c.id);if(el){el.focus();}else{openCats();}return;}
@@ -1663,6 +1787,7 @@ function saveEdit(){
 
 /* ---- 상세 화면 ---- */
 function openDetail(id){
+  if(noClick)return;
   detailId=id;
   document.getElementById("dIc").innerHTML=chImg(cur);
   document.getElementById("detail").classList.add("on");
