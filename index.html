@@ -388,6 +388,26 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .ordrow b{flex:1;min-width:0;font-size:13px;font-weight:700;color:#41546f}
 .ordrow .btn{padding:5px 10px}
 .ordrow .btn:disabled{opacity:.35;cursor:default}
+/* --- 인스타 계정 헤더 --- */
+.ighead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding-bottom:12px;margin-bottom:12px;border-bottom:1px dashed var(--line)}
+.igid{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.igid .ch{width:34px;height:34px;flex:none;border-radius:50%;background:#f3f7ee;padding:1px}
+.igid b{display:block;font-size:14px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.igid span{display:block;font-size:11.5px;font-weight:600;color:var(--muted)}
+.ighead a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.fspark{display:flex;align-items:center;gap:9px;margin-top:12px;
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.fspark svg{flex:1;min-width:0;height:30px}
+.fspark span{font-size:11.5px;font-weight:800;flex:none}
+.fspark span.up{color:var(--ok)}.fspark span.dn{color:var(--danger)}
+.ighint{margin-top:11px;background:#fff8ec;border:1px solid #f2e3c6;border-radius:12px;
+  padding:10px 12px;font-size:11.5px;font-weight:600;color:#8a6d3b;line-height:1.65}
+.ighint b{color:#6b5124}
+.card .head .acts a.lnk{display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border:1px solid var(--line);border-radius:8px;background:#fff;
+  color:#9aabc6;font-size:12px;text-decoration:none}
+.card .head .acts a.lnk:hover{border-color:#bed3f7;color:var(--blue);background:var(--blue-xl)}
 /* --- 마중 캐릭터 --- */
 .ch{display:block;object-fit:contain;image-rendering:auto;-webkit-user-drag:none;user-select:none}
 .brand .logo{overflow:hidden;background:linear-gradient(160deg,#f3f7ee,#e4eddc);padding:2px}
@@ -724,53 +744,57 @@ const SEED = {
   },
   muse: {
     label:"✨ 내가 브랜드가 되기", icon:"✨", type:"muse",
-    tags:["릴스","시리즈","협찬","리브랜딩"],
-    followers:{cur:3200,goal:10000},
-    monthGoal:{uploads:12,views:200000,saves:2000},
+    account:"hyen_roy", nickname:"혠로이",
+    bio:"🏢 맨땅에서 13년 차 Life : 생존을 위한 로그아웃 / 치열하게 일하고, 잘 쉬는 법 기록 중",
+    tags:["시리즈","릴스","사진","협찬"],
+    followers:{cur:261,goal:1000},
+    history:[{d:"2026-07-27",n:261}],
+    monthGoal:{uploads:8,views:50000,saves:500},
     items:[
-      {id:"m1",title:"직장인 아침 루틴 60초",tag:"릴스",status:"편집",progress:70,
-       start:"2026-07-20",due:"2026-07-28",owner:"나",
-       hook:"6시 기상 3주차, 솔직히 이게 제일 힘들었어요",
-       concept:"기상 → 스트레칭 → 커피 → 노트 정리까지 빠른 컷 전환. 잔잔한 로파이 BGM.",
-       cta:"저장해두고 내일 아침에 따라해보세요 🌿",
-       hashtags:"#아침루틴 #미라클모닝 #직장인브이로그 #루틴챌린지",
-       stats:{views:0,likes:0,saves:0,shares:0,follows:0},
-       todos:[{id:"t1",text:"기상 컷 촬영",done:true},{id:"t2",text:"스트레칭 컷 촬영",done:true},
-              {id:"t3",text:"자막 작업",done:false},{id:"t4",text:"썸네일 커버 제작",done:false}],
-       milestones:[{date:"2026-07-28",text:"오전 8시 업로드",done:false}],
-       links:[{label:"편집 원본 폴더",url:""}],logs:[{id:"l1",date:"2026-07-24",text:"컷 편집 1차 완료, 길이 72초 → 60초로 줄여야 함"}],
-       quotes:[],desc:"‘아침 루틴’ 시리즈 3편. 1·2편 저장수가 높았던 포맷 유지.",goal:"저장수 500 이상",note:""},
-      {id:"m2",title:"퇴근 후 30분 홈트 루틴",tag:"시리즈",status:"기획",progress:20,
-       start:"2026-07-26",due:"2026-08-02",owner:"나",
-       hook:"헬스장 안 가고 3개월, 몸이 이렇게 바뀌었어요",
-       concept:"비포/애프터 → 동작 4개 → 마무리. 앞부분 1.5초 안에 결과부터 보여주기.",
-       cta:"루틴 전체는 프로필 링크에 정리해뒀어요",
-       hashtags:"#홈트 #퇴근후운동 #직장인운동 #30분홈트",
-       stats:{views:0,likes:0,saves:0,shares:0,follows:0},
-       todos:[{id:"t5",text:"동작 4개 선정",done:true},{id:"t6",text:"촬영 장소 정리",done:false},
-              {id:"t7",text:"대본 작성",done:false}],
-       milestones:[],links:[],logs:[],quotes:[],
-       desc:"운동 탭 기록과 연결되는 시리즈. 실제 기록 화면 살짝 노출.",goal:"팔로워 +300",note:""},
-      {id:"m3",title:"부동산 첫 임장 브이로그",tag:"릴스",status:"아이디어",progress:0,
-       start:"",due:"2026-08-09",owner:"나",
-       hook:"부동산 아무것도 모르던 내가 처음 임장 간 날",
-       concept:"현장 스케치 + 체크리스트 자막. 초보 시점 그대로 담기.",
-       cta:"임장 체크리스트 저장해두세요",
-       hashtags:"#임장 #부동산공부 #내집마련 #부린이",
-       stats:{views:0,likes:0,saves:0,shares:0,follows:0},
-       todos:[],milestones:[],links:[],logs:[],quotes:[],
-       desc:"부동산 탭 공부 내용과 연결. 시리즈로 확장 가능.",goal:"신규 유입 확보",note:""},
-      {id:"m4",title:"올해 읽은 책 TOP 5",tag:"릴스",status:"발행",progress:100,
-       start:"2026-07-05",due:"2026-07-12",owner:"나",
-       hook:"이 중에 한 권은 무조건 인생책 됩니다",
-       concept:"책 표지 5컷 + 한 줄 문장. 문장 수집한 것 그대로 활용.",
-       cta:"어떤 책이 제일 궁금하세요? 댓글 남겨주세요",
-       hashtags:"#책추천 #독서기록 #인생책 #북스타그램",
-       stats:{views:48200,likes:2140,saves:1860,shares:410,follows:230},
-       todos:[{id:"t8",text:"표지 촬영",done:true},{id:"t9",text:"문장 자막",done:true},{id:"t10",text:"업로드",done:true}],
-       milestones:[{date:"2026-07-12",text:"업로드 완료",done:true}],links:[],
-       logs:[{id:"l2",date:"2026-07-15",text:"저장수 1,860 — 지금까지 중 최고. 책 콘텐츠 반응 확실히 좋음"}],
-       quotes:[],desc:"독서 탭 문장 수집 활용 첫 사례.",goal:"저장수 1000",note:"반응 좋았음 → 시즌2 제작 검토"}
+      {id:"ig4",title:"혼자 도전한 강원도 여행",tag:"사진",status:"발행",progress:100,
+       url:"https://www.instagram.com/hyen_roy/p/DSucDRbD4PE/",
+       start:"2025-12-26",due:"2025-12-26",owner:"나",
+       hook:"혼자 도전한 강원도 여행 ㅎㅎㅎ",
+       concept:"고양이 + 불멍. 캠핑장 분위기 사진 중심 게시물.",
+       cta:"",hashtags:"",
+       stats:{views:0,likes:27,comments:12,saves:0,shares:0,follows:0},
+       todos:[],milestones:[],links:[{label:"게시물 보기",url:"https://www.instagram.com/hyen_roy/p/DSucDRbD4PE/"}],
+       logs:[],quotes:[],desc:"혼캠 시리즈 이후 올린 사진 게시물.",
+       goal:"",note:"조회수·저장수는 인스타 인사이트에서 확인해 입력하세요."},
+      {id:"ig3",title:"혼캠 EP.03 — 첫 겨울 혼캠 마지막 편",tag:"시리즈",status:"발행",progress:100,
+       url:"https://www.instagram.com/hyen_roy/reel/DRrSYXDj8GA/",
+       start:"2025-11-30",due:"2025-11-30",owner:"나",
+       hook:"첫 겨울 혼캠 시리즈의 마지막 편.",
+       concept:"시리즈 마무리 편. 다음 콘텐츠(혼자 여행) 예고로 연결.",
+       cta:"다음엔 혼자 여행을 가볼까요?🫶",hashtags:"#혼캠 #캠핑 #혼자캠핑 #겨울캠핑",
+       stats:{views:0,likes:176,comments:9,saves:0,shares:2,follows:0},
+       todos:[],milestones:[],links:[{label:"릴스 보기",url:"https://www.instagram.com/hyen_roy/reel/DRrSYXDj8GA/"}],
+       logs:[{id:"lg3",date:"2025-11-30",text:"시리즈 마지막 편. 좋아요 176 · 댓글 9 · 공유 2"}],
+       quotes:[],desc:"혼캠 3부작의 마지막. 댓글로 다음 여행지 추천을 유도했음.",
+       goal:"",note:""},
+      {id:"ig2",title:"혼캠 EP.02 — 첫날부터 사고가 났어요",tag:"시리즈",status:"발행",progress:100,
+       url:"https://www.instagram.com/hyen_roy/reel/DRmS-94D7k6/",
+       start:"2025-11-28",due:"2025-11-28",owner:"나",
+       hook:"혼캠 첫날부터… 사고가 났어요🥲",
+       concept:"사건 중심. 밤에 들린 부스럭 소리 → 정체 공개까지 긴장감 유지.",
+       cta:"마지막! EP03에서 무슨 일 있었는지도 보여드릴게요🙌",
+       hashtags:"#혼캠 #캠핑사고 #혼자캠핑 #캠핑브이로그",
+       stats:{views:0,likes:149,comments:19,saves:0,shares:7,follows:0},
+       todos:[],milestones:[],links:[{label:"릴스 보기",url:"https://www.instagram.com/hyen_roy/reel/DRmS-94D7k6/"}],
+       logs:[{id:"lg2",date:"2025-11-28",text:"좋아요 149 · 댓글 19 · 공유 7. 댓글 참여율이 3편 중 가장 높음"}],
+       quotes:[],desc:"‘무서웠다’ 반응이 몰린 편. 스토리텔링형 후킹이 통함.",
+       goal:"",note:""},
+      {id:"ig1",title:"혼캠 EP.01 — 둘이 하던 취미를 혼자",tag:"시리즈",status:"발행",progress:100,
+       url:"https://www.instagram.com/hyen_roy/reel/DRhPY30D4dP/",
+       start:"2025-11-26",due:"2025-11-26",owner:"나",
+       hook:"혼자가 된 후, 둘이 하던 취미를 혼자 해봤다.",
+       concept:"감정선 중심 내레이션 자막. 혼캠 시리즈의 시작.",
+       cta:"EP.02도 봐주세요🫶",hashtags:"#혼캠 #혼자캠핑 #캠핑입문 #힐링",
+       stats:{views:0,likes:480,comments:51,saves:0,shares:8,follows:0},
+       todos:[],milestones:[],links:[{label:"릴스 보기",url:"https://www.instagram.com/hyen_roy/reel/DRhPY30D4dP/"}],
+       logs:[{id:"lg1",date:"2025-11-26",text:"계정 대표작. 좋아요 480 · 댓글 51 · 공유 8 — 팔로워 수의 1.8배 좋아요"}],
+       quotes:[],desc:"가장 반응이 좋았던 콘텐츠. 감정 훅 + 시리즈 예고 조합이 핵심.",
+       goal:"",note:"‘나래이션 육성으로 하면 더 몰입될 것 같다’는 댓글 피드백 있음"}
     ]
   },
   estate: {
@@ -823,6 +847,11 @@ function normalize(d){
   d=m;
   Object.keys(d).forEach(k=>{
     const s=d[k];
+    if(s.type==="muse"&&!s.account){ d[k]=JSON.parse(JSON.stringify(SEED.muse)); return; }
+    if(s.type==="muse"){
+      s.followers=s.followers||{cur:0,goal:1000};
+      s.history=Array.isArray(s.history)?s.history:[{d:todayStr(),n:s.followers.cur}];
+    }
     if(s.type==="daily"){
       s.cats=(s.cats&&s.cats.length)?s.cats:JSON.parse(JSON.stringify(SEED.daily.cats));
       s.days=s.days||{};
@@ -854,7 +883,7 @@ function normalize(d){
       (s.items||[]).forEach(i=>{
         i.hook=i.hook||""; i.concept=i.concept||""; i.cta=i.cta||""; i.hashtags=i.hashtags||"";
         const st=i.stats||{};
-        i.stats={views:+st.views||0,likes:+st.likes||0,saves:+st.saves||0,shares:+st.shares||0,follows:+st.follows||0};
+        i.stats={views:+st.views||0,likes:+st.likes||0,comments:+st.comments||0,saves:+st.saves||0,shares:+st.shares||0,follows:+st.follows||0};
         if(MSTATUS.indexOf(i.status)<0) i.status="아이디어";
       });
     }
@@ -1161,23 +1190,43 @@ function ms(){return DATA.muse;}
 function nfm(n){n=+n||0;return n>=10000?(n/10000).toFixed(n%10000?1:0).replace(/\.0$/,"")+"만":n.toLocaleString("ko-KR");}
 function inMonth(d){return d&&d.slice(0,7)===calY+"-"+String(calM+1).padStart(2,"0");}
 function museAgg(){
-  const s=ms();let v=0,l=0,sv=0,sh=0,fo=0,upM=0,pub=0;
+  const s=ms();let v=0,l=0,sv=0,sh=0,fo=0,cm=0,upM=0,pub=0;
   (s.items||[]).forEach(i=>{
     const st=i.stats||{};
-    v+=+st.views||0;l+=+st.likes||0;sv+=+st.saves||0;sh+=+st.shares||0;fo+=+st.follows||0;
+    v+=+st.views||0;l+=+st.likes||0;sv+=+st.saves||0;sh+=+st.shares||0;
+    fo+=+st.follows||0;cm+=+st.comments||0;
     if(i.status==="발행")pub++;
     if(inMonth(i.due))upM++;
   });
-  return {views:v,likes:l,saves:sv,shares:sh,follows:fo,upM:upM,pub:pub};
+  return {views:v,likes:l,saves:sv,shares:sh,follows:fo,comments:cm,upM:upM,pub:pub};
 }
 function goalBar(label,cur,goal,unit){
   const pct=goal?Math.min(100,Math.round(cur/goal*100)):0;
   return `<div class="gcell"><div class="glab">${label}<b>${nfm(cur)} <span>/ ${nfm(goal)}${unit||""}</span></b></div>
     <div class="bar sm"><i style="width:${pct}%"></i></div><div class="gpct">${pct}%</div></div>`;
 }
+function spark(h){
+  h=(h||[]).slice(-12); if(h.length<2) return "";
+  const ns=h.map(x=>+x.n||0),mx=Math.max.apply(null,ns),mn=Math.min.apply(null,ns);
+  const rg=(mx-mn)||1,W=132,H=30;
+  const pts=ns.map((n,i)=>[(i/(ns.length-1))*W,H-((n-mn)/rg)*(H-4)-2]);
+  const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const diff=ns[ns.length-1]-ns[0];
+  return `<div class="fspark"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <path d="${d}" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${pts[pts.length-1][0].toFixed(1)}" cy="${pts[pts.length-1][1].toFixed(1)}" r="2.6" fill="var(--blue)"/></svg>
+    <span class="${diff>=0?"up":"dn"}">${diff>=0?"▲":"▼"} ${Math.abs(diff)}명</span></div>`;
+}
 function museGoals(){
-  const s=ms(),a=museAgg();
+  const s=ms(),a=museAgg(),ac=s.account||"";
+  const need=(!a.views&&!a.saves)?`<div class="ighint">👀 조회수와 🔖 저장수는 인스타그램 공개 데이터가 아니에요.
+    <b>프로필 → 프로페셔널 대시보드 → 인사이트</b>에서 본 숫자를 콘텐츠 상세의 ‘성과 기록’에 넣어주세요.</div>`:"";
   return `<div class="goalpanel">
+    <div class="ighead">
+      <div class="igid">${chImg("muse")}<div><b>@${esc(ac)}</b><span>${esc(s.nickname||"")} · 팔로워 ${nfm(s.followers.cur)}</span></div></div>
+      <a class="btn sm" href="https://www.instagram.com/${esc(ac)}/" target="_blank" rel="noopener">인스타 열기 ↗</a>
+      <button class="btn sm" onclick="snapFollow()">팔로워 기록</button>
+    </div>
     <div class="ghead">🎯 나의 브랜드 목표<button class="btn sm" onclick="openGoals()">목표 수정</button></div>
     <div class="ggrid">
       ${goalBar("팔로워",s.followers.cur,s.followers.goal,"명")}
@@ -1185,8 +1234,15 @@ function museGoals(){
       ${goalBar("누적 조회수",a.views,s.monthGoal.views,"회")}
       ${goalBar("누적 저장수",a.saves,s.monthGoal.saves,"회")}
     </div>
-    <div class="gsum">좋아요 ${nfm(a.likes)} · 공유 ${nfm(a.shares)} · 콘텐츠로 유입된 팔로워 ${nfm(a.follows)}명 · 발행 완료 ${a.pub}개</div>
+    ${spark(s.history)}
+    <div class="gsum">좋아요 ${nfm(a.likes)} · 댓글 ${nfm(a.comments)} · 공유 ${nfm(a.shares)} · 유입 팔로워 ${nfm(a.follows)}명 · 발행 ${a.pub}개</div>
+    ${need}
   </div>`;
+}
+function snapFollow(){
+  const s=ms(),v=prompt("지금 팔로워 수를 입력하세요",s.followers.cur);
+  if(v===null)return;
+  setGoalV("fcur",v);
 }
 function museCal(){
   const s=ms(),total=monthDays(calY,calM),start=firstIdx(calY,calM),t=todayStr();
@@ -1209,7 +1265,7 @@ function museCal(){
 function newOn(k){
   const o={id:uid(),title:"새 릴스",tag:(ms().tags||[])[0]||"릴스",status:"아이디어",progress:0,
     start:todayStr(),due:k,owner:"",hook:"",concept:"",cta:"",hashtags:"",
-    stats:{views:0,likes:0,saves:0,shares:0,follows:0},
+    url:"",stats:{views:0,likes:0,comments:0,saves:0,shares:0,follows:0},
     todos:[],milestones:[],links:[],logs:[],quotes:[],desc:"",goal:"",note:""};
   ms().items.unshift(o);save();render();openDetail(o.id);
 }
@@ -1228,12 +1284,15 @@ function museView(){
 function museCard(i){
   const st=i.stats||{},pct=Math.max(0,Math.min(100,+i.progress||0));
   const td=i.todos.length?`<span class="pill">☑ ${i.todos.filter(t=>t.done).length}/${i.todos.length}</span>`:"";
-  const perf=(+st.views||+st.saves)?`<div class="perf">
-      <span>👀 ${nfm(st.views)}</span><span>🔖 ${nfm(st.saves)}</span>
-      <span>❤ ${nfm(st.likes)}</span><span>👤 +${nfm(st.follows)}</span></div>`:"";
+  const any=(+st.views||+st.saves||+st.likes||+st.comments||+st.shares);
+  const perf=any?`<div class="perf">
+      ${+st.views?`<span>👀 ${nfm(st.views)}</span>`:""}
+      <span>❤ ${nfm(st.likes)}</span><span>💬 ${nfm(st.comments)}</span>
+      ${+st.saves?`<span>🔖 ${nfm(st.saves)}</span>`:""}
+      <span>↗ ${nfm(st.shares)}</span>${+st.follows?`<span>👤 +${nfm(st.follows)}</span>`:""}</div>`:"";
   return `<div class="card">
     <div class="head"><span class="t">${chImg("muse")}${esc(i.tag||"")}</span>
-      <div class="acts"><button title="상세" onclick="openDetail('${i.id}')">⤢</button>
+      <div class="acts">${i.url?`<a class="lnk" title="인스타에서 보기" href="${esc(i.url)}" target="_blank" rel="noopener">↗</a>`:""}<button title="상세" onclick="openDetail('${i.id}')">⤢</button>
       <button title="삭제" onclick="delItem('${i.id}')">✕</button></div></div>
     <div class="body">
       <h3 class="clickable" onclick="openDetail('${i.id}')">${esc(i.title)}</h3>
@@ -1298,7 +1357,12 @@ function openGoals(){
 }
 function setGoalV(k,v){
   const s=ms(),n=Math.max(0,+v||0);
-  if(k==="fcur")s.followers.cur=n; else if(k==="fgoal")s.followers.goal=Math.max(1,n);
+  if(k==="fcur"){s.followers.cur=n;
+    s.history=s.history||[];
+    const t=todayStr(),last=s.history[s.history.length-1];
+    if(last&&last.d===t)last.n=n; else s.history.push({d:t,n:n});
+    if(s.history.length>60)s.history=s.history.slice(-60);
+  } else if(k==="fgoal")s.followers.goal=Math.max(1,n);
   else if(k==="up")s.monthGoal.uploads=Math.max(1,n); else if(k==="vw")s.monthGoal.views=Math.max(1,n);
   else if(k==="sv")s.monthGoal.saves=Math.max(1,n);
   save();render();
@@ -1314,7 +1378,7 @@ const HERO={
   book:["읽고, 남기고, 쌓기 ✦","좋았던 문장은 상세 화면의 ‘문장 수집’에 담아두세요."],
   habit:["오늘도 몸 챙기기 ✦","날짜를 눌러 운동 종류와 시간을 기록하면 한 달이 채워져요."],
   estate:["차근차근 임장 노트 ✦","기초부터 청약·세금까지. 배운 건 업무 일지에 남겨두세요."],
-  muse:["나를 브랜드로 만들기 ✦","릴스 기획부터 업로드 일정, 성과까지 한 곳에서 관리해요."]
+  muse:["나를 브랜드로 만들기 ✦","@hyen_roy · 혼캠 시리즈부터 다음 콘텐츠까지, 기획·일정·성과를 한 곳에서."]
 };
 function renderLogo(){document.getElementById("tbLogo").innerHTML=chImg("muse");}
 function renderHero(){
@@ -1650,7 +1714,7 @@ function renderDetail(){
     <div class="sect perf">
       <h4>📈 성과 기록 <span class="r">업로드 후 숫자를 채워두면 목표에 자동 반영돼요</span></h4>
       <div class="pgrid">
-        ${[["views","👀 조회수"],["likes","❤ 좋아요"],["saves","🔖 저장"],["shares","↗ 공유"],["follows","👤 유입 팔로워"]]
+        ${[["views","👀 조회수"],["likes","❤ 좋아요"],["comments","💬 댓글"],["saves","🔖 저장"],["shares","↗ 공유"],["follows","👤 유입 팔로워"]]
           .map(p=>`<div class="field"><label>${p[1]}</label>
             <input type="number" min="0" value="${(i.stats||{})[p[0]]||0}" onchange="setStat('${p[0]}',this.value)"></div>`).join("")}
       </div>
