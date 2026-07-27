@@ -435,6 +435,54 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .erow .spl{width:auto;padding:0 8px;height:26px;border-radius:8px;border:1px solid var(--line);
   background:#fff;color:#a3b0c6;font-size:11px;line-height:1;cursor:pointer}
 .erow .spl.on{border-color:#bed3f7;color:var(--blue);background:var(--blue-xl)}
+/* --- 오늘의 공부 / 이슈 --- */
+.studybox{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);
+  padding:16px 18px;margin-bottom:16px}
+.sbhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.sbhead .sbd{font-weight:800;font-size:14px;letter-spacing:-.02em}
+.sbhead .strk{margin-left:auto;font-size:12px;font-weight:700;color:#e8590c;background:#fff4e6;
+  border:1px solid #ffd8a8;padding:3px 9px;border-radius:999px}
+.sblab{font-size:11.5px;font-weight:800;color:var(--blue);letter-spacing:.02em;margin:12px 0 6px}
+.sbmain h3{margin:0 0 6px;font-size:17px;font-weight:800;letter-spacing:-.03em;line-height:1.35}
+.sbmain p{margin:0;font-size:13.5px;line-height:1.75;color:#41506b}
+.terms{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.term{font-size:11.5px;font-weight:700;color:var(--blue);background:var(--blue-xl);
+  border:1px solid #dbe7fb;padding:3px 9px;border-radius:999px}
+.todoline{margin-top:10px;font-size:12.5px;font-weight:700;color:#0b7f5c;background:#e9f9f2;
+  border:1px solid #b8ecd8;border-radius:10px;padding:8px 11px;line-height:1.6}
+.sbacts{display:flex;gap:6px;margin-top:12px}
+.sbnews{border-top:1px dashed var(--line);margin-top:14px}
+.nitem{padding:9px 0;border-bottom:1px dashed var(--line)}
+.nitem:last-child{border-bottom:0}
+.nitem .nt{font-size:13.5px;font-weight:700;letter-spacing:-.02em;line-height:1.45}
+.nitem .nt a{color:inherit;text-decoration:none}
+.nitem .nt a:hover{color:var(--blue);text-decoration:underline}
+.nitem .ns{font-size:12.5px;color:#6b7a94;line-height:1.65;margin-top:3px}
+.nitem .nw{font-size:12px;color:#6d28d9;background:#f5f0ff;border-radius:8px;padding:6px 9px;margin-top:6px;line-height:1.55}
+.nempty{font-size:12.5px;color:#8394b3;padding:10px 0;line-height:1.6}
+/* --- 주간 콘텐츠 스케줄 --- */
+.weekbox{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);
+  padding:14px 16px;margin-bottom:16px}
+.wbh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px;font-weight:800;
+  letter-spacing:-.02em;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.wbh .wbd{font-size:11.5px;font-weight:600;color:#8394b3}
+.wbh .wbsrc{margin-left:auto;font-size:11px;font-weight:700;color:var(--blue)}
+.wslot{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.wslot:last-child{border-bottom:0}
+.wslot.done{opacity:.5}
+.wsd{min-width:74px;font-size:11.5px;font-weight:800;color:var(--blue);display:flex;flex-direction:column;gap:2px}
+.wsd span{font-weight:600;color:#8394b3}
+.wsb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.wsb b{font-size:13.5px;font-weight:700;letter-spacing:-.02em;line-height:1.4}
+.wsb i{font-size:12px;color:#6d28d9;font-style:normal}
+.wsa{display:flex;align-items:center;gap:5px}
+.madeb{font-size:11.5px;font-weight:700;color:#0b7f5c}
+@media(max-width:720px){
+  .wslot{flex-wrap:wrap}
+  .wsd{flex-direction:row;gap:6px;min-width:0}
+  .wsa{width:100%;justify-content:flex-end}
+  .studybox{padding:14px}
+}
 /* --- 마중 캐릭터 --- */
 .ch{display:block;object-fit:contain;image-rendering:auto;-webkit-user-drag:none;user-select:none}
 .brand .logo{overflow:hidden;background:linear-gradient(160deg,#f3f7ee,#e4eddc);padding:2px}
@@ -622,6 +670,9 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   </div>
 </div>
 
+<script id="feed" type="application/json">
+{"estate": {}, "muse": {"week": {"start": "2026-07-27", "src": "claude", "made": "2026-07-27", "slots": [{"id": "w1", "d": "2026-07-27", "tag": "시리즈", "title": "혼캠 EP.04 — 한여름에 혼자 캠핑 가면 생기는 일", "hook": "7월에 혼캠은 미친 짓일까 싶었는데요", "note": "낮 세팅 → 해질녘 → 새벽 순서로 3컷. 더위 대비로 뭘 챙겼는지, 뭐가 쓸모없었는지 솔직하게. EP.01~03 보신 분들을 위해 첫 5초에 시리즈 표시.", "made": false}, {"id": "w2", "d": "2026-07-29", "tag": "사진", "title": "13년 차 직장인의 여름 퇴근 루틴", "hook": "일 잘하는 사람이 아니라, 잘 끄는 사람이 오래 갑니다", "note": "퇴근 후 한 시간을 3컷 캐러셀로. 샤워·걷기·노트 같은 아주 사소한 것들. 캡션은 짧게, 마지막 장에 ‘당신의 로그아웃 방법은?’ 질문으로 댓글 유도.", "made": false}, {"id": "w3", "d": "2026-07-31", "tag": "릴스", "title": "8월 첫 주말, 혼자 가도 안 무서운 캠핑장 고르는 기준 3가지", "hook": "저장해두고 금요일 밤에 꺼내 보세요", "note": "장소 추천이 아니라 ‘고르는 기준’으로 (관리사무소 상주 / 화장실 거리 / 사이트 시야). 직접 다녀온 곳 사진만 사용. 저장 유도 문구를 마지막 3초에.", "made": false}]}}}
+</script>
 <script>
 /* ===========================================================
    1) 여기만 고치면 됩니다 — 샘플 데이터
@@ -852,6 +903,8 @@ const SEED = {
 /* ===========================================================
    2) 동작 코드
    =========================================================== */
+const FEED=(function(){try{return JSON.parse(document.getElementById("feed").textContent)||{};}catch(e){return {};}})();
+let eStudyD=null;
 const KEY="hyein_work_os_v3";
 const STATUSES=["할일","진행중","대기","완료"];
 const MSTATUS=["아이디어","기획","촬영","편집","예약","발행"];
@@ -876,6 +929,8 @@ function normalize(d){
     const s=d[k];
     if(s.type==="muse"&&!s.account){ d[k]=JSON.parse(JSON.stringify(SEED.muse)); return; }
     if(s.type==="muse"){
+      const fw=(FEED.muse&&FEED.muse.week)||null;
+      if(fw&&fw.start&&(!s.week||!s.week.start||fw.start>s.week.start)) s.week=JSON.parse(JSON.stringify(fw));
       s.followers=s.followers||{cur:0,goal:1000};
       s.history=Array.isArray(s.history)?s.history:[{d:todayStr(),n:s.followers.cur}];
     }
@@ -1328,7 +1383,7 @@ function museView(){
     <button class="btn sm primary" onclick="newOn(todayStr())">＋ 콘텐츠 추가</button></div>`;
   const grid=list.length?`<div class="grid">${list.map(museCard).join("")}</div>`
     :`<div class="empty">${chImg("muse")}이 조건에 맞는 콘텐츠가 없어요.</div>`;
-  return museGoals()+head+museCal()+`<div class="sechead">📼 콘텐츠 목록 <span>${list.length}개</span></div>`+grid;
+  return museGoals()+weekBox()+head+museCal()+`<div class="sechead">📼 콘텐츠 목록 <span>${list.length}개</span></div>`+grid;
 }
 function museCard(i){
   const st=i.stats||{},pct=Math.max(0,Math.min(100,+i.progress||0));
@@ -1719,6 +1774,163 @@ function cEnd(){
   const d=document.querySelector(".card.dragging");if(d)d.classList.remove("dragging");
 }
 
+/* ---- 부동산 기초 커리큘럼(완전 초보 30일) ---- */
+const CURRI=[
+{t:"부동산 공부, 지도부터 그리기",b:"부동산은 아파트·빌라·상가·토지로 크게 나뉘어요. 완전 초보는 '내가 살 집(주거용)' 하나만 보면 됩니다. 오늘은 욕심내지 말고 목표를 한 문장으로 적어보세요.",k:["주거용","수익형","실거주"],a:"‘나는 ○○년 안에 ○○지역 ○○평대에 살고 싶다’ 한 줄 쓰기"},
+{t:"등기부등본이 뭐예요?",b:"그 집의 주민등록등본 같은 서류예요. 표제부·갑구·을구 세 칸으로 되어 있고, 인터넷등기소에서 700원이면 누구나 뗄 수 있어요. 부동산 공부의 8할은 이 종이 읽기입니다.",k:["등기사항전부증명서","표제부","갑구","을구"],a:"인터넷등기소에서 관심 있는 집 1건 열람해보기"},
+{t:"표제부 — 이 집이 뭔지",b:"표제부는 건물의 신상명세입니다. 주소, 준공연도, 구조, 그리고 전용면적이 적혀 있어요. 광고에 적힌 면적과 표제부 면적이 다르면 무조건 표제부가 맞습니다.",k:["표제부","전용면적","준공일"],a:"어제 뗀 등기부에서 전용면적 숫자 찾아보기"},
+{t:"갑구 — 누구 집인지",b:"갑구에는 소유권이 적힙니다. 소유자가 자주 바뀌었는지, 가압류·압류·경매개시 같은 무서운 단어가 있는지 보세요. 이런 단어가 하나라도 있으면 초보는 패스가 정답입니다.",k:["소유권","가압류","경매개시결정"],a:"갑구 마지막 줄의 현재 소유자 이름 확인하기"},
+{t:"을구 — 빚이 얼마인지",b:"을구에는 근저당권, 전세권처럼 소유권 외 권리가 적혀요. 근저당의 '채권최고액'은 실제 빚의 약 120%로 잡습니다. 채권최고액이 집값에 육박하면 위험 신호예요.",k:["근저당권","채권최고액","전세권"],a:"을구가 ‘없음’인 깨끗한 집 1건 찾아보기"},
+{t:"전세와 월세, 돈이 흐르는 방향",b:"전세는 큰 보증금을 맡기고 월 임대료가 없고, 월세는 작은 보증금에 매달 돈을 냅니다. 전세는 내 돈이 집에 묶이는 대신 주거비가 0에 가깝고, 월세는 현금이 남는 대신 매달 나가요.",k:["보증금","반전세","전월세전환율"],a:"내 상황이 전세형인지 월세형인지 이유 한 줄로 적기"},
+{t:"전입신고 + 확정일자 = 내 보증금의 갑옷",b:"이사한 날 주민센터에서 전입신고를 하고 계약서에 확정일자를 받으면 '대항력'과 '우선변제권'이 생깁니다. 이걸 안 하면 집이 경매로 넘어갔을 때 보증금을 못 받을 수 있어요. 이사 당일에 무조건 하세요.",k:["대항력","확정일자","우선변제권"],a:"지금 사는 집의 확정일자 받았는지 계약서 확인"},
+{t:"우선변제권과 최우선변제",b:"우선변제권은 순서대로 돈을 받을 권리, 최우선변제는 소액 임차인이 다른 빚보다 먼저 일정액을 받는 제도예요. 지역별로 기준 금액이 달라서 내 보증금이 해당되는지 확인해야 합니다.",k:["최우선변제","소액임차인","배당"],a:"내 지역 최우선변제 기준 금액 검색해보기"},
+{t:"전세보증보험, 왜 다들 들라고 할까",b:"집주인이 보증금을 못 돌려주면 보증기관이 대신 주는 보험입니다. HUG·HF·SGI 세 곳에서 취급하고, 보증료는 보증금의 0.1% 안팎이에요. 전세라면 사실상 필수입니다.",k:["HUG","보증료","전세사기"],a:"HUG 전세보증금반환보증 가입 조건 훑어보기"},
+{t:"계약서, 초보가 꼭 볼 5줄",b:"당사자(등기부 소유자와 같은지), 금액과 날짜, 특약사항, 중개대상물 확인설명서, 그리고 잔금일 기준 등기부 재발급. 이 다섯 개만 지켜도 사고의 90%는 피합니다.",k:["특약사항","중개대상물 확인설명서","잔금"],a:"계약서 특약에 넣을 문장 1개 미리 적어두기"},
+{t:"등기부 vs 건축물대장",b:"등기부는 '권리'를, 건축물대장은 '사실'을 보여줍니다. 불법 증축·용도변경은 등기부가 아니라 건축물대장의 위반건축물 표시로 드러나요. 정부24에서 무료로 뗍니다.",k:["건축물대장","위반건축물","용도"],a:"정부24에서 건축물대장 1건 무료 열람"},
+{t:"호가·실거래가·공시가격",b:"호가는 팔고 싶은 가격(희망), 실거래가는 실제 팔린 가격(사실), 공시가격은 세금 매기는 기준 가격이에요. 셋은 늘 다릅니다. 초보는 실거래가만 믿으세요.",k:["호가","실거래가","공시가격"],a:"관심 단지 실거래가와 네이버 호가 비교해보기"},
+{t:"실거래가 조회하는 법",b:"국토교통부 실거래가 공개시스템에서 아파트·빌라 거래를 층수까지 볼 수 있어요. 같은 단지도 층·향·동에 따라 수천만 원 차이가 납니다. 최근 3개월, 같은 평형만 필터해서 보세요.",k:["실거래가 공개시스템","평형","층수"],a:"관심 단지 최근 3개월 거래 3건 적어두기"},
+{t:"평, 제곱미터, 전용면적",b:"1평은 약 3.3㎡예요. 84㎡가 흔히 말하는 34평(공급면적 기준)입니다. 전용면적은 우리 집 문 안쪽, 공급면적은 계단·복도까지 포함이에요.",k:["전용면적","공급면적","전용률"],a:"관심 매물의 전용/공급 면적 각각 적어보기"},
+{t:"용적률과 건폐율",b:"건폐율은 땅에서 건물이 깔고 앉은 비율, 용적률은 층수를 다 더한 연면적 비율이에요. 용적률이 낮은 오래된 단지가 재건축 이야기가 나오는 이유입니다.",k:["용적률","건폐율","연면적"],a:"관심 단지 용적률 검색해서 200% 넘는지 보기"},
+{t:"LTV·DTI·DSR 한 번에",b:"LTV는 집값 대비 대출 한도, DTI는 소득 대비 원리금, DSR은 내 모든 빚의 원리금을 소득으로 나눈 값이에요. 요즘 실질적으로 한도를 결정하는 건 DSR입니다.",k:["LTV","DTI","DSR"],a:"내 연소득 × 40% ÷ 12 로 월 상환 한도 계산해보기"},
+{t:"주담대 고정금리 vs 변동금리",b:"고정은 이자가 안 변해 마음이 편하고, 변동은 금리가 내려가면 유리해요. 혼합형은 5년 고정 후 변동입니다. 금리 방향을 못 맞추겠으면 고정이 초보에게 안전합니다.",k:["고정금리","변동금리","혼합형"],a:"은행 3곳 주담대 금리 오늘 자로 비교해보기"},
+{t:"원리금균등 vs 원금균등",b:"원리금균등은 매달 같은 금액을 내서 계획이 쉽고, 원금균등은 처음에 많이 내지만 총이자가 적어요. 3억을 30년 빌리면 두 방식의 총이자 차이가 수천만 원 납니다.",k:["원리금균등","원금균등","거치기간"],a:"네이버 대출계산기로 두 방식 총이자 비교"},
+{t:"취득세 — 살 때 내는 세금",b:"집을 사면 잔금일 기준 60일 안에 취득세를 냅니다. 6억 이하 1주택은 1%, 6~9억은 구간별, 9억 초과는 3%가 기본이에요. 다주택·법인은 훨씬 높습니다.",k:["취득세","농특세","지방교육세"],a:"관심 매물 가격으로 취득세 자동계산 해보기"},
+{t:"재산세와 종부세 — 갖고 있을 때",b:"매년 6월 1일 소유자가 그 해 보유세를 냅니다. 그래서 5월 말 잔금이냐 6월 초 잔금이냐로 세금이 갈려요. 종부세는 공시가격 합계가 기준을 넘을 때만 냅니다.",k:["과세기준일","재산세","종합부동산세"],a:"6월 1일 규칙, 달력에 메모해두기"},
+{t:"양도세와 1주택 비과세",b:"팔아서 남은 차익에 붙는 세금이 양도세예요. 1세대 1주택은 2년 이상 보유(조정지역은 거주까지)하면 12억까지 비과세입니다. 보유기간을 못 채우면 세율이 확 뜁니다.",k:["양도소득세","1세대1주택","보유·거주요건"],a:"‘2년’ 이라는 숫자 외우기"},
+{t:"청약통장, 오늘 만들어도 늦지 않아요",b:"주택청약종합저축 하나면 국민주택·민영주택 모두 가능합니다. 중요한 건 가입 기간과 납입 횟수라 일찍 만들수록 유리해요. 매달 10만 원이 국민주택 기준 인정 최대입니다.",k:["주택청약종합저축","납입인정금액","예치금"],a:"청약통장 없으면 오늘 개설, 있으면 회차 확인"},
+{t:"가점제와 추첨제",b:"가점은 무주택기간(32점)+부양가족(35점)+통장기간(17점)=84점 만점이에요. 1인 가구는 가점이 낮으니 추첨제 물량이 있는 평형을 노리는 게 현실적입니다.",k:["청약가점","무주택기간","추첨제"],a:"청약홈에서 내 가점 계산해보기"},
+{t:"특별공급, 나도 해당될까",b:"신혼부부·생애최초·다자녀·노부모부양 등으로 나뉘고, 경쟁률이 일반보다 훨씬 낮아요. 소득·자산 요건이 있지만 생애최초는 1인 가구도 가능한 경우가 있습니다.",k:["특별공급","생애최초","소득요건"],a:"내가 넣을 수 있는 특공 유형 1개 찾기"},
+{t:"분양권과 입주권",b:"분양권은 청약에 당첨돼 아파트를 받을 권리, 입주권은 재개발·재건축 조합원이 갖는 권리예요. 세금과 대출 규정이 서로 완전히 다릅니다.",k:["분양권","입주권","전매제한"],a:"둘의 차이를 내 말로 두 줄 요약해보기"},
+{t:"규제지역이라는 말",b:"조정대상지역·투기과열지구로 지정되면 대출 한도, 세금, 전매제한이 한꺼번에 강해집니다. 지정과 해제가 자주 바뀌니 매수 직전에 꼭 다시 확인하세요.",k:["조정대상지역","투기과열지구","전매제한"],a:"관심 지역이 현재 규제지역인지 확인"},
+{t:"임장 가기 전 체크리스트",b:"낮과 밤, 평일과 주말에 각각 가보세요. 지하철까지 실제로 걸어보고, 주차 자리와 소음, 경사도를 봅니다. 사진보다 발이 정확합니다.",k:["임장","역세권","도보거리"],a:"이번 주 임장 갈 동네 하나 정하기"},
+{t:"관리비도 집값입니다",b:"같은 평형인데 관리비가 월 10만 원 차이면 10년에 1,200만 원이에요. 세대수가 적거나 오래된 단지, 중앙난방 단지가 대체로 비쌉니다. 공동주택관리정보시스템에서 단지별로 비교할 수 있어요.",k:["관리비","중앙난방","K-apt"],a:"관심 단지 관리비 평균 확인해보기"},
+{t:"재건축·재개발 아주 기초",b:"재건축은 아파트를 허물고 다시, 재개발은 낡은 동네 전체를 새로. 조합설립→사업시행인가→관리처분인가 순서로 가고, 뒤로 갈수록 안전하지만 비싸집니다.",k:["조합설립","관리처분인가","추가분담금"],a:"관심 지역 재개발 구역 지도에서 찾아보기"},
+{t:"나만의 매수 기준 만들기",b:"한 달 공부의 결론은 체크리스트 한 장이에요. 예산 상한, 대출 상한, 지역 3곳, 절대 안 되는 조건 3개를 적어두면 흔들릴 때 나를 잡아줍니다.",k:["매수기준","예산상한","손절기준"],a:"체크리스트 한 장 만들어 부동산 탭 카드로 저장"}
+];
+
+/* ---- 오늘의 부동산 공부 · 이슈 ---- */
+function FEEDGET(p,d){try{return p.split(".").reduce((a,k)=>a[k],FEED);}catch(e){return d;}}
+function esDay(){return eStudyD||todayStr();}
+function eIdx(k){
+  const b=Date.UTC(2026,6,27),d=Date.parse(k+"T00:00:00Z");
+  const n=Math.round((d-b)/86400000);
+  return ((n%CURRI.length)+CURRI.length)%CURRI.length;
+}
+function eStudy(k){
+  const f=FEEDGET("estate."+k+".study",null);
+  return f||CURRI[eIdx(k)];
+}
+function eNews(k){return FEEDGET("estate."+k+".news",null)||[];}
+function eRead(){const s=DATA.estate;s.read=s.read||{};return s.read;}
+function togRead(){
+  const k=esDay(),r=eRead();
+  if(r[k])delete r[k];else r[k]=1;
+  save();render();
+}
+function eStreak(){
+  const r=eRead();let n=0,c=todayStr();
+  while(r[c]){n++;c=addDays(c,-1);}
+  return n;
+}
+function eShift(n){
+  const k=addDays(esDay(),n);
+  if(k>todayStr())return;
+  eStudyD=k;render();
+}
+function studyToCard(){
+  const k=esDay(),st=eStudy(k);
+  const o={id:uid(),title:st.t,tag:"기초",status:"진행중",progress:0,due:"",owner:"",
+    goal:(st.a||""),desc:(st.b||""),
+    todos:(st.k||[]).map(x=>({id:uid(),text:x+" 뜻 내 말로 정리",done:false})),
+    milestones:[],links:[],logs:[],quotes:[],note:"📚 "+k+" 오늘의 공부에서 저장"};
+  DATA.estate.items.unshift(o);save();render();
+}
+function estatePanel(){
+  const k=esDay(),st=eStudy(k),nw=eNews(k),r=eRead()[k],today=todayStr();
+  const no=k===today?1:0;
+  const terms=(st.k||[]).map(x=>`<span class="term">${esc(x)}</span>`).join("");
+  const news=nw.length?nw.map(n=>`<div class="nitem">
+      <div class="nt">${n.u?`<a href="${esc(n.u)}" target="_blank" rel="noopener">${esc(n.t)} ↗</a>`:esc(n.t)}</div>
+      <div class="ns">${esc(n.s||"")}</div>
+      ${n.w?`<div class="nw">💡 ${esc(n.w)}</div>`:""}</div>`).join("")
+    :`<div class="nempty">아직 오늘 뉴스가 없어요. 매일 오전 9시에 클로드가 채워둡니다.</div>`;
+  return `<div class="studybox">
+    <div class="sbhead">
+      <button class="btn sm" onclick="eShift(-1)">‹ 어제</button>
+      <div class="sbd">${korDate(k)}${k===today?`<span class="tdbadge">오늘</span>`:""}</div>
+      <button class="btn sm" ${no?"disabled":""} onclick="eShift(1)">내일 ›</button>
+      <span class="strk">🔥 ${eStreak()}일 연속</span>
+    </div>
+    <div class="sbmain">
+      <div class="sblab">📚 오늘의 공부 · ${eIdx(k)+1}일차</div>
+      <h3>${esc(st.t)}</h3>
+      <p>${esc(st.b)}</p>
+      ${terms?`<div class="terms">${terms}</div>`:""}
+      ${st.a?`<div class="todoline">✅ 오늘의 한 가지 — ${esc(st.a)}</div>`:""}
+      <div class="sbacts">
+        <button class="btn sm ${r?"primary":""}" onclick="togRead()">${r?"✓ 읽음":"읽음 표시"}</button>
+        <button class="btn sm ghost" onclick="studyToCard()">카드로 저장</button>
+      </div>
+    </div>
+    <div class="sbnews"><div class="sblab">📰 오늘의 부동산 이슈</div>${news}</div>
+  </div>`;
+}
+
+/* ---- 주간 콘텐츠 스케줄 ---- */
+const WPAT=[
+ {d:0,tag:"시리즈",t:["혼캠 EP.{n} — {x}","혼자 떠난 {p}, 1박 2일 기록","{p}에서 보낸 토요일 아침"],
+  h:["둘이 하던 걸 혼자 해봤습니다","이번엔 진짜 아무도 없었어요","도망친 곳에도 낙원은 있더라"]},
+ {d:2,tag:"사진",t:["13년 차 직장인의 {p} 루틴","퇴근하고 {x} 해봤어요","요즘 나를 살리는 것 3가지"],
+  h:["일 잘하는 사람일수록 잘 쉽니다","오늘도 로그아웃 성공","버티는 게 아니라 고르는 중"]},
+ {d:4,tag:"릴스",t:["{x} 하는 사람들의 공통점","주말 시작 전 딱 1분만","이번 주 나를 웃게 한 장면"],
+  h:["저장해두고 금요일마다 보세요","이거 모르면 주말이 사라집니다","3초만 보고 가세요"]}
+];
+const WX=["캠핑","혼밥","산책","커피","독서","드라이브","정리","달리기"];
+const WP=["강원도","서울 근교","동네","제주","바다 앞","숲속"];
+function wkOf(k){const d=new Date(k+"T00:00:00");return Math.floor(d.getTime()/604800000);}
+function genWeek(){
+  const s=ms(),ws=weekStart(todayStr()),n=wkOf(ws);
+  const ep=((s.items||[]).filter(i=>/EP\./.test(i.title)).length)+1;
+  const slots=WPAT.map((p,i)=>{
+    const pick=a=>a[(n+i)%a.length];
+    const t=pick(p.t).replace("{n}",String(ep+i>9?ep:"0"+(ep))).replace("{x}",WX[(n+i)%WX.length]).replace("{p}",WP[(n+i*2)%WP.length]);
+    return {id:uid(),d:addDays(ws,p.d),tag:p.tag,title:t,hook:pick(p.h),note:"",made:false};
+  });
+  s.week={start:ws,src:"auto",made:todayStr(),slots:slots};
+  save();render();
+}
+function slotCard(id){
+  const s=ms(),sl=(s.week&&s.week.slots||[]).find(x=>x.id===id); if(!sl)return;
+  const o={id:uid(),title:sl.title,tag:sl.tag||(s.tags||[])[0]||"릴스",status:"기획",progress:0,
+    start:todayStr(),due:sl.d,owner:"",hook:sl.hook||"",concept:sl.note||"",cta:"",hashtags:"",
+    url:"",stats:{views:0,likes:0,comments:0,saves:0,shares:0,follows:0},
+    todos:[{id:uid(),text:"촬영",done:false},{id:uid(),text:"편집",done:false},{id:uid(),text:"업로드",done:false}],
+    milestones:[],links:[],logs:[],quotes:[],desc:"",goal:"",note:""};
+  s.items.unshift(o);sl.made=true;save();render();openDetail(o.id);
+}
+function delSlot(id){
+  const s=ms();if(!s.week)return;
+  s.week.slots=(s.week.slots||[]).filter(x=>x.id!==id);save();render();
+}
+function weekBox(){
+  const s=ms(),ws=weekStart(todayStr()),w=s.week;
+  const fresh=w&&w.start===ws;
+  const body=(fresh&&(w.slots||[]).length)?w.slots.map(sl=>`<div class="wslot ${sl.made?"done":""}">
+      <div class="wsd">${korDate(sl.d).replace(/^\d+년 /,"")}<span>${esc(sl.tag||"")}</span></div>
+      <div class="wsb"><b>${esc(sl.title)}</b>${sl.hook?`<i>“${esc(sl.hook)}”</i>`:""}</div>
+      <div class="wsa">${sl.made?`<span class="madeb">카드 생성됨</span>`
+        :`<button class="btn sm primary" onclick="slotCard('${sl.id}')">카드로 만들기</button>`}
+        <button class="x" onclick="delSlot('${sl.id}')">✕</button></div>
+    </div>`).join("")
+    :`<div class="nempty">이번 주 스케줄이 아직 없어요. 매주 월요일 오전 9시에 클로드가 만들어 두거나, 아래 버튼으로 바로 뽑을 수 있어요.</div>`;
+  const src=fresh?(w.src==="claude"?"🤖 클로드 자동 생성":"⚙ 자동 생성"):"";
+  return `<div class="weekbox">
+    <div class="wbh">🗓 이번 주 콘텐츠 스케줄 <span class="wbd">${ws.slice(5)} ~ ${addDays(ws,6).slice(5)}</span>
+      <span class="wbsrc">${src}</span>
+      <button class="btn sm" onclick="genWeek()">＋ 이번 주 자동 생성</button></div>
+    ${body}</div>`;
+}
+
 function taskCard(i){
   const s=DATA[cur],pct=Math.max(0,Math.min(100,+i.progress||0));
   const td=i.todos.length?` <span class="pill">☑ ${i.todos.filter(t=>t.done).length}/${i.todos.length}</span>`:"";
@@ -1753,6 +1965,7 @@ function render(){
       <button class="btn sm primary" onclick="openDay(todayStr())">＋ 오늘 기록</button>
     </div>`;
   }
+  if(cur==="estate") head=estatePanel()+`<div class="sechead">🏠 내 부동산 공부 카드 <span>${list.length}개</span></div>`+head;
   const body=s.type==="muse" ? museView()
     : s.type==="daily" ? dailyView()
     : s.type==="habit" ? habitView()
