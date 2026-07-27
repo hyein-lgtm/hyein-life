@@ -362,6 +362,19 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   .msum{width:100%;order:9;margin:6px 0 0;text-align:center}
   .dcell2{height:38px}
 }
+/* --- 데일리: 카테고리 카드 인라인 입력 --- */
+.tshort{display:none}
+.gadd{display:flex;align-items:center;gap:8px;padding:7px 2px 1px;margin-top:2px}
+.gadd .plus{font-size:13px;font-weight:800;color:var(--cc,#9aabc6);flex:none;width:17px;text-align:center}
+.gadd input{flex:1;min-width:0;border:none;background:transparent;padding:4px 0;
+  font-size:13.5px;font-weight:600;font-family:inherit;color:var(--ink)}
+.gadd input::placeholder{color:#c2cee1;font-weight:600}
+.gadd input:focus{outline:none}
+.gadd:focus-within{border-radius:9px;background:var(--blue-xl);padding:7px 8px 7px 4px}
+.tgroup.newcat{display:block;width:100%;text-align:center;cursor:pointer;
+  border-style:dashed;background:transparent;box-shadow:none;color:#9aabc6;
+  font-size:12.5px;font-weight:700;font-family:inherit;padding:14px}
+.tgroup.newcat:hover{border-color:#bed3f7;color:var(--blue);background:var(--blue-xl)}
 /* --- 마중 캐릭터 --- */
 .ch{display:block;object-fit:contain;image-rendering:auto;-webkit-user-drag:none;user-select:none}
 .brand .logo{overflow:hidden;background:linear-gradient(160deg,#f3f7ee,#e4eddc);padding:2px}
@@ -464,6 +477,22 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   .app{border-radius:18px}
   .board,.hero,.stats,.tabs,.topbar{padding-left:15px;padding-right:15px}
 }
+/* --- 모바일: 탭 한 화면에 --- */
+@media(max-width:720px){
+  .tabs{display:grid!important;grid-template-columns:repeat(4,1fr);gap:5px;
+    overflow:visible!important;padding:12px 12px 0!important}
+  .tab{flex:none;width:100%;flex-direction:column;gap:2px;border-radius:14px;
+    padding:7px 2px 6px!important;font-size:10.5px!important;font-weight:700;line-height:1.2}
+  .tab .ch{width:24px;height:24px}
+  .tab.on{box-shadow:0 4px 12px rgba(37,99,235,.24)}
+  .tfull{display:none}
+  .tshort{display:block}
+}
+@media(max-width:360px){
+  .tabs{gap:4px;padding:12px 10px 0!important}
+  .tab{font-size:9.5px!important}
+  .tab .ch{width:21px;height:21px}
+}
 </style>
 </head>
 <body>
@@ -490,7 +519,7 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 
   <div class="board">
     <div class="toolbar">
-      <button class="btn primary" onclick="openEdit()">＋ 새 카드</button>
+      <button class="btn primary" id="btnNew" onclick="openEdit()">＋ 새 카드</button>
       <button class="btn" onclick="exportJSON()">백업</button>
       <button class="btn" onclick="document.getElementById('imp').click()">복원</button>
       <button class="btn" onclick="openSync()">기기 간 옮기기</button>
@@ -902,28 +931,31 @@ function setDay(k){daySel=k;const d=new Date(k+"T00:00:00");calY=d.getFullYear()
 function dailyList(){
   const s=ds(),all=dayTodos(daySel);
   const qe=document.getElementById("q"),q=((qe&&qe.value)||"").toLowerCase();
-  const list=all.filter(t=>(filter==="ALL"||t.cat===filter)&&(!q||t.text.toLowerCase().includes(q)));
+  const mt=t=>(!q||t.text.toLowerCase().includes(q));
   const done=all.filter(t=>t.done).length;
   const pct=all.length?Math.round(done/all.length*100):0;
   const ids=(s.cats||[]).map(c=>c.id);
-  const buckets=(s.cats||[]).slice();
-  if(list.some(t=>ids.indexOf(t.cat)<0)) buckets.push({id:"__etc",name:"기타",color:"#94a3b8"});
-  let groups="";
-  buckets.forEach(c=>{
-    const g=c.id==="__etc"?list.filter(t=>ids.indexOf(t.cat)<0):list.filter(t=>t.cat===c.id);
-    if(!g.length)return;
+  const orphan=all.filter(t=>ids.indexOf(t.cat)<0&&mt(t));
+  let bk=(s.cats||[]).filter(c=>filter==="ALL"||filter===c.id);
+  if(filter==="ALL"&&orphan.length) bk=bk.concat([{id:"__etc",name:"기타",color:"#94a3b8"}]);
+  const row=(t,c)=>`<label class="titem ${t.done?"on":""}">
+      <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
+      <span class="ttx">${esc(t.text)}</span>
+      <button class="x" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`;
+  let groups=bk.map(c=>{
+    const g=c.id==="__etc"?orphan:all.filter(t=>t.cat===c.id&&mt(t));
     const gd=g.filter(t=>t.done).length;
-    groups+=`<div class="tgroup">
+    return `<div class="tgroup" style="--cc:${c.color}">
       <div class="ghd"><span class="cdot" style="background:${c.color}"></span>${esc(c.name)}
         <span class="gcnt">${gd}/${g.length}</span></div>
-      ${g.map(t=>`<label class="titem ${t.done?"on":""}">
-        <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
-        <span class="ttx">${esc(t.text)}</span>
-        <button class="x" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`).join("")}
+      ${g.map(t=>row(t,c)).join("")}
+      ${c.id==="__etc"?"":`<div class="gadd"><span class="plus">＋</span>
+        <input id="a_${c.id}" autocomplete="off" placeholder="할 일 추가"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();addDaily('${c.id}')}"
+          onblur="addDaily('${c.id}')"></div>`}
     </div>`;
-  });
-  if(!groups) groups=`<div class="empty">${chImg("daily")}${all.length?"이 조건에 맞는 할 일이 없어요.":"오늘 할 일을 적어볼까요?"}</div>`;
-  const opts=(s.cats||[]).map(c=>`<option value="${c.id}" ${filter===c.id?"selected":""}>${esc(c.name)}</option>`).join("");
+  }).join("");
+  if(filter==="ALL") groups+=`<button class="tgroup newcat" onclick="openCats()">＋ 카테고리 추가·관리</button>`;
   const yst=dayTodos(addDays(daySel,-1)).length;
   return `<div class="dayhead">
       <div class="dhtx"><div class="dh1">${korDate(daySel)}${daySel===todayStr()?`<span class="tdbadge">오늘</span>`:""}</div>
@@ -931,22 +963,17 @@ function dailyList(){
       <div class="dring" style="--p:${pct}"><b>${pct}<i>%</i></b></div>
     </div>
     <div class="tlist">${groups}</div>
-    <div class="addline daily">
-      <select id="a_dcat">${opts}</select>
-      <input id="a_dtxt" placeholder="할 일 입력 후 Enter" onkeydown="if(event.key==='Enter')addDaily()">
-      <button class="btn primary sm" onclick="addDaily()">추가</button>
-    </div>
     ${yst?`<button class="btn sm ghost wide2" onclick="copyYesterday()">↩ 어제 할 일 ${yst}개 가져오기</button>`:""}`;
 }
-
-function addDaily(){
-  const t=document.getElementById("a_dtxt"),c=document.getElementById("a_dcat");
-  const v=(t.value||"").trim(); if(!v) return;
+function addDaily(cid){
+  const el=document.getElementById("a_"+cid); if(!el) return;
+  const v=(el.value||"").trim(); if(!v) return;
+  el.value="";
   const s=ds(); if(!s.days) s.days={};
   if(!s.days[daySel]) s.days[daySel]=[];
-  s.days[daySel].push({id:uid(),cat:c?c.value:(s.cats[0]||{}).id,text:v,done:false});
-  t.value=""; render();
-  const n=document.getElementById("a_dtxt"); if(n) n.focus();
+  s.days[daySel].push({id:uid(),cat:cid,text:v,done:false});
+  render();
+  const n=document.getElementById("a_"+cid); if(n) n.focus();
 }
 function togDaily(id){
   const t=dayTodos(daySel).find(x=>x.id===id); if(!t) return;
@@ -1206,9 +1233,12 @@ function cheerMsg(){
   if(st.cnt===0) return ["","이번 달 첫 기록을 남겨봐요. 15분 스트레칭도 충분해요."];
   return ["","이번 달 <b>"+st.cnt+"회</b> · "+hhmm(st.min)+" 기록했어요. 목표까지 "+left+"회!"];
 }
+const SHORT={project:"프로젝트",work:"업무",daily:"투두",book:"독서",habit:"운동",muse:"브랜드",estate:"부동산"};
 function renderTabs(){
-  document.getElementById("tabs").innerHTML=Object.keys(DATA).map(k=>
-    `<button class="tab ${k===cur?"on":""}" onclick="go('${k}')">${chImg(k)}${esc(DATA[k].label.replace(/^\S+\s/,""))}</button>`).join("");
+  document.getElementById("tabs").innerHTML=Object.keys(DATA).map(k=>{
+    const full=esc(DATA[k].label.replace(/^\S+\s/,""));
+    return `<button class="tab ${k===cur?"on":""}" onclick="go('${k}')">${chImg(k)}<span class="tfull">${full}</span><span class="tshort">${esc(SHORT[k]||full)}</span></button>`;
+  }).join("");
 }
 function go(k){cur=k;filter="ALL";document.getElementById("q").value="";render();}
 
@@ -1411,6 +1441,8 @@ function render(){
       : `<div class="empty">${chImg(cur)}표시할 카드가 없어요.<br>［＋ 새 카드］로 추가해보세요.</div>`);
   document.getElementById("panel").innerHTML=head+body;
   document.getElementById("tbNow").textContent=s.label;
+  const bn=document.getElementById("btnNew");
+  if(bn) bn.textContent=s.type==="daily"?"＋ 할 일 쓰기":s.type==="habit"?"＋ 오늘 기록":"＋ 새 카드";
   save();
 }
 function shiftMonth(n){calM+=n;if(calM<0){calM=11;calY--;}if(calM>11){calM=0;calY++;}render();}
@@ -1424,7 +1456,7 @@ function delItem(id){
 function openEdit(id){
   const s=DATA[cur];
   if(s.type==="habit"){openDay(todayStr());return;}
-  if(s.type==="daily"){const el=document.getElementById("a_dtxt");if(el)el.focus();return;}
+  if(s.type==="daily"){const c=(ds().cats||[])[0];const el=c&&document.getElementById("a_"+c.id);if(el){el.focus();}else{openCats();}return;}
   if(s.type==="muse"&&!id){newOn(todayStr());return;}
   editing=id?find(id):null;
   document.getElementById("mSave").style.display="";
