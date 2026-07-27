@@ -490,65 +490,128 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .hnsd{font-size:10.5px;font-weight:800;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
 @media (max-width:560px){.heroNs{font-size:11.5px;margin-top:7px}}
 /* --- 2026 북극성 --- */
-.north{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:15px 16px 14px;margin-bottom:14px;
-  background-image:radial-gradient(circle at 92% 8%,rgba(37,99,235,.07),transparent 42%)}
-.nshead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.nshead b{font-size:14px;letter-spacing:-.02em}
+.north{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:0;margin-bottom:16px;overflow:hidden}
+.nstop{padding:16px 17px 15px;background:linear-gradient(160deg,#f4f8ff 0%,#eef3fc 55%,#f7f9fd 100%);border-bottom:1px solid var(--line)}
+.nstl2{display:flex;align-items:center;gap:7px;margin-bottom:11px}
+.nstl2 b{font-size:13px;letter-spacing:.01em}
 .nsyy{font-size:11px;font-weight:900;color:#fff;background:var(--ink);border-radius:999px;padding:2px 9px;letter-spacing:.02em}
-.nsdday{font-size:11px;font-weight:800;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
-.nshead .btn{margin-left:0}
-.nshead .btn.primary{margin-left:auto}
-.nsstate{cursor:pointer;padding:11px 13px;border-radius:13px;background:#f5f8fd;border:1px solid var(--line);margin-bottom:12px}
-.nsstate h3{margin:0;font-size:17px;line-height:1.45;letter-spacing:-.03em}
-.nsstate h3.ph{color:var(--muted);font-weight:600;font-size:14px}
-.nsstate p{margin:6px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6;white-space:pre-wrap}
-.nstot{margin-bottom:13px}
-.nstl{display:flex;align-items:baseline;gap:8px;margin-bottom:5px}
-.nstl b{font-size:13px}
-.nstl span{font-size:11px;color:var(--muted);margin-left:auto}
-.nsbar{position:relative;height:7px;border-radius:99px;background:#e8ecf4;overflow:visible}
-.nsbar.big{height:10px}
+.nsdday{margin-left:auto;font-size:11px;font-weight:800;color:#5b86e5;background:rgba(91,134,229,.13);border-radius:999px;padding:3px 10px}
+.nsstate{cursor:pointer;margin-bottom:14px}
+.nsstate h3{margin:0;font-size:21px;line-height:1.4;letter-spacing:-.035em;font-weight:800}
+.nsstate h3.ph{color:var(--muted);font-weight:600;font-size:15px}
+.nsstate p{margin:8px 0 0;font-size:12.5px;color:var(--muted);line-height:1.65;white-space:pre-wrap}
+.nsgauge{display:flex;align-items:center;gap:14px}
+.ngnum{font-size:40px;font-weight:900;line-height:1;letter-spacing:-.05em;flex:none;color:#5b86e5}
+.ngnum i{font-style:normal;font-size:17px;font-weight:800;margin-left:1px}
+.ngnum.good{color:#1a9c66}.ngnum.warn{color:#e2a03f}.ngnum.bad{color:#e05b5b}
+.ngside{flex:1;min-width:0}
+.ngbar{position:relative;height:11px;border-radius:99px;background:rgba(15,27,51,.09);overflow:visible}
+.ngbar i{display:block;height:100%;border-radius:99px;background:#5b86e5;transition:width .35s}
+.ngbar i.good{background:linear-gradient(90deg,#25b37a,#1a9c66)}
+.ngbar i.warn{background:linear-gradient(90deg,#f0bb63,#e2a03f)}
+.ngbar i.bad{background:linear-gradient(90deg,#f08585,#e05b5b)}
+.ngbar u{position:absolute;top:-4px;width:2px;height:calc(100% + 8px);background:rgba(15,27,51,.4);border-radius:2px}
+.ngtx{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:11px;font-weight:700;color:var(--muted)}
+.ngtx span:first-child{color:var(--ink)}
+/* 분기 */
+.nsq4s{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:14px 17px 0}
+.nsq4{border:1px solid var(--line);border-radius:13px;padding:10px 11px;cursor:pointer;background:var(--card);min-height:66px}
+.nsq4:hover{border-color:#c3cede}
+.nsq4.on{border-color:#5b86e5;background:rgba(91,134,229,.05);box-shadow:0 0 0 2px rgba(91,134,229,.12)}
+.qh{font-size:12px;font-weight:900;display:flex;align-items:baseline;gap:5px;margin-bottom:5px}
+.qh span{font-size:9.5px;color:var(--muted);font-weight:700}
+.qnow{margin-left:auto;font-size:9.5px;font-weight:900;color:#fff;background:#5b86e5;border-radius:999px;padding:2px 7px}
+.qb{font-size:11.5px;line-height:1.5;color:var(--ink);white-space:pre-wrap;word-break:break-all}
+.qb i{color:var(--muted);opacity:.6;font-style:normal}
+/* 목표 리스트 */
+.nsbhead{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:16px 17px 9px}
+.nsbhead b{font-size:13px;letter-spacing:-.02em}
+.nsbhead>span{font-size:11px;font-weight:800;color:var(--muted);background:#f1f4fa;border-radius:999px;padding:2px 8px}
+.nsbhead .btn{margin-left:0}
+.nsbhead .btn.primary{margin-left:auto}
+.nsgs{display:grid;gap:9px;padding:0 17px 16px}
+.nsg{border:1px solid var(--line);border-radius:14px;padding:12px 13px 11px;cursor:pointer;background:var(--card);border-left:4px solid #5b86e5}
+.nsg.full{border-left-color:#1a9c66;background:rgba(26,156,102,.035)}
+.nsg.late{border-left-color:#e2a03f}
+.nsg:hover{border-color:#c3cede}
+.nsgt{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.nsgt b{font-size:14.5px;letter-spacing:-.025em}
+.nsauto{font-size:10px;font-weight:800;color:#7a8aa5;background:#f1f4fa;border-radius:999px;padding:2px 6px}
+.nsq{font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 7px;margin-left:auto;color:#5b86e5;background:rgba(91,134,229,.12)}
+.nsgm{display:flex;align-items:baseline;gap:8px;margin-bottom:7px}
+.nsnum{font-size:19px;font-weight:900;letter-spacing:-.04em}
+.nsnum em{font-style:normal;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:0}
+.nspct{margin-left:auto;font-size:17px;font-weight:900;color:#5b86e5;letter-spacing:-.04em}
+.nspct i{font-style:normal;font-size:11px;font-weight:800;margin-left:1px}
+.nspct.full{color:#1a9c66}.nspct.late{color:#e2a03f}
+.nsbar{position:relative;height:8px;border-radius:99px;background:#e8ecf4;overflow:visible}
 .nsbar i{display:block;height:100%;border-radius:99px;background:#5b86e5;transition:width .3s}
-.nsbar i.full{background:#22a06b}
+.nsbar i.full{background:#1a9c66}
 .nsbar i.late{background:#e2a03f}
 .nsbar u{position:absolute;top:-3px;width:2px;height:calc(100% + 6px);background:rgba(15,27,51,.28);border-radius:2px}
-.nsgs{display:grid;gap:9px}
-.nsg{border:1px solid var(--line);border-radius:13px;padding:10px 12px 9px;cursor:pointer;background:var(--card)}
-.nsg:hover{border-color:#c3cede}
-.nsgt{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:7px}
-.nsgt b{font-size:13.5px;letter-spacing:-.02em}
-.nsarea{font-size:10.5px;font-weight:800;color:var(--muted);background:#f1f4fa;border-radius:999px;padding:2px 7px}
-.nsauto{font-size:10px}
-.nsq{font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 7px;margin-left:auto}
-.nsq{color:#5b86e5;background:rgba(91,134,229,.12)}
-.nsgm{display:flex;align-items:baseline;gap:8px;margin-top:6px}
-.nsnum{font-size:13px;font-weight:800}
-.nsnum em{font-style:normal;font-size:11px;color:var(--muted);font-weight:700}
-.nspct{margin-left:auto;font-size:12px;font-weight:800;color:#5b86e5}
-.nspct.full{color:#22a06b}.nspct.late{color:#e2a03f}
-.nsnote{margin-top:6px;font-size:11.5px;color:var(--muted)}
-.nsempty{border:1px dashed var(--line);border-radius:13px;padding:18px 12px;text-align:center;font-size:12.5px;color:var(--muted)}
-.nsq4s{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
-.nsq4{border:1px solid var(--line);border-radius:11px;padding:8px 9px;cursor:pointer;background:var(--card);min-height:62px}
-.nsq4.on{border-color:var(--ink);box-shadow:0 0 0 2px rgba(15,27,51,.07)}
-.nsq4.past{opacity:.62}
-.qh{font-size:11px;font-weight:900;display:flex;align-items:baseline;gap:4px;margin-bottom:4px}
-.qh span{font-size:9.5px;color:var(--muted);font-weight:700}
-.qb{font-size:11px;line-height:1.5;color:var(--ink);white-space:pre-wrap;word-break:break-all}
-.qb i{color:var(--muted);opacity:.6;font-style:normal}
+.nsgf{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px}
+.nsarea{font-size:10.5px;font-weight:800;color:var(--muted);background:#f1f4fa;border-radius:999px;padding:2px 8px}
+.nsnote{font-size:11.5px;color:var(--muted)}
+.nsempty{border:1px dashed var(--line);border-radius:13px;padding:20px 12px;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.7}
+/* 다른 탭 목표 스트립 */
 .nsstrip{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:12px;padding:9px 11px;border:1px solid var(--line);border-radius:13px;background:var(--card)}
 .nsl{font-size:10.5px;font-weight:900;color:#fff;background:var(--ink);border-radius:999px;padding:2px 8px;flex:none}
 .nsc{display:inline-flex;align-items:baseline;gap:6px;font-size:11.5px;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
 .nsc b{font-weight:800;letter-spacing:-.02em}
 .nsc i{font-style:normal;color:var(--muted);font-size:11px}
 .nsc em{font-style:normal;font-weight:800;color:#5b86e5}
-.nsc em.full{color:#22a06b}
+.nsc em.full{color:#1a9c66}
 @media (max-width:560px){
-  .north{padding:13px 13px 12px;border-radius:15px}
-  .nsstate h3{font-size:15px}
-  .nsq4s{grid-template-columns:repeat(2,1fr)}
-  .nshead .btn.primary{margin-left:0}
+  .north{border-radius:16px}
+  .nstop{padding:14px 13px 13px}
+  .nsstate h3{font-size:18px}
+  .ngnum{font-size:34px}
+  .nsq4s{padding:12px 13px 0;gap:7px}
+  .nsbhead{padding:14px 13px 8px}
+  .nsbhead .btn.primary{margin-left:auto}
+  .nsgs{padding:0 13px 14px}
+  .nsnum{font-size:17px}
+  .nspct{font-size:15px}
   .nsstrip{padding:8px 9px;gap:6px}
+}
+/* --- 프로젝트 토글 목록 --- */
+.pjlist.reorder .pj{transition:transform .16s ease}
+.pj.dragging{opacity:.55;box-shadow:0 8px 22px rgba(15,27,51,.16)}
+.pjbar{display:flex;gap:7px;margin-bottom:9px}
+.pjlist{display:grid;gap:8px}
+.pj{border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden;border-left:4px solid #c9d2e2}
+.pj.st-doing{border-left-color:#5b86e5}
+.pj.st-done{border-left-color:#1a9c66}
+.pj.st-hold{border-left-color:#e2a03f}
+.pj.open{border-color:#c3cede;box-shadow:0 2px 10px rgba(15,27,51,.05)}
+.pjh{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:12px 13px;cursor:pointer;position:relative}
+.pjh:hover{background:#fafbfe}
+.pjar{font-size:11px;color:var(--muted);flex:none;width:11px}
+.pjt{font-size:14.5px;font-weight:800;letter-spacing:-.025em;flex:1;min-width:120px}
+.pjtag{font-size:10.5px;font-weight:800;color:var(--muted);background:#f1f4fa;border-radius:999px;padding:2px 8px}
+.pjd{font-size:11px;font-weight:700;color:var(--muted)}
+.pjd.near{color:#e05b5b}
+.pjck{font-size:11px;font-weight:800;color:var(--muted);margin-left:auto}
+.pjh .drag{flex:none;border:none;background:none;color:#b9c2d2;font-size:14px;cursor:grab;padding:0 2px;touch-action:none}
+.pjbody{padding:2px 14px 14px 28px;border-top:1px dashed var(--line);display:grid;gap:10px}
+.pjbody>*:first-child{margin-top:10px}
+.pjgoal{font-size:12.5px;font-weight:700;color:var(--ink)}
+.pjdesc{font-size:12.5px;line-height:1.65;color:var(--muted);white-space:pre-wrap}
+.pjsec{display:grid;gap:5px}
+.pjsl{font-size:10.5px;font-weight:900;color:var(--muted);letter-spacing:.03em}
+.pjck2,.pjms{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;line-height:1.5;cursor:pointer;padding:4px 0}
+.pjck2 .bx,.pjms .bx{flex:none;width:16px;height:16px;border-radius:5px;border:1.5px solid #ccd4e2;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;margin-top:1px}
+.pjck2.on .bx,.pjms.on .bx{background:#5b86e5;border-color:#5b86e5}
+.pjck2.on,.pjms.on{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(15,27,51,.25)}
+.pjms b{font-weight:800;font-size:11px;color:var(--muted);flex:none}
+.pjlk{display:flex;flex-wrap:wrap;gap:6px}
+.pjlk a{font-size:11.5px;font-weight:700;color:#5b86e5;border:1px solid var(--line);border-radius:999px;padding:3px 10px;text-decoration:none}
+.pjnote{font-size:12px;color:var(--muted);background:#f7f9fd;border-radius:10px;padding:9px 11px;line-height:1.6;white-space:pre-wrap}
+.pjacts{display:flex;gap:6px;flex-wrap:wrap;padding-top:2px}
+@media (max-width:560px){
+  .pjh{padding:11px 11px;gap:6px}
+  .pjt{font-size:13.5px;min-width:0;flex-basis:100%}
+  .pjbody{padding:2px 12px 12px 12px}
 }
 /* --- 동기화 --- */
 .gsbox{border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:12px;background:var(--card)}
@@ -1788,6 +1851,10 @@ function renderStats(){
     const avg=its.length?Math.round(its.reduce((a,b)=>a+(+b.progress||0),0)/its.length):0;
     const tdAll=its.reduce((a,b)=>a+b.todos.length,0);
     const tdDone=its.reduce((a,b)=>a+b.todos.filter(t=>t.done).length,0);
+    if(cur==="project"){
+      const soon=its.filter(i=>i.status!=="완료"&&i.due&&i.due<=addDays(todayStr(),7)).length;
+      cells=[["전체",its.length],["진행중",doing],["완료",done],["마감 임박",soon+"개"],["세부 할일",tdDone+"/"+tdAll]];
+    }else
     cells=[["전체",its.length],["진행중",doing],["완료",done],["평균 진행률",avg+"%"],["세부 할일",tdDone+"/"+tdAll]];
   }
   document.getElementById("stats").innerHTML=cells.map(c=>`<div class="stat">${c[0]}<b>${c[1]}</b></div>`).join("");
@@ -1977,17 +2044,17 @@ function cardDown(ev,id,now){
 function cStart(){
   if(!CDRAG)return;
   CDRAG.on=true;
-  const g=document.querySelector(".grid");if(g)g.classList.add("reorder");
-  const el=document.querySelector('.card[data-id="'+CDRAG.id+'"]');if(el)el.classList.add("dragging");
+  const g=document.querySelector(".grid,.pjlist");if(g)g.classList.add("reorder");
+  const el=document.querySelector('.card[data-id="'+CDRAG.id+'"],.pj[data-id="'+CDRAG.id+'"]');if(el)el.classList.add("dragging");
   if(navigator.vibrate){try{navigator.vibrate(12);}catch(e){}}
 }
 function cBlock(ev){if(CDRAG&&CDRAG.on&&ev.cancelable)ev.preventDefault();}
 function cardsPaint(){
-  const g=document.querySelector(".grid");if(!g)return;
-  const mk=DATA[cur].type==="muse"?museCard:taskCard;
+  const g=document.querySelector(".grid,.pjlist");if(!g)return;
+  const mk=g.classList.contains("pjlist")?pjRow:(DATA[cur].type==="muse"?museCard:taskCard);
   g.innerHTML=visible().map(mk).join("");
   g.classList.add("reorder");
-  if(CDRAG){const nw=g.querySelector('.card[data-id="'+CDRAG.id+'"]');if(nw)nw.classList.add("dragging");}
+  if(CDRAG){const nw=g.querySelector('[data-id="'+CDRAG.id+'"]');if(nw)nw.classList.add("dragging");}
 }
 function cMove(ev){
   if(!CDRAG)return;
@@ -1998,7 +2065,7 @@ function cMove(ev){
   }
   if(!document.elementFromPoint)return;
   const el=document.elementFromPoint(ev.clientX,ev.clientY);
-  const c=el&&el.closest?el.closest(".card"):null;
+  const c=el&&el.closest?el.closest(".card,.pj"):null;
   if(!c||!c.dataset.id||c.dataset.id===CDRAG.id)return;
   const a=cardsArr();
   let i=-1,j=-1;
@@ -2020,8 +2087,8 @@ function cEnd(){
   document.removeEventListener("pointerup",cUp);
   document.removeEventListener("pointercancel",cUp);
   document.removeEventListener("touchmove",cBlock);
-  const g=document.querySelector(".grid");if(g)g.classList.remove("reorder");
-  const d=document.querySelector(".card.dragging");if(d)d.classList.remove("dragging");
+  const g=document.querySelector(".grid,.pjlist");if(g)g.classList.remove("reorder");
+  const d=document.querySelector(".card.dragging,.pj.dragging");if(d)d.classList.remove("dragging");
 }
 
 /* ---- 부동산 기초 커리큘럼(완전 초보 30일) ---- */
@@ -2284,47 +2351,54 @@ function nsElapsed(){
   return Math.max(0,Math.min(100,Math.round((now-a)/(b-a)*100)));
 }
 function nsQnow(){const m=new Date().getMonth();return Math.floor(m/3)+1;}
+function nsQopts(cq){
+  const l=nsQlist().slice();
+  if(cq&&l.indexOf(cq)<0)l.unshift(cq);
+  return l.map(q=>`<option value="${q}" ${cq===q?"selected":""}>Q${q}까지 (${(q-1)*3+1}~${q*3}월)</option>`).join("");
+}
+function nsQlist(){const c=nsQnow();const a=[];for(let q=c;q<=4;q++)a.push(q);return a.length?a:[4];}
 function nsBar(g){
   const p=nsPct(g),v=nsVal(g),t=+g.target||0,a=NSAREA[g.area]||NSAREA.manual;
-  const auto=g.auto&&g.auto!=="none";
-  const late=p<Math.max(0,nsElapsed()-12);
-  return `<div class="nsg" onclick="openGoal('${g.id}')">
+  const auto=g.auto&&g.auto!=="none",el=nsElapsed();
+  const cls=p>=100?"full":(p<Math.max(0,el-12)?"late":"");
+  return `<div class="nsg ${cls}" onclick="openGoal('${g.id}')">
     <div class="nsgt"><b>${esc(g.title||"제목 없음")}</b>
-      <span class="nsarea"${a.t?` onclick="event.stopPropagation();go('${a.t}')"`:""}>${esc(a.n)}</span>
-      ${auto?`<span class="nsauto" title="자동 집계">⚡</span>`:""}
-      <span class="nsq q${g.q}">Q${g.q}</span></div>
-    <div class="nsbar"><i style="width:${p}%" class="${p>=100?"full":(late?"late":"")}"></i>
-      <u style="left:${nsElapsed()}%"></u></div>
-    <div class="nsgm"><span class="nsnum">${nfm(v)}<em>/${nfm(t)}${esc(g.unit||"")}</em></span>
-      <span class="nspct ${p>=100?"full":(late?"late":"")}">${p}%</span></div>
-    ${g.note?`<div class="nsnote">${esc(g.note)}</div>`:""}
+      ${auto?`<span class="nsauto" title="다른 탭에서 자동 집계">⚡ 자동</span>`:""}
+      <span class="nsq">Q${g.q}</span></div>
+    <div class="nsgm"><span class="nsnum">${nfm(v)}<em> / ${nfm(t)}${esc(g.unit||"")}</em></span>
+      <span class="nspct ${cls}">${p}<i>%</i></span></div>
+    <div class="nsbar"><i style="width:${p}%" class="${cls}"></i><u style="left:${el}%"></u></div>
+    <div class="nsgf"><span class="nsarea">${esc(a.n)}</span>${g.note?`<span class="nsnote">${esc(g.note)}</span>`:""}</div>
   </div>`;
 }
 function northPanel(){
-  const n=ns(),all=nsAll(),el=nsElapsed(),qn=nsQnow();
-  const goals=n.goals.length?n.goals.slice().sort((a,b)=>a.q-b.q).map(nsBar).join("")
-    :`<div class="nsempty">아직 올해 목표가 없어요. ［＋ 목표 추가］로 3~5개만 정해보세요.</div>`;
-  const qs=[1,2,3,4].map(q=>`<div class="nsq4 ${q===qn?"on":""} ${q<qn?"past":""}" onclick="openQ(${q})">
-      <div class="qh">Q${q}<span>${(q-1)*3+1}~${q*3}월</span></div>
-      <div class="qb">${n.q[q]?esc(n.q[q]):`<i>비어 있음</i>`}</div></div>`).join("");
+  const n=ns(),all=nsAll(),el=nsElapsed(),qn=nsQnow(),qs=nsQlist();
+  const gap=all-el,tone=all>=el?"good":(gap>-15?"warn":"bad");
+  const goals=n.goals.length?n.goals.slice().sort((a,b)=>(a.q-b.q)||(nsPct(b)-nsPct(a))).map(nsBar).join("")
+    :`<div class="nsempty">아직 올해 목표가 없어요.<br>［＋ 목표］로 3~5개만 정해보세요.</div>`;
+  const q4=qs.map(q=>`<div class="nsq4 ${q===qn?"on":""}" onclick="openQ(${q})">
+      <div class="qh">Q${q}<span>${(q-1)*3+1}~${q*3}월</span>${q===qn?`<b class="qnow">지금</b>`:""}</div>
+      <div class="qb">${n.q[q]?esc(n.q[q]):`<i>＋ 이 분기에 끝낼 한 가지</i>`}</div></div>`).join("");
   return `<div class="north">
-    <div class="nshead">
-      <span class="nsyy">${n.year}</span>
-      <b>북극성</b>
-      <span class="nsdday">D-${nsDays()}</span>
+    <div class="nstop">
+      <div class="nstl2"><span class="nsyy">${n.year}</span><b>북극성</b><span class="nsdday">D-${nsDays()}</span></div>
+      <div class="nsstate" onclick="openNorth()">
+        ${n.statement?`<h3>${esc(n.statement)}</h3>`:`<h3 class="ph">올해를 한 문장으로 적어보세요 ✎</h3>`}
+        ${n.why?`<p>${esc(n.why)}</p>`:""}
+      </div>
+      <div class="nsgauge">
+        <div class="ngnum ${tone}">${all}<i>%</i></div>
+        <div class="ngside">
+          <div class="ngbar"><i style="width:${all}%" class="${tone}"></i><u style="left:${el}%"></u></div>
+          <div class="ngtx"><span>전체 달성</span><span>올해 ${el}% 지남</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="nsq4s">${q4}</div>
+    <div class="nsbhead"><b>올해 핵심 목표</b><span>${n.goals.length}개</span>
       <button class="btn sm" onclick="openNorth()">문장 수정</button>
-      <button class="btn sm primary" onclick="openGoal()">＋ 목표 추가</button>
-    </div>
-    <div class="nsstate" onclick="openNorth()">
-      ${n.statement?`<h3>${esc(n.statement)}</h3>`:`<h3 class="ph">올해를 한 문장으로 적어보세요 ✎</h3>`}
-      ${n.why?`<p>${esc(n.why)}</p>`:""}
-    </div>
-    <div class="nstot">
-      <div class="nstl"><b>전체 달성 ${all}%</b><span>올해 ${el}% 지남</span></div>
-      <div class="nsbar big"><i style="width:${all}%" class="${all>=el?"full":"late"}"></i><u style="left:${el}%"></u></div>
-    </div>
+      <button class="btn sm primary" onclick="openGoal()">＋ 목표</button></div>
     <div class="nsgs">${goals}</div>
-    <div class="nsq4s">${qs}</div>
   </div>`;
 }
 function nsStrip(k){
@@ -2386,7 +2460,7 @@ function openGoal(id){
       <div class="field"><label>어느 영역</label><select id="g_area" onchange="gAreaChg()">
         ${Object.keys(NSAREA).map(k=>`<option value="${k}" ${v.area===k?"selected":""}>${NSAREA[k].n}</option>`).join("")}</select></div>
       <div class="field"><label>목표 분기</label><select id="g_q">
-        ${[1,2,3,4].map(q=>`<option value="${q}" ${(+v.q||4)===q?"selected":""}>Q${q}까지</option>`).join("")}</select></div>
+        ${nsQopts(+v.q||4)}</select></div>
     </div>
     <div class="two">
       <div class="field"><label>목표 수치</label><input id="g_target" type="number" value="${+v.target||0}"></div>
@@ -2435,6 +2509,66 @@ function delGoal(id){
   if(!confirm("이 목표를 삭제할까요?"))return;
   const n=ns();n.goals=n.goals.filter(x=>x.id!==id);closeEdit();render();
 }
+/* --- 프로젝트 토글 목록 --- */
+let pjOpen={};
+function pjTog(id,ev){
+  if(typeof noClick!=="undefined"&&noClick)return;
+  if(ev){const t=ev.target;if(t&&t.closest&&t.closest("button,a,input,select,textarea"))return;}
+  pjOpen[id]=!pjOpen[id];render();
+}
+function pjTogTodo(id,tid,ev){
+  if(ev)ev.stopPropagation();
+  const i=find(id);if(!i)return;
+  const t=(i.todos||[]).find(x=>x.id===tid);if(!t)return;
+  t.done=!t.done;autoProgress(i);render();
+}
+function pjTogMs(id,x,ev){
+  if(ev)ev.stopPropagation();
+  const i=find(id);if(!i||!i.milestones||!i.milestones[x])return;
+  i.milestones[x].done=!i.milestones[x].done;render();
+}
+function pjRow(i){
+  const op=!!pjOpen[i.id];
+  const td=i.todos||[],dn=td.filter(t=>t.done).length;
+  const dd=i.due?dday(i.due):"";
+  const near=i.due&&i.status!=="완료"&&i.due<=addDays(todayStr(),7);
+  return `<div class="pj ${op?"open":""} ${stClass(i.status)}" data-id="${i.id}">
+    <div class="pjh" onclick="pjTog('${i.id}',event)">
+      <span class="pjar">${op?"▾":"▸"}</span>
+      <span class="pjt">${esc(i.title)}</span>
+      <span class="pill ${stClass(i.status)}">${esc(i.status)}</span>
+      ${i.tag?`<span class="pjtag">${esc(i.tag)}</span>`:""}
+      ${i.due?`<span class="pjd ${near?"near":""}">📅 ${esc(i.due.slice(5))} ${esc(dd)}</span>`:""}
+      ${td.length?`<span class="pjck">☑ ${dn}/${td.length}</span>`:""}
+      <button class="drag" title="순서 이동" onpointerdown="cardDown(event,'${i.id}',1)">⠿</button>
+    </div>
+    ${op?`<div class="pjbody">
+      ${i.goal?`<div class="pjgoal">🎯 ${esc(i.goal)}</div>`:""}
+      ${i.desc?`<div class="pjdesc">${esc(i.desc)}</div>`:""}
+      ${td.length?`<div class="pjsec"><div class="pjsl">체크리스트</div>
+        ${td.map(t=>`<label class="pjck2 ${t.done?"on":""}" onclick="pjTogTodo('${i.id}','${t.id}',event)">
+          <span class="bx">${t.done?"✓":""}</span>${esc(t.text)}</label>`).join("")}</div>`:""}
+      ${(i.milestones||[]).length?`<div class="pjsec"><div class="pjsl">마일스톤</div>
+        ${i.milestones.map((m,x)=>`<div class="pjms ${m.done?"on":""}" onclick="pjTogMs('${i.id}',${x},event)">
+          <span class="bx">${m.done?"✓":""}</span><b>${esc(m.date||"")}</b>${esc(m.text)}</div>`).join("")}</div>`:""}
+      ${(i.links||[]).filter(l=>l.url).length?`<div class="pjsec"><div class="pjsl">링크</div>
+        <div class="pjlk">${i.links.filter(l=>l.url).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(l.label||l.url)} ↗</a>`).join("")}</div></div>`:""}
+      ${i.note?`<div class="pjnote">🗒 ${esc(i.note)}</div>`:""}
+      <div class="pjacts">
+        <button class="btn sm primary" onclick="openDetail('${i.id}')">상세 열기</button>
+        <button class="btn sm" onclick="openEdit('${i.id}')">빠른 수정</button>
+        <button class="btn sm danger" onclick="delItem('${i.id}')">삭제</button>
+      </div></div>`:""}
+  </div>`;
+}
+function pjView(list){
+  if(!list.length)return `<div class="empty">${chImg("project")}표시할 프로젝트가 없어요.<br>［＋ 새 카드］로 추가해보세요.</div>`;
+  const allOpen=list.every(i=>pjOpen[i.id]);
+  return `<div class="pjbar"><button class="btn sm" onclick="pjAll(${allOpen?0:1})">${allOpen?"모두 접기":"모두 펼치기"}</button></div>
+    <div class="pjlist">${list.map(pjRow).join("")}</div>`;
+}
+function pjAll(v){const l=visible();l.forEach(i=>{pjOpen[i.id]=!!v;});render();}
+
 function render(){
   renderTabs();renderHero();renderStats();renderFilters();
   const s=DATA[cur],list=visible();
@@ -2455,6 +2589,7 @@ function render(){
   const body=s.type==="muse" ? museView()
     : s.type==="daily" ? dailyView()
     : s.type==="habit" ? habitView()
+    : cur==="project" ? pjView(list)
     : (list.length
       ? `<div class="grid">${list.map(taskCard).join("")}</div>`
       : `<div class="empty">${chImg(cur)}표시할 카드가 없어요.<br>［＋ 새 카드］로 추가해보세요.</div>`);
@@ -2490,7 +2625,7 @@ function openEdit(id){
   {
     html+=`<div class="two">
       <div class="field"><label>상태</label><select id="f_status">${statusList().map(t=>`<option ${v.status===t?"selected":""}>${t}</option>`).join("")}</select></div>
-      <div class="field"><label>진행률 (%)</label><input id="f_progress" type="number" min="0" max="100" value="${v.progress==null?0:v.progress}"></div></div>
+      ${cur==="project"?`<input type="hidden" id="f_progress" value="${v.progress==null?0:v.progress}">`:`<div class="field"><label>진행률 (%)</label><input id="f_progress" type="number" min="0" max="100" value="${v.progress==null?0:v.progress}"></div>`}</div>
       <div class="two">
       <div class="field"><label>시작일</label><input id="f_start" type="date" value="${esc(v.start||"")}"></div>
       <div class="field"><label>마감일</label><input id="f_due" type="date" value="${esc(v.due||"")}"></div></div>
@@ -2554,12 +2689,12 @@ function renderDetail(){
       <div class="field"><label>상태</label><select onchange="setF2('status',this.value)">${statusList().map(t=>`<option ${i.status===t?"selected":""}>${t}</option>`).join("")}</select></div>
       <div class="field"><label>담당 / 협업</label><input value="${esc(i.owner)}" onchange="setF2('owner',this.value)"></div>
     </div>
-    <div class="three">
+    <div class="${cur==="project"?"two":"three"}">
       <div class="field"><label>시작일</label><input type="date" value="${esc(i.start)}" onchange="setF2('start',this.value)"></div>
       <div class="field"><label>마감일 ${i.due?"("+dday(i.due)+")":""}</label><input type="date" value="${esc(i.due)}" onchange="setF2('due',this.value)"></div>
-      <div class="field"><label>진행률 ${pct}%</label><input type="number" min="0" max="100" value="${pct}" onchange="setF2('progress',this.value)"></div>
+      ${cur==="project"?"":`<div class="field"><label>진행률 ${pct}%</label><input type="number" min="0" max="100" value="${pct}" onchange="setF2('progress',this.value)"></div>`}
     </div>
-    <div class="bar"><i style="width:${pct}%"></i><span>${pct}%</span></div>
+    ${cur==="project"?"":`<div class="bar"><i style="width:${pct}%"></i><span>${pct}%</span></div>`}
     <div class="field"><label>${s.type==="muse"?"🎯 이 콘텐츠의 목표 (예: 저장수 500)":"🎯 목표 (한 줄)"}</label><input value="${esc(i.goal)}" onchange="setF2('goal',this.value)"></div>
     <div class="field"><label>📄 상세 설명</label><textarea onchange="setF2('desc',this.value)">${esc(i.desc)}</textarea></div>
     ${s.type==="muse"?`
@@ -2585,7 +2720,7 @@ function renderDetail(){
     </div>`:""}
 
     <div class="sect">
-      <h4>${s.type==="muse"?"🎥 촬영·편집 컷 리스트":"☑ 체크리스트"} <span class="r">${tdDone}/${i.todos.length} 완료 · 체크하면 진행률 자동 반영</span></h4>
+      <h4>${s.type==="muse"?"🎥 촬영·편집 컷 리스트":"☑ 체크리스트"} <span class="r">${tdDone}/${i.todos.length} 완료${cur==="project"?"":" · 체크하면 진행률 자동 반영"}</span></h4>
       ${i.todos.length?i.todos.map(t=>`<div class="row">
         <input type="checkbox" ${t.done?"checked":""} onchange="togTodo('${t.id}')">
         <span class="grow ${t.done?"done":""}">${esc(t.text)}</span>
