@@ -871,6 +871,39 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   .tab .ch{width:21px;height:21px}
 }
 
+/* --- 루틴 --- */
+.titem .x.rt{font-size:12px;opacity:.4}
+.titem .x.rt:hover{opacity:1;color:var(--blue)}
+.titem .x.rt.on{opacity:1;color:var(--blue);font-weight:900}
+.titem.on .x.rt.on{opacity:.45}
+.rtq{font-size:14px;font-weight:800;color:var(--ink);padding:10px 12px;border-radius:11px;
+  background:var(--blue-xl);border:1px solid var(--line);margin-bottom:11px;word-break:break-all}
+.rtpre{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+.rtdays{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:9px}
+.rtd{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:9px 0;
+  font-size:12.5px;font-weight:800;color:var(--muted);cursor:pointer;font-family:inherit}
+.rtd:hover{border-color:var(--blue)}
+.rtd.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.rtrow{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--line)}
+.rtrow:last-child{border-bottom:none}
+.rtrow.off{opacity:.45}
+.rtrow .rtt{flex:1;min-width:0}
+.rtrow .rtt b{display:block;font-size:13px;font-weight:800;color:var(--ink);word-break:break-all}
+.rtrow .rtt span{font-size:11px;color:var(--muted);font-weight:700}
+.tgroup.newcat.rtbtn{color:var(--blue)}
+
+/* --- 설정 메뉴 --- */
+.setg{padding:13px 14px;border:1px solid var(--line);border-radius:13px;background:var(--blue-xl);margin-bottom:10px}
+.setg.danger{background:#fff6f6;border-color:#ffd7d7}
+.setg .seth{font-size:13px;font-weight:900;color:var(--ink);margin-bottom:3px}
+.setg .setd{font-size:11.5px;color:var(--muted);line-height:1.55;margin-bottom:9px;word-break:keep-all}
+.setg .setd.warn{color:#c0392b;font-weight:700}
+.setg .setb{display:flex;gap:7px;flex-wrap:wrap}
+.gearwrap{position:relative;display:inline-flex}
+.gearwrap .bdot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;
+  background:var(--danger);border:2px solid var(--card);display:none}
+.gearwrap.alert .bdot{display:block}
+
 /* ================= 다크모드 ================= */
 html[data-theme=dark]{
   color-scheme:dark;
@@ -1159,14 +1192,10 @@ html[data-theme=dark] .btn.primary,html[data-theme=dark] .sbt button.go{color:#f
   <div class="board">
     <div class="toolbar">
       <button class="btn primary" id="btnNew" onclick="openEdit()">＋ 새 카드</button>
-      <button class="btn" id="btnBk" onclick="exportJSON()">💾 백업</button>
-      <button class="btn" onclick="document.getElementById('imp').click()">복원</button>
       <button class="btn" id="btnTheme" onclick="toggleTheme()">🌙 어둡게</button>
       <button class="btn" id="btnApp" style="display:none" onclick="installApp()">🏠 홈화면에 추가</button>
-      <button class="btn" onclick="openOrder()">⇅ 탭 순서</button>
-      <button class="btn" onclick="openSync()">기기 간 옮기기</button>
+      <span class="gearwrap" id="gearWrap"><button class="btn" id="btnBk" title="설정" onclick="openSettings()">⚙</button><i class="bdot"></i></span>
       <input type="file" id="imp" accept="application/json" style="display:none" onchange="importJSON(event)">
-      <button class="btn danger" onclick="resetAll()">샘플로 초기화</button>
       <div class="spacer"></div>
       <input class="search" id="q" placeholder="검색어를 입력하세요" oninput="render()">
     </div>
@@ -1498,7 +1527,9 @@ function normalize(d){
     if(s.type==="daily"){
       s.cats=(s.cats&&s.cats.length)?s.cats:JSON.parse(JSON.stringify(SEED.daily.cats));
       s.days=s.days||{};
-      Object.keys(s.days).forEach(dk=>{ s.days[dk]=(s.days[dk]||[]).map(t=>({id:t.id||("d"+Math.random().toString(36).slice(2,8)),cat:t.cat,part:(t.part==="pm"?"pm":"am"),text:t.text||"",done:!!t.done,roll:+t.roll||0,from:t.from||""})); });
+      s.skip=s.skip||{};
+      s.routines=(s.routines||[]).filter(r=>r&&r.text).map(r=>({id:r.id||uid(),cat:r.cat,part:(r.part==="pm"?"pm":"am"),text:r.text||"",days:(Array.isArray(r.days)?r.days:[]).map(Number).filter(x=>x>=0&&x<=6),since:r.since||"",off:!!r.off})).filter(r=>r.days.length);
+      Object.keys(s.days).forEach(dk=>{ s.days[dk]=(s.days[dk]||[]).map(t=>({id:t.id||("d"+Math.random().toString(36).slice(2,8)),cat:t.cat,part:(t.part==="pm"?"pm":"am"),text:t.text||"",done:!!t.done,roll:+t.roll||0,from:t.from||"",rt:t.rt||""})); });
       s.items=[];
     }
     if(s.type==="habit"){
@@ -1719,6 +1750,7 @@ function dailyList(){
       <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
       <span class="ttx">${esc(t.text)}</span>${rollBadge(t)}
       ${sp?`<button class="x mv" title="${t.part==="pm"?"오전으로 옮기기":"오후로 옮기기"}" onclick="event.preventDefault();movePart('${t.id}')">${t.part==="pm"?"☀":"🌙"}</button>`:""}
+      <button class="x rt ${t.rt?"on":""}" title="${t.rt?"루틴 "+rtLabel(rtOf(t)||{days:[]}):"루틴으로 등록"}" onclick="event.preventDefault();openRoutine('${t.id}')">♺</button>
       <button class="x" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`;
   const addrow=(c,part)=>`<div class="gadd"><span class="plus">＋</span>
       <input id="a_${c.id}${part==="pm"?"_pm":""}" autocomplete="off" placeholder="${part==="pm"?"오후 할 일 추가":part==="am"?"오전 할 일 추가":"할 일 추가"}"
@@ -1744,7 +1776,8 @@ function dailyList(){
       ${body}
     </div>`;
   }).join("");
-  if(filter==="ALL") groups+=`<button class="tgroup newcat" onclick="openCats()">＋ 카테고리 추가·관리</button>`;
+  if(filter==="ALL") groups+=`<button class="tgroup newcat" onclick="openCats()">＋ 카테고리 추가·관리</button>`
+    +`<button class="tgroup newcat rtbtn" onclick="openRoutineList()">♺ 반복 루틴 관리 ${(ds().routines||[]).length?"("+(ds().routines||[]).length+"개)":""}</button>`;
   const yst=dayTodos(addDays(daySel,-1)).length;
   const rolled=all.filter(t=>(+t.roll||0)>0&&!t.done);
   const stuck=rolled.filter(t=>(+t.roll||0)>=3);
@@ -1758,6 +1791,117 @@ function dailyList(){
     <div class="tlist">${groups}</div>
     ${yst?`<button class="btn sm ghost wide2" onclick="copyYesterday()">↩ 어제 한 일 ${yst}개 그대로 가져오기</button>`:""}`;
 }
+/* ---- 루틴(반복 할 일) ---- */
+function rts(){const s=ds();return s.routines||(s.routines=[]);}
+function dowOf(k){return (new Date(k+"T00:00:00").getDay()+6)%7;}
+function rtOf(t){return t&&t.rt?rts().find(r=>r.id===t.rt):null;}
+function rtLabel(r){
+  const d=(r.days||[]).slice().sort((a,b)=>a-b);
+  if(d.length===7)return "매일";
+  if(d.length===5&&d.join()==="0,1,2,3,4")return "평일";
+  if(d.length===2&&d.join()==="5,6")return "주말";
+  return d.map(x=>WD[x]).join("·");
+}
+function syncRoutines(k){
+  if(k<todayStr())return;
+  const s=ds(),rs=rts(); if(!rs.length)return;
+  const w=dowOf(k),skip=(s.skip&&s.skip[k])||[];
+  if(!s.days)s.days={};
+  rs.forEach(r=>{
+    if(r.off)return;
+    if(r.since&&k<r.since)return;
+    if((r.days||[]).indexOf(w)<0)return;
+    if(skip.indexOf(r.id)>=0)return;
+    if(dayTodos(k).some(x=>x.rt===r.id))return;
+    if(!s.days[k])s.days[k]=[];
+    s.days[k].push({id:uid(),cat:r.cat,part:r.part==="pm"?"pm":"am",text:r.text,done:false,rt:r.id});
+  });
+}
+let rtPick={tid:null,id:null,days:[]};
+function rtDaysHtml(){
+  return WD.map((n,i)=>`<button type="button" class="rtd ${rtPick.days.indexOf(i)>=0?"on":""}" onclick="rtTog(${i})">${n}</button>`).join("");
+}
+function rtPaint(){const e=document.getElementById("rtDays");if(e)e.innerHTML=rtDaysHtml();}
+function rtTog(i){
+  const p=rtPick.days.indexOf(i);
+  if(p>=0)rtPick.days.splice(p,1);else rtPick.days.push(i);
+  rtPaint();
+}
+function rtSet(mode){
+  rtPick.days = mode==="every"?[0,1,2,3,4,5,6] : mode==="week"?[0,1,2,3,4] : [5,6];
+  rtPaint();
+}
+function openRoutine(tid){
+  const t=dayTodos(daySel).find(x=>x.id===tid); if(!t)return;
+  const r=rtOf(t);
+  rtPick={tid:tid,id:r?r.id:null,days:r?(r.days||[]).slice():[dowOf(daySel)]};
+  document.getElementById("mTitle").textContent=r?"♺ 루틴 수정":"♺ 루틴으로 등록";
+  document.getElementById("mIc").innerHTML="♺";
+  document.getElementById("mForm").innerHTML=`
+    <div class="rtq">${esc(t.text)}</div>
+    <div class="rtpre">
+      <button type="button" class="btn sm" onclick="rtSet('every')">매일</button>
+      <button type="button" class="btn sm" onclick="rtSet('week')">평일 (월~금)</button>
+      <button type="button" class="btn sm" onclick="rtSet('end')">주말</button>
+    </div>
+    <div class="rtdays" id="rtDays">${rtDaysHtml()}</div>
+    <div class="hint2">체크한 요일이 되면 이 할 일이 자동으로 만들어져요. 지난 날짜에는 만들지 않아요.</div>
+    ${r?`<button type="button" class="btn danger wide" style="margin-top:12px" onclick="rtRemove()">루틴 해제</button>`:""}`;
+  document.getElementById("mSave").style.display="";
+  document.getElementById("mSave").setAttribute("data-ns","rt");
+  document.getElementById("overlay").classList.add("on");
+}
+function saveRoutine(){
+  if(!rtPick.days.length){alert("요일을 하나 이상 골라주세요.");return;}
+  const t=dayTodos(daySel).find(x=>x.id===rtPick.tid); if(!t){closeEdit();return;}
+  const s=ds();
+  let r=rtPick.id?rts().find(x=>x.id===rtPick.id):null;
+  if(r){ r.days=rtPick.days.slice(); r.text=t.text; r.cat=t.cat; r.part=t.part; r.off=false; }
+  else{
+    r={id:uid(),cat:t.cat,part:t.part==="pm"?"pm":"am",text:t.text,
+       days:rtPick.days.slice(),since:daySel,off:false};
+    rts().push(r); t.rt=r.id;
+  }
+  if(s.skip&&s.skip[daySel])s.skip[daySel]=s.skip[daySel].filter(x=>x!==r.id);
+  closeEdit();
+  try{toast("♺ "+rtLabel(r)+" 루틴으로 등록했어요");}catch(e){}
+  render();
+}
+function rtRemove(){
+  const r=rtPick.id?rts().find(x=>x.id===rtPick.id):null;
+  if(!r){closeEdit();return;}
+  if(!confirm("이 루틴을 해제할까요?\n앞으로 자동으로 만들어지지 않아요. (이미 만들어진 할 일은 그대로 남아요)"))return;
+  const s=ds();
+  s.routines=rts().filter(x=>x.id!==r.id);
+  const t=dayTodos(daySel).find(x=>x.id===rtPick.tid); if(t)t.rt="";
+  closeEdit();
+  try{toast("♺ 루틴을 해제했어요");}catch(e){}
+  render();
+}
+function openRoutineList(){
+  const rs=rts();
+  document.getElementById("mTitle").textContent="♺ 루틴 관리";
+  document.getElementById("mIc").innerHTML="♺";
+  document.getElementById("mForm").innerHTML= rs.length
+    ? `<div class="hint2" style="margin:0 0 10px">잠시 쉬고 싶으면 끄기만 해도 돼요. 끈 루틴은 할 일이 만들어지지 않아요.</div>
+       ${rs.map(r=>{const c=catOf(r.cat);return `<div class="rtrow ${r.off?"off":""}">
+         <span class="cdot" style="background:${c.color}"></span>
+         <div class="rtt"><b>${esc(r.text)}</b><span>${rtLabel(r)} · ${esc(c.name)}</span></div>
+         <button class="btn sm" onclick="rtOff('${r.id}')">${r.off?"켜기":"끄기"}</button>
+         <button class="btn sm danger" onclick="rtDel('${r.id}')">삭제</button>
+       </div>`;}).join("")}`
+    : `<div class="empty" style="padding:24px 0">아직 등록한 루틴이 없어요.<br>할 일 옆 <b>♺</b> 를 눌러 반복으로 만들어보세요.</div>`;
+  document.getElementById("mSave").style.display="none";
+  document.getElementById("overlay").classList.add("on");
+}
+function rtOff(id){const r=rts().find(x=>x.id===id);if(!r)return;r.off=!r.off;save();openRoutineList();render();}
+function rtDel(id){
+  if(!confirm("이 루틴을 삭제할까요?"))return;
+  const s=ds();s.routines=rts().filter(x=>x.id!==id);
+  Object.keys(s.days||{}).forEach(k=>{(s.days[k]||[]).forEach(t=>{if(t.rt===id)t.rt="";});});
+  save();openRoutineList();render();
+}
+
 /* ---- 못 한 할 일 자동 이월 ---- */
 const ROLLDAYS=14;
 function autoRoll(){
@@ -1766,7 +1910,7 @@ function autoRoll(){
   let n=0;
   Object.keys(s.days).forEach(k=>{
     if(k>=t||k<lim) return;
-    const src=s.days[k]||[], stay=src.filter(x=>x.done), go=src.filter(x=>!x.done);
+    const src=s.days[k]||[], stay=src.filter(x=>x.done||x.rt), go=src.filter(x=>!x.done&&!x.rt);
     if(!go.length) return;
     if(!s.days[t]) s.days[t]=[];
     const have=s.days[t].map(x=>x.text);
@@ -1838,7 +1982,12 @@ function togDaily(id){
   t.done=!t.done; render();
 }
 function delDaily(id){
-  const s=ds(); s.days[daySel]=dayTodos(daySel).filter(x=>x.id!==id); render();
+  const s=ds(),t=dayTodos(daySel).find(x=>x.id===id);
+  if(t&&t.rt){
+    if(!s.skip)s.skip={}; if(!s.skip[daySel])s.skip[daySel]=[];
+    if(s.skip[daySel].indexOf(t.rt)<0)s.skip[daySel].push(t.rt);
+  }
+  s.days[daySel]=dayTodos(daySel).filter(x=>x.id!==id); render();
 }
 function copyYesterday(){
   const y=addDays(daySel,-1),src=dayTodos(y); if(!src.length) return;
@@ -1916,7 +2065,7 @@ function dailyMonth(){
       <span>0 → 100%</span></div>
   </div>`;
 }
-function dailyView(){ autoRoll(); return weekStrip()+dailyList()+dailyMonth(); }
+function dailyView(){ syncRoutines(daySel); autoRoll(); return weekStrip()+dailyList()+dailyMonth(); }
 
 /* ---- 인플루언서(muse) 탭 ---- */
 function statusList(){return DATA[cur]&&DATA[cur].type==="muse"?MSTATUS:STATUSES;}
@@ -3339,6 +3488,7 @@ function closeEdit(){document.getElementById("overlay").classList.remove("on");e
 function saveEdit(){
   const tag=document.getElementById("mSave").getAttribute("data-ns");
   if(tag){
+    if(tag==="rt")return saveRoutine();
     if(tag==="north")return saveNorth();
     if(tag.indexOf("q")===0)return saveQ(+tag.slice(1));
     if(tag.indexOf("goal:")===0)return saveGoal(tag.slice(5));
@@ -3587,12 +3737,44 @@ function toggleTheme(){setTheme(themeGet()==="dark"?"light":"dark");}
 
 /* ---- 백업 상태 ---- */
 function renderBk(){
-  const b=document.getElementById("btnBk");if(!b)return;
+  const w=document.getElementById("gearWrap");if(!w)return;
+  w.classList.toggle("alert",bkStale());
+  const b=document.getElementById("btnBk");
+  if(b)b.title="설정";
+}
+
+/* ---- 설정 메뉴 ---- */
+function bkStale(){const l=DATA.__backup||"";return (!l)||(l<addDays(todayStr(),-14));}
+function openSettings(){
   const l=DATA.__backup||"";
-  const stale=(!l)||(l<addDays(todayStr(),-14));
-  b.classList.toggle("danger",stale);
-  b.textContent=l?("💾 백업 · "+l.slice(5).replace("-",".")):"💾 백업 (아직 없음)";
-  b.title=l?("마지막 백업: "+l):"아직 한 번도 백업하지 않았어요";
+  document.getElementById("mTitle").textContent="⚙ 설정";
+  document.getElementById("mForm").innerHTML=`
+    <div class="setg">
+      <div class="seth">💾 백업</div>
+      <div class="setd ${bkStale()?"warn":""}">${l?("마지막 백업: "+l):"아직 한 번도 백업하지 않았어요. 브라우저를 정리하면 전부 사라져요."}</div>
+      <div class="setb">
+        <button class="btn primary" onclick="closeEdit();exportJSON()">파일로 내보내기</button>
+        <button class="btn" onclick="closeEdit();document.getElementById('imp').click()">파일에서 복원</button>
+      </div>
+    </div>
+    <div class="setg">
+      <div class="seth">🔄 기기 간 동기화</div>
+      <div class="setd">구글 드라이브로 PC와 휴대폰 내용을 자동으로 맞춰요.</div>
+      <div class="setb"><button class="btn" onclick="closeEdit();openSync()">설정하기</button></div>
+    </div>
+    <div class="setg">
+      <div class="seth">⇅ 탭 순서</div>
+      <div class="setd">탭을 길게 눌러 끌어도 순서가 바뀌어요.</div>
+      <div class="setb"><button class="btn" onclick="closeEdit();openOrder()">순서 바꾸기</button></div>
+    </div>
+    <div class="setg danger">
+      <div class="seth">⚠ 초기화</div>
+      <div class="setd">모든 내용이 사라지고 샘플 데이터로 돌아가요. 되돌릴 수 없어요.</div>
+      <div class="setb"><button class="btn danger" onclick="closeEdit();resetAll()">샘플로 초기화</button></div>
+    </div>`;
+  document.getElementById("mIc").innerHTML="⚙";
+  document.getElementById("mSave").style.display="none";
+  document.getElementById("overlay").classList.add("on");
 }
 
 /* ---- 백업 ---- */
