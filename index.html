@@ -65,6 +65,14 @@ a{color:var(--blue)}
   padding:9px 15px;font-size:13px;font-weight:600;transition:.15s}
 .tab:hover{border-color:#bed3f7;color:var(--blue)}
 .tab.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.26)}
+/* 데일리 투두 탭 강조 */
+.tab[data-k="daily"]{background:linear-gradient(135deg,#ffeef5,#ffe1ee);border-color:#ffc2d8;color:#d4477e;font-weight:800}
+.tab[data-k="daily"]:hover{border-color:#ff9ec1;color:#c93a70;background:linear-gradient(135deg,#ffe6f0,#ffd6e8)}
+.tab[data-k="daily"].on{background:linear-gradient(135deg,#ff7fae,#f6538d);border-color:#f6538d;color:#fff;
+  box-shadow:0 6px 18px rgba(246,83,141,.32)}
+.tab[data-k="daily"]::after{content:"";width:5px;height:5px;border-radius:50%;background:#f6538d;
+  display:inline-block;margin-left:5px;vertical-align:middle}
+.tab[data-k="daily"].on::after{background:#fff}
 /* board */
 .board{padding:18px 24px 28px}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
@@ -827,6 +835,9 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
     padding:7px 2px 6px!important;font-size:10.5px!important;font-weight:700;line-height:1.2}
   .tab .ch{width:24px;height:24px}
   .tab.on{box-shadow:0 4px 12px rgba(37,99,235,.24)}
+  .tab[data-k="daily"]::after{display:none}
+  .tab[data-k="daily"]{border-width:1.5px;box-shadow:0 2px 8px rgba(246,83,141,.18)}
+  .tab[data-k="daily"].on{box-shadow:0 4px 14px rgba(246,83,141,.34)}
   .tfull{display:none}
   .tshort{display:block}
 }
