@@ -525,6 +525,20 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .qb i{color:var(--muted);opacity:.6;font-style:normal}
 /* 목표 리스트 */
 .nsbhead{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:16px 17px 9px}
+.nsbhead i{font-style:normal;font-size:10.5px;color:var(--muted);font-weight:600}
+.nsbhead.sub{padding-top:6px;border-top:1px dashed var(--line);margin:4px 17px 0;padding-left:0;padding-right:0}
+.nsg.issub{border-left-width:3px;border-left-color:#c3cede;padding:9px 11px 8px;opacity:.92}
+.nsg.issub .nsgt b{font-size:13px}
+.nsg.issub .nsnum{font-size:15px}
+.nsg.issub .nspct{font-size:14px}
+.nsg.issub.full{border-left-color:#7fc7a6}
+.nsgs.sub{gap:7px}
+.kindpick{display:flex;gap:6px}
+.kbtn{flex:1;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 6px;
+  font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;font-family:inherit;letter-spacing:-.02em}
+.kbtn.on.core{background:#f5b73f;border-color:#f5b73f;color:#fff}
+.kbtn.on.sub{background:#8e99ab;border-color:#8e99ab;color:#fff}
+.nsc.sub{opacity:.8}
 .nsbhead b{font-size:13px;letter-spacing:-.02em}
 .nsbhead>span{font-size:11px;font-weight:800;color:var(--muted);background:#f1f4fa;border-radius:999px;padding:2px 8px}
 .nsbhead .btn{margin-left:0}
@@ -573,6 +587,68 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   .nsnum{font-size:17px}
   .nspct{font-size:15px}
   .nsstrip{padding:8px 9px;gap:6px}
+}
+/* --- 비밀 탭: 꿈 보드 --- */
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);z-index:9999;
+  background:rgba(15,27,51,.93);color:#fff;font-size:12.5px;font-weight:700;padding:10px 16px;
+  border-radius:999px;opacity:0;pointer-events:none;transition:all .25s;letter-spacing:-.02em}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.dmhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.dmt b{font-size:14px;letter-spacing:-.02em;display:block}
+.dmt span{font-size:11.5px;color:var(--muted);font-weight:700}
+.dmhead .btn{margin-left:auto}
+.dmgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.dmc{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;
+  background:linear-gradient(160deg,#1e2a44,#2f3f63);box-shadow:0 2px 12px rgba(15,27,51,.08)}
+.dmc:hover{transform:translateY(-2px);transition:transform .18s}
+.dmimg{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.dmimg img{width:100%;height:100%;object-fit:cover;display:block}
+.dmph{font-size:34px;opacity:.6}
+.dmc.done .dmimg img{filter:saturate(1.05)}
+.dmcap{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 11px;color:#fff;
+  background:linear-gradient(to top,rgba(10,16,30,.88),rgba(10,16,30,0))}
+.dmcap b{display:block;font-size:13.5px;font-weight:800;letter-spacing:-.03em;line-height:1.35}
+.dmcap span{display:block;margin-top:3px;font-size:10.5px;opacity:.8;font-weight:700}
+.dmstamp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-14deg);
+  border:3px solid #e05b5b;color:#e05b5b;border-radius:12px;padding:7px 12px;text-align:center;
+  background:rgba(255,255,255,.86);box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.dmstamp b{display:block;font-size:15px;font-weight:900;letter-spacing:-.03em}
+.dmstamp i{display:block;font-style:normal;font-size:9.5px;font-weight:800;margin-top:1px}
+.dmup{border:1px dashed var(--line);border-radius:12px;min-height:120px;display:flex;align-items:center;
+  justify-content:center;overflow:hidden;background:#f7f9fd;margin-bottom:7px}
+.dmup img{width:100%;max-height:240px;object-fit:cover;display:block}
+.dmup span{font-size:12px;color:var(--muted);font-weight:700}
+.dmupb{display:flex;gap:6px}
+.stampbtn{width:100%;border:2px dashed var(--line);background:var(--card);border-radius:12px;padding:12px;
+  font-size:12.5px;font-weight:800;color:var(--muted);cursor:pointer;font-family:inherit;letter-spacing:-.02em}
+.stampbtn.on{border-style:solid;border-color:#e05b5b;color:#e05b5b;background:rgba(224,91,91,.06)}
+@media (max-width:560px){
+  .dmgrid{gap:9px}
+  .dmcap b{font-size:12.5px}
+  .dmstamp b{font-size:13px}
+}
+/* --- 진행 단계 --- */
+.stepv{display:flex;align-items:center;gap:8px;margin:9px 0 2px}
+.sdots{display:inline-flex;gap:3px;flex:none}
+.sdots i{display:block;width:16px;height:6px;border-radius:99px;background:#e6eaf2}
+.stepv.k1 .sdots i.on{background:#9db7ec}
+.stepv.k2 .sdots i.on{background:#7fa2e8}
+.stepv.k3 .sdots i.on{background:#5b86e5}
+.stepv.k4 .sdots i.on{background:#1a9c66}
+.stepv b{font-size:11.5px;font-weight:800;color:#5b86e5;letter-spacing:-.02em}
+.stepv.k0 b{color:var(--muted)}
+.stepv.k4 b{color:#1a9c66}
+.steppick{display:flex;gap:5px;flex-wrap:wrap}
+.sbtn{flex:1;min-width:56px;border:1px solid var(--line);background:var(--card);border-radius:10px;
+  padding:8px 4px;font-size:11.5px;font-weight:800;color:var(--muted);cursor:pointer;font-family:inherit;
+  letter-spacing:-.02em;transition:all .15s}
+.sbtn:hover{border-color:#c3cede}
+.sbtn.on{background:#5b86e5;border-color:#5b86e5;color:#fff;box-shadow:0 2px 8px rgba(91,134,229,.25)}
+.sbtn.on.k0{background:#8e99ab;border-color:#8e99ab;box-shadow:none}
+.sbtn.on.k4{background:#1a9c66;border-color:#1a9c66;box-shadow:0 2px 8px rgba(26,156,102,.25)}
+@media (max-width:560px){
+  .sbtn{min-width:0;padding:8px 2px;font-size:10.5px}
+  .sdots i{width:13px}
 }
 /* --- 프로젝트 토글 목록 --- */
 .pjlist.reorder .pj{transition:transform .16s ease}
@@ -754,7 +830,7 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 <div class="app">
   <div class="topbar">
     <div class="brand">
-      <div class="logo" id="tbLogo"></div>
+      <div class="logo" id="tbLogo" onclick="logoTap()"></div>
       <div><h1>My Life OS</h1><p>hyein's workspace · 2026</p></div>
     </div>
     <div class="topmeta"><span id="tbNow">workspace</span><span class="dot"></span><span id="clock">00:00</span></div>
@@ -842,11 +918,11 @@ const SEED = {
       why:"회사 밖에서도 굴러가는 나만의 축을 올해 안에 세운다.\n흔들릴 땐 '이게 그 축을 키우는 일인가'만 물어본다.",
       q:{1:"기록 습관 정착 · 릴스 포맷 실험",2:"콘텐츠 주 2회 루틴화",3:"임장·청약 실전 1건",4:"올해 정리 · 내년 축 설계"},
       goals:[
-        {id:"n1",title:"릴스 60개 발행",area:"muse",auto:"muse_pub",target:60,unit:"개",q:4,note:"주 2개 페이스면 도달"},
-        {id:"n2",title:"팔로워 5,000명",area:"muse",auto:"muse_fol",target:5000,unit:"명",q:4,note:""},
-        {id:"n3",title:"책 24권 완독",area:"book",auto:"book_done",target:24,unit:"권",q:4,note:"월 2권"},
-        {id:"n4",title:"운동 150회",area:"habit",auto:"habit_cnt",target:150,unit:"회",q:4,note:"주 3회"},
-        {id:"n5",title:"부동산 공부 200일",area:"estate",auto:"estate_day",target:200,unit:"일",q:4,note:"하루 10분이라도"}
+        {id:"n1",title:"릴스 60개 발행",area:"muse",auto:"muse_pub",target:60,unit:"개",q:4,kind:"core",note:"주 2개 페이스면 도달"},
+        {id:"n2",title:"팔로워 5,000명",area:"muse",auto:"muse_fol",target:5000,unit:"명",q:4,kind:"core",note:""},
+        {id:"n3",title:"책 24권 완독",area:"book",auto:"book_done",target:24,unit:"권",q:4,kind:"sub",note:"월 2권"},
+        {id:"n4",title:"운동 150회",area:"habit",auto:"habit_cnt",target:150,unit:"회",q:4,kind:"sub",note:"주 3회"},
+        {id:"n5",title:"부동산 공부 200일",area:"estate",auto:"estate_day",target:200,unit:"일",q:4,kind:"core",note:"하루 10분이라도"}
       ]},
     items:[
       {id:"p1",title:"브랜드 리뉴얼 프로젝트",tag:"신규",status:"진행중",progress:60,
@@ -1087,6 +1163,11 @@ function normalize(d){
   d=m;
   Object.keys(d).forEach(k=>{
     const s=d[k];
+    if(s.type==="dream"){
+      s.secret=true;s.label=s.label||"🌙 꿈";
+      s.items=(s.items||[]).map(x=>({id:x.id||uid(),title:x.title||"",img:x.img||"",when:x.when||"",done:!!x.done,doneAt:x.doneAt||""}));
+      return;
+    }
     if(s.type==="muse"&&!s.account){ d[k]=JSON.parse(JSON.stringify(SEED.muse)); return; }
     if(s.type==="muse"){
       const fw=(FEED.muse&&FEED.muse.week)||null;
@@ -1095,6 +1176,10 @@ function normalize(d){
       s.history=Array.isArray(s.history)?s.history:[{d:todayStr(),n:s.followers.cur}];
     }
     if(k==="project"&&!s.north){s.north=JSON.parse(JSON.stringify(SEED.project.north));}
+    if(k==="project"&&s.north&&Array.isArray(s.north.goals)){
+      const KD={n1:"core",n2:"core",n3:"sub",n4:"sub",n5:"core"};
+      s.north.goals.forEach(g=>{if(g.kind!=="core"&&g.kind!=="sub")g.kind=KD[g.id]||"core";});
+    }
     if(s.type==="daily"){
       s.cats=(s.cats&&s.cats.length)?s.cats:JSON.parse(JSON.stringify(SEED.daily.cats));
       s.days=s.days||{};
@@ -1194,8 +1279,10 @@ function streakDays(){
 /* ---- 탭 순서 ---- */
 function tabKeys(){
   const o=DATA.__order;
-  if(o&&o.length) return o.filter(k=>DATA[k]);
-  return Object.keys(DATA).filter(k=>k.indexOf("__")!==0);
+  const a=(o&&o.length)?o.filter(k=>DATA[k]):Object.keys(DATA).filter(k=>k.indexOf("__")!==0);
+  const b=a.filter(k=>!(DATA[k]&&DATA[k].secret));
+  if(dreamOn&&DATA.dream&&b.indexOf("dream")<0)b.push("dream");
+  return b;
 }
 function setOrder(a){DATA.__order=a;save();renderTabs();}
 function moveTab(k,dir){
@@ -1567,7 +1654,7 @@ function museCard(i){
         <span class="pill ${stClass(i.status)}">${esc(i.status)}</span>
         ${i.due?`<span class="pill">📤 ${esc(i.due)} <b>${dday(i.due)}</b></span>`:""}${td}
       </div>
-      <div class="bar"><i style="width:${pct}%"></i><span>${pct}%</span></div>
+      ${stepView(pct)}
       ${perf}
       ${i.goal?`<div class="note">🎯 ${esc(i.goal)}</div>`:""}
       ${i.note?`<div class="note">${esc(i.note)}</div>`:""}
@@ -1793,7 +1880,8 @@ const HERO={
   book:["읽고, 남기고, 쌓기 ✦","좋았던 문장은 상세 화면의 ‘문장 수집’에 담아두세요."],
   habit:["오늘도 몸 챙기기 ✦","날짜를 눌러 운동 종류와 시간을 기록하면 한 달이 채워져요."],
   estate:["차근차근 임장 노트 ✦","기초부터 청약·세금까지. 배운 건 업무 일지에 남겨두세요."],
-  muse:["나를 브랜드로 만들기 ✦","@hyen_roy · 혼캠 시리즈부터 다음 콘텐츠까지, 기획·일정·성과를 한 곳에서."]
+  muse:["나를 브랜드로 만들기 ✦","@hyen_roy · 혼캠 시리즈부터 다음 콘텐츠까지, 기획·일정·성과를 한 곳에서."],
+  dream:["여기는 나만 아는 곳 🌙","말하면 웃길까 봐 못 한 이야기들. 로고를 세 번 누르면 다시 숨겨져요."]
 };
 function renderLogo(){document.getElementById("tbLogo").innerHTML=chImg("logo");}
 function renderHero(){
@@ -1814,7 +1902,7 @@ function cheerMsg(){
   if(st.cnt===0) return ["","이번 달 첫 기록을 남겨봐요. 15분 스트레칭도 충분해요."];
   return ["","이번 달 <b>"+st.cnt+"회</b> · "+hhmm(st.min)+" 기록했어요. 목표까지 "+left+"회!"];
 }
-const SHORT={project:"프로젝트",work:"업무",daily:"투두",book:"독서",habit:"운동",muse:"브랜드",estate:"부동산"};
+const SHORT={project:"프로젝트",work:"업무",daily:"투두",book:"독서",habit:"운동",muse:"브랜드",estate:"부동산",dream:"꿈"};
 function renderTabs(){
   document.getElementById("tabs").innerHTML=tabKeys().map(k=>{
     const full=esc(DATA[k].label.replace(/^\S+\s/,""));
@@ -1825,6 +1913,13 @@ function go(k){if(noClick)return;cur=k;filter="ALL";document.getElementById("q")
 
 function renderStats(){
   const s=DATA[cur],its=s.items;let cells;
+  if(s.type==="dream"){
+    const t=(s.items||[]),dn=t.filter(x=>x.done).length;
+    const img=t.filter(x=>x.img).length;
+    document.getElementById("stats").innerHTML=[["적어둔 꿈",t.length+"개"],["이뤄짐",dn+"개"],["사진 있음",img+"개"]]
+      .map(c=>`<div class="stat">${c[0]}<b>${c[1]}</b></div>`).join("");
+    return;
+  }
   if(s.type==="habit"){
     const st=monthStats(calY,calM);
     cells=[[(calM+1)+"월 운동한 날",st.days+"일"],["총 횟수",st.cnt+"회"],["총 운동 시간",hhmm(st.min)],
@@ -1854,13 +1949,20 @@ function renderStats(){
     if(cur==="project"){
       const soon=its.filter(i=>i.status!=="완료"&&i.due&&i.due<=addDays(todayStr(),7)).length;
       cells=[["전체",its.length],["진행중",doing],["완료",done],["마감 임박",soon+"개"],["세부 할일",tdDone+"/"+tdAll]];
-    }else
-    cells=[["전체",its.length],["진행중",doing],["완료",done],["평균 진행률",avg+"%"],["세부 할일",tdDone+"/"+tdAll]];
+    }else{
+      const half=its.filter(i=>(+i.progress||0)>=50&&i.status!=="완료").length;
+      cells=[["전체",its.length],["진행중",doing],["완료",done],["절반 넘음",half+"개"],["세부 할일",tdDone+"/"+tdAll]];
+    }
   }
   document.getElementById("stats").innerHTML=cells.map(c=>`<div class="stat">${c[0]}<b>${c[1]}</b></div>`).join("");
 }
 function renderFilters(){
   const s=DATA[cur],el=document.getElementById("filters");
+  if(s.type==="dream"){
+    el.innerHTML=[["ALL","전체"],["TODO","아직"],["DONE","이뤄짐"]]
+      .map(c=>`<button class="chip ${filter===c[0]?"on":""}" onclick="setF('${c[0]}')">${c[1]}</button>`).join("");
+    return;
+  }
   if(s.type==="habit"){
     el.innerHTML=[`<button class="chip ${filter==="ALL"?"on":""}" onclick="setF('ALL')">전체</button>`]
       .concat((s.types||[]).map(t=>`<button class="chip tchip ${filter===t.id?"on":""}" onclick="setF('${t.id}')"><i style="background:${t.color}"></i>${esc(t.name)}</button>`))
@@ -2248,6 +2350,151 @@ function weekBox(){
     ${body}</div>`;
 }
 
+/* --- 비밀 탭: 꿈 보드 --- */
+let dreamOn=false, logoTaps=[], dreamPick=null;
+function dm(){return DATA.dream||(DATA.dream={label:"🌙 꿈",type:"dream",secret:true,tags:[],items:[]});}
+function logoTap(){
+  const t=Date.now();
+  logoTaps=logoTaps.filter(x=>t-x<1400);logoTaps.push(t);
+  if(logoTaps.length>=3){
+    logoTaps=[];
+    if(dreamOn){dreamOn=false;if(cur==="dream")cur="project";renderTabs();render();toast("🔒 비밀 탭을 숨겼어요");}
+    else{dreamOn=true;dm();renderTabs();go("dream");toast("🌙 비밀 탭이 열렸어요");}
+  }
+}
+function toast(msg){
+  let el=document.getElementById("toast");
+  if(!el){el=document.createElement("div");el.id="toast";document.body.appendChild(el);}
+  el.textContent=msg;el.className="on";
+  clearTimeout(toast._t);toast._t=setTimeout(()=>{el.className="";},1800);
+}
+function dreamView(){
+  const s=dm();
+  let its=s.items||[];
+  if(filter==="TODO")its=its.filter(i=>!i.done);
+  else if(filter==="DONE")its=its.filter(i=>i.done);
+  const all=s.items||[],done=all.filter(i=>i.done).length;
+  const head=`<div class="dmhead">
+    <div class="dmt"><b>🌙 아무한테도 말 안 한 꿈</b>
+      <span>${all.length}개 중 ${done}개 이뤄짐</span></div>
+    <button class="btn sm primary" onclick="openDream()">＋ 꿈 추가</button>
+  </div>`;
+  if(!its.length)return head+`<div class="empty">${chImg("base")}아직 비어 있어요.<br>말하기 부끄러운 꿈일수록 여기에 적어두세요.</div>`;
+  return head+`<div class="dmgrid">${its.map(dreamCard).join("")}</div>`;
+}
+function dreamCard(i){
+  const dd=i.when?(" · "+esc(i.when)):"";
+  return `<div class="dmc ${i.done?"done":""}" onclick="openDream('${i.id}')">
+    <div class="dmimg">${i.img?`<img src="${i.img}" alt="">`:`<span class="dmph">🌙</span>`}</div>
+    ${i.done?`<div class="dmstamp"><b>이뤄졌음</b><i>${esc(i.doneAt||"")}</i></div>`:""}
+    <div class="dmcap"><b>${esc(i.title||"이름 없는 꿈")}</b>${dd?`<span>${dd.slice(3)}</span>`:""}</div>
+  </div>`;
+}
+function toggleDreamDone(id,ev){
+  if(ev)ev.stopPropagation();
+  const i=(dm().items||[]).find(x=>x.id===id);if(!i)return;
+  i.done=!i.done;i.doneAt=i.done?todayStr():"";
+  if(i.done)toast("✨ 축하해요, 하나 이뤄졌어요");
+  render();
+  if(document.getElementById("overlay").classList.contains("on"))openDream(id);
+}
+function openDream(id){
+  const s=dm(),v=id?(s.items||[]).find(x=>x.id===id):null;
+  dreamPick=v?(v.img||""):"";
+  document.getElementById("mIc").innerHTML=chImg("base");
+  document.getElementById("mTitle").textContent=v?"꿈 수정":"＋ 새로운 꿈";
+  document.getElementById("mForm").innerHTML=`
+    <div class="field"><label>어떤 꿈이야?</label>
+      <input id="d_title" value="${esc(v?v.title:"")}" placeholder="예) 마중으로 팝업스토어 열기"></div>
+    <div class="field"><label>사진 (선택)</label>
+      <div class="dmup" id="d_prev">${dreamPick?`<img src="${dreamPick}" alt="">`:`<span>🌙 이미지를 올려보세요</span>`}</div>
+      <input type="file" id="d_file" accept="image/*" style="display:none" onchange="dreamFile(this)">
+      <div class="dmupb">
+        <button type="button" class="btn sm" onclick="document.getElementById('d_file').click()">사진 고르기</button>
+        ${dreamPick?`<button type="button" class="btn sm" onclick="dreamClear()">사진 지우기</button>`:""}
+      </div></div>
+    <div class="field"><label>언제쯤 (선택)</label>
+      <input id="d_when" value="${esc(v&&v.when?v.when:"")}" placeholder="예) 2028년 안에"></div>
+    ${v?`<div class="field"><label>이뤄졌어?</label>
+      <button type="button" class="stampbtn ${v.done?"on":""}" onclick="toggleDreamDone('${v.id}',event)">
+        ${v.done?`✨ 이뤄졌음 (${esc(v.doneAt||"")}) — 취소하려면 탭`:"아직이야 — 이뤄지면 여기를 눌러요"}</button></div>`:""}
+    ${v?`<button class="btn danger wide" onclick="delDream('${v.id}')">이 꿈 지우기</button>`:""}`;
+  document.getElementById("mSave").style.display="";
+  document.getElementById("mSave").setAttribute("data-ns","dream:"+(id||""));
+  document.getElementById("overlay").classList.add("on");
+  document.getElementById("d_title").focus();
+}
+function dreamFile(el){
+  const f=el.files&&el.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const M=900,sc=Math.min(1,M/Math.max(img.width,img.height));
+      const c=document.createElement("canvas");
+      c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      let out="";
+      try{out=c.toDataURL("image/webp",0.72);}catch(err){out="";}
+      if(!out||out.indexOf("image/webp")<0)out=c.toDataURL("image/jpeg",0.75);
+      dreamPick=out;
+      const p=document.getElementById("d_prev");if(p)p.innerHTML=`<img src="${out}" alt="">`;
+    };
+    img.src=e.target.result;
+  };
+  r.readAsDataURL(f);
+}
+function dreamClear(){dreamPick="";const p=document.getElementById("d_prev");if(p)p.innerHTML=`<span>🌙 이미지를 올려보세요</span>`;}
+function saveDream(id){
+  const s=dm(),t=(document.getElementById("d_title").value||"").trim();
+  if(!t){alert("꿈을 한 줄로 적어주세요.");return;}
+  s.items=s.items||[];
+  let v=id?s.items.find(x=>x.id===id):null;
+  if(!v){v={id:uid(),done:false,doneAt:""};s.items.unshift(v);}
+  v.title=t;
+  v.when=(document.getElementById("d_when").value||"").trim();
+  v.img=dreamPick||"";
+  closeEdit();render();
+}
+function delDream(id){
+  if(!confirm("이 꿈을 지울까요?"))return;
+  const s=dm();s.items=(s.items||[]).filter(x=>x.id!==id);closeEdit();render();
+}
+/* --- 진행 단계 (진행률 % 대체) --- */
+const STEPS=[{v:0,n:"시작 전"},{v:25,n:"조금 했어"},{v:50,n:"절반쯤"},{v:80,n:"거의 다"},{v:100,n:"완료"}];
+function stepIdx(p){
+  const x=Math.max(0,Math.min(100,+p||0));
+  let b=0,bd=999;
+  STEPS.forEach((s,k)=>{const d=Math.abs(s.v-x);if(d<bd){bd=d;b=k;}});
+  return b;
+}
+function stepName(p){return STEPS[stepIdx(p)].n;}
+function stepView(p){
+  const k=stepIdx(p);
+  return `<div class="stepv k${k}">
+    <span class="sdots">${STEPS.map((s,x)=>`<i class="${x<=k?"on":""}"></i>`).join("")}</span>
+    <b>${STEPS[k].n}</b></div>`;
+}
+function stepPick(k,fn){
+  return `<div class="steppick">${STEPS.map((s,x)=>
+    `<button type="button" class="sbtn ${x===k?"on":""} k${x}" onclick="${fn}(${x})">${s.n}</button>`).join("")}</div>`;
+}
+function applyStep(i,x){
+  const v=STEPS[Math.max(0,Math.min(4,+x||0))].v;
+  i.progress=v;
+  if(v===100)i.status="완료";
+  else{if(i.status==="완료")i.status="진행중";else if(v>0&&i.status==="할일")i.status="진행중";}
+}
+function setStepD(x){
+  const i=find(detailId);if(!i)return;
+  applyStep(i,x);save();renderDetail();render();
+}
+let editStep=0;
+function setStepE(x){
+  editStep=+x||0;
+  const el=document.getElementById("f_progress");if(el)el.value=STEPS[editStep].v;
+  const w=document.getElementById("f_stepwrap");if(w)w.innerHTML=stepPick(editStep,"setStepE");
+}
 function taskCard(i){
   const s=DATA[cur],pct=Math.max(0,Math.min(100,+i.progress||0));
   const td=i.todos.length?` <span class="pill">☑ ${i.todos.filter(t=>t.done).length}/${i.todos.length}</span>`:"";
@@ -2264,7 +2511,7 @@ function taskCard(i){
         <span class="pill ${stClass(i.status)}">${esc(i.status)}</span>
         ${i.due?`<span class="pill">📅 ${esc(i.due)} <b>${dday(i.due)}</b></span>`:""}${td}${qz}
       </div>
-      <div class="bar"><i style="width:${pct}%"></i><span>${pct}%</span></div>
+      ${stepView(pct)}
       ${i.note?`<div class="note">${esc(i.note)}</div>`:""}
     </div></div>`;
 }
@@ -2341,7 +2588,16 @@ function nsAutoVal(g){
 }
 function nsVal(g){return g.auto&&g.auto!=="none"?nsAutoVal(g):(+g.cur||0);}
 function nsPct(g){const t=+g.target||0;if(!t)return 0;return Math.max(0,Math.min(100,Math.round(nsVal(g)/t*100)));}
-function nsAll(){const g=ns().goals;if(!g.length)return 0;return Math.round(g.reduce((a,x)=>a+nsPct(x),0)/g.length);}
+function nsKind(g){return g.kind==="sub"?"sub":"core";}
+function nsCore(){return ns().goals.filter(g=>nsKind(g)==="core");}
+function nsSub(){return ns().goals.filter(g=>nsKind(g)==="sub");}
+function nsAll(){
+  const g=ns().goals;if(!g.length)return 0;
+  let w=0,t=0;
+  g.forEach(x=>{const k=nsKind(x)==="core"?2:1;w+=k;t+=nsPct(x)*k;});
+  return w?Math.round(t/w):0;
+}
+function nsCoreAll(){const g=nsCore();if(!g.length)return 0;return Math.round(g.reduce((a,x)=>a+nsPct(x),0)/g.length);}
 function nsDays(){
   const y=nsYear(),end=new Date(y,11,31),now=new Date();
   return Math.max(0,Math.ceil((end-now)/86400000));
@@ -2357,11 +2613,12 @@ function nsQopts(cq){
   return l.map(q=>`<option value="${q}" ${cq===q?"selected":""}>Q${q}까지 (${(q-1)*3+1}~${q*3}월)</option>`).join("");
 }
 function nsQlist(){const c=nsQnow();const a=[];for(let q=c;q<=4;q++)a.push(q);return a.length?a:[4];}
-function nsBar(g){
+function nsBar(g,kind){
   const p=nsPct(g),v=nsVal(g),t=+g.target||0,a=NSAREA[g.area]||NSAREA.manual;
   const auto=g.auto&&g.auto!=="none",el=nsElapsed();
   const cls=p>=100?"full":(p<Math.max(0,el-12)?"late":"");
-  return `<div class="nsg ${cls}" onclick="openGoal('${g.id}')">
+  const kc=(kind||nsKind(g))==="sub"?"issub":"iscore";
+  return `<div class="nsg ${cls} ${kc}" onclick="openGoal('${g.id}')">
     <div class="nsgt"><b>${esc(g.title||"제목 없음")}</b>
       ${auto?`<span class="nsauto" title="다른 탭에서 자동 집계">⚡ 자동</span>`:""}
       <span class="nsq">Q${g.q}</span></div>
@@ -2374,11 +2631,18 @@ function nsBar(g){
 function northPanel(){
   const n=ns(),all=nsAll(),el=nsElapsed(),qn=nsQnow(),qs=nsQlist();
   const gap=all-el,tone=all>=el?"good":(gap>-15?"warn":"bad");
-  const goals=n.goals.length?n.goals.slice().sort((a,b)=>(a.q-b.q)||(nsPct(b)-nsPct(a))).map(nsBar).join("")
-    :`<div class="nsempty">아직 올해 목표가 없어요.<br>［＋ 목표］로 3~5개만 정해보세요.</div>`;
+  const srt=a=>a.slice().sort((x,y)=>(x.q-y.q)||(nsPct(y)-nsPct(x)));
+  const core=srt(nsCore()),sub=srt(nsSub());
   const q4=qs.map(q=>`<div class="nsq4 ${q===qn?"on":""}" onclick="openQ(${q})">
       <div class="qh">Q${q}<span>${(q-1)*3+1}~${q*3}월</span>${q===qn?`<b class="qnow">지금</b>`:""}</div>
       <div class="qb">${n.q[q]?esc(n.q[q]):`<i>＋ 이 분기에 끝낼 한 가지</i>`}</div></div>`).join("");
+  const coreBlock=core.length
+    ? `<div class="nsgs">${core.map(g=>nsBar(g,"core")).join("")}</div>`
+    : `<div class="nsempty">핵심 목표가 아직 없어요.<br>올해 꼭 이뤄야 할 2~3개만 정해보세요.</div>`;
+  const subBlock=sub.length
+    ? `<div class="nsbhead sub"><b>🌱 서브 목표</b><span>${sub.length}개</span><i>되면 좋은 것들</i></div>
+       <div class="nsgs sub">${sub.map(g=>nsBar(g,"sub")).join("")}</div>`
+    : "";
   return `<div class="north">
     <div class="nstop">
       <div class="nstl2"><span class="nsyy">${n.year}</span><b>북극성</b><span class="nsdday">D-${nsDays()}</span></div>
@@ -2390,23 +2654,24 @@ function northPanel(){
         <div class="ngnum ${tone}">${all}<i>%</i></div>
         <div class="ngside">
           <div class="ngbar"><i style="width:${all}%" class="${tone}"></i><u style="left:${el}%"></u></div>
-          <div class="ngtx"><span>전체 달성</span><span>올해 ${el}% 지남</span></div>
+          <div class="ngtx"><span>전체 달성 (핵심 ${nsCoreAll()}%)</span><span>올해 ${el}% 지남</span></div>
         </div>
       </div>
     </div>
     <div class="nsq4s">${q4}</div>
-    <div class="nsbhead"><b>올해 핵심 목표</b><span>${n.goals.length}개</span>
+    <div class="nsbhead"><b>⭐ 핵심 목표</b><span>${core.length}개</span><i>이게 흔들리면 올해가 흔들림</i>
       <button class="btn sm" onclick="openNorth()">문장 수정</button>
       <button class="btn sm primary" onclick="openGoal()">＋ 목표</button></div>
-    <div class="nsgs">${goals}</div>
+    ${coreBlock}
+    ${subBlock}
   </div>`;
 }
 function nsStrip(k){
-  const n=ns(),g=n.goals.filter(x=>x.area===k);
+  const n=ns(),g=n.goals.filter(x=>x.area===k).sort((a,b)=>(nsKind(a)==="core"?0:1)-(nsKind(b)==="core"?0:1));
   if(!g.length)return "";
   return `<div class="nsstrip">
     <span class="nsl">${n.year} 목표</span>
-    ${g.map(x=>`<span class="nsc" onclick="go('project')"><b>${esc(x.title)}</b>
+    ${g.map(x=>`<span class="nsc ${nsKind(x)}" onclick="go('project')"><b>${nsKind(x)==="core"?"⭐ ":""}${esc(x.title)}</b>
       <i>${nfm(nsVal(x))}/${nfm(x.target)}${esc(x.unit||"")}</i>
       <em class="${nsPct(x)>=100?"full":""}">${nsPct(x)}%</em></span>`).join("")}
   </div>`;
@@ -2456,6 +2721,12 @@ function openGoal(id){
   document.getElementById("mForm").innerHTML=`
     <div class="field"><label>목표</label>
       <input id="g_title" value="${esc(v.title||"")}" placeholder="예) 책 24권 읽기"></div>
+    <div class="field"><label>우선순위</label>
+      <div class="kindpick" id="g_kindwrap">
+        <button type="button" class="kbtn core ${(v.kind||"core")!=="sub"?"on":""}" onclick="setKind('core')">⭐ 핵심 목표</button>
+        <button type="button" class="kbtn sub ${(v.kind||"core")==="sub"?"on":""}" onclick="setKind('sub')">🌱 서브 목표</button>
+      </div>
+      <input type="hidden" id="g_kind" value="${(v.kind||"core")==="sub"?"sub":"core"}"></div>
     <div class="two">
       <div class="field"><label>어느 영역</label><select id="g_area" onchange="gAreaChg()">
         ${Object.keys(NSAREA).map(k=>`<option value="${k}" ${v.area===k?"selected":""}>${NSAREA[k].n}</option>`).join("")}</select></div>
@@ -2479,6 +2750,11 @@ function openGoal(id){
   document.getElementById("overlay").classList.add("on");
   document.getElementById("g_title").focus();
 }
+function setKind(k){
+  document.getElementById("g_kind").value=k;
+  const w=document.getElementById("g_kindwrap");
+  [...w.querySelectorAll(".kbtn")].forEach(b=>b.classList.toggle("on",b.classList.contains(k)));
+}
 function gAutoChg(){
   const a=document.getElementById("g_auto").value,on=a&&a!=="none";
   document.getElementById("g_curwrap").style.display=on?"none":"";
@@ -2498,6 +2774,7 @@ function saveGoal(id){
   g.title=t;
   g.area=document.getElementById("g_area").value;
   g.q=+document.getElementById("g_q").value||4;
+  g.kind=(document.getElementById("g_kind")||{}).value==="sub"?"sub":"core";
   g.target=+document.getElementById("g_target").value||0;
   g.unit=(document.getElementById("g_unit").value||"").trim();
   g.auto=document.getElementById("g_auto").value;
@@ -2586,7 +2863,8 @@ function render(){
   if(cur==="project") head=northPanel()+`<div class="sechead">🗂 프로젝트 카드 <span>${list.length}개</span></div>`+head;
   else head=nsStrip(cur)+head;
   if(cur==="estate") head=estatePanel()+`<div class="sechead">🏠 내 부동산 공부 카드 <span>${list.length}개</span></div>`+head;
-  const body=s.type==="muse" ? museView()
+  const body=s.type==="dream" ? dreamView()
+    : s.type==="muse" ? museView()
     : s.type==="daily" ? dailyView()
     : s.type==="habit" ? habitView()
     : cur==="project" ? pjView(list)
@@ -2596,7 +2874,8 @@ function render(){
   document.getElementById("panel").innerHTML=head+body;
   document.getElementById("tbNow").textContent=s.label;
   const bn=document.getElementById("btnNew");
-  if(bn) bn.textContent=s.type==="daily"?"＋ 할 일 쓰기":s.type==="habit"?"＋ 오늘 기록":"＋ 새 카드";
+  if(bn){bn.textContent=s.type==="daily"?"＋ 할 일 쓰기":s.type==="habit"?"＋ 오늘 기록":s.type==="dream"?"＋ 꿈 추가":"＋ 새 카드";
+    bn.setAttribute("onclick",s.type==="dream"?"openDream()":"openEdit()");}
   save();
 }
 function shiftMonth(n){calM+=n;if(calM<0){calM=11;calY--;}if(calM>11){calM=0;calY++;}render();}
@@ -2623,9 +2902,9 @@ function openEdit(id){
   let html=`<div class="field"><label>제목</label><input id="f_title" value="${esc(v.title||"")}"></div>
     <div class="field"><label>분류</label><select id="f_tag">${tagOpts}</select></div>`;
   {
-    html+=`<div class="two">
-      <div class="field"><label>상태</label><select id="f_status">${statusList().map(t=>`<option ${v.status===t?"selected":""}>${t}</option>`).join("")}</select></div>
-      ${cur==="project"?`<input type="hidden" id="f_progress" value="${v.progress==null?0:v.progress}">`:`<div class="field"><label>진행률 (%)</label><input id="f_progress" type="number" min="0" max="100" value="${v.progress==null?0:v.progress}"></div>`}</div>
+    html+=`<div class="field"><label>상태</label><select id="f_status">${statusList().map(t=>`<option ${v.status===t?"selected":""}>${t}</option>`).join("")}</select>
+      <input type="hidden" id="f_progress" value="${v.progress==null?0:v.progress}"></div>
+      ${cur==="project"?"":`<div class="field"><label>어디까지 왔어?</label><div id="f_stepwrap">${stepPick(stepIdx(v.progress),"setStepE")}</div></div>`}
       <div class="two">
       <div class="field"><label>시작일</label><input id="f_start" type="date" value="${esc(v.start||"")}"></div>
       <div class="field"><label>마감일</label><input id="f_due" type="date" value="${esc(v.due||"")}"></div></div>
@@ -2643,6 +2922,7 @@ function saveEdit(){
     if(tag==="north")return saveNorth();
     if(tag.indexOf("q")===0)return saveQ(+tag.slice(1));
     if(tag.indexOf("goal:")===0)return saveGoal(tag.slice(5));
+    if(tag.indexOf("dream:")===0)return saveDream(tag.slice(6));
   }
   const s=DATA[cur],g=id=>document.getElementById(id);
   const title=(g("f_title").value||"").trim();
@@ -2689,12 +2969,11 @@ function renderDetail(){
       <div class="field"><label>상태</label><select onchange="setF2('status',this.value)">${statusList().map(t=>`<option ${i.status===t?"selected":""}>${t}</option>`).join("")}</select></div>
       <div class="field"><label>담당 / 협업</label><input value="${esc(i.owner)}" onchange="setF2('owner',this.value)"></div>
     </div>
-    <div class="${cur==="project"?"two":"three"}">
+    <div class="two">
       <div class="field"><label>시작일</label><input type="date" value="${esc(i.start)}" onchange="setF2('start',this.value)"></div>
       <div class="field"><label>마감일 ${i.due?"("+dday(i.due)+")":""}</label><input type="date" value="${esc(i.due)}" onchange="setF2('due',this.value)"></div>
-      ${cur==="project"?"":`<div class="field"><label>진행률 ${pct}%</label><input type="number" min="0" max="100" value="${pct}" onchange="setF2('progress',this.value)"></div>`}
     </div>
-    ${cur==="project"?"":`<div class="bar"><i style="width:${pct}%"></i><span>${pct}%</span></div>`}
+    ${cur==="project"?"":`<div class="field"><label>어디까지 왔어?</label>${stepPick(stepIdx(pct),"setStepD")}</div>`}
     <div class="field"><label>${s.type==="muse"?"🎯 이 콘텐츠의 목표 (예: 저장수 500)":"🎯 목표 (한 줄)"}</label><input value="${esc(i.goal)}" onchange="setF2('goal',this.value)"></div>
     <div class="field"><label>📄 상세 설명</label><textarea onchange="setF2('desc',this.value)">${esc(i.desc)}</textarea></div>
     ${s.type==="muse"?`
@@ -2720,7 +2999,7 @@ function renderDetail(){
     </div>`:""}
 
     <div class="sect">
-      <h4>${s.type==="muse"?"🎥 촬영·편집 컷 리스트":"☑ 체크리스트"} <span class="r">${tdDone}/${i.todos.length} 완료${cur==="project"?"":" · 체크하면 진행률 자동 반영"}</span></h4>
+      <h4>${s.type==="muse"?"🎥 촬영·편집 컷 리스트":"☑ 체크리스트"} <span class="r">${tdDone}/${i.todos.length} 완료${cur==="project"?"":" · 체크하면 단계 자동 반영"}</span></h4>
       ${i.todos.length?i.todos.map(t=>`<div class="row">
         <input type="checkbox" ${t.done?"checked":""} onchange="togTodo('${t.id}')">
         <span class="grow ${t.done?"done":""}">${esc(t.text)}</span>
