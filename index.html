@@ -1891,6 +1891,8 @@ const SEED = {
 const FEED=(function(){try{return JSON.parse(document.getElementById("feed").textContent)||{};}catch(e){return {};}})();
 let eStudyD=null;
 let LOSTMODE=false, LOSTFROM="", ALLOWSHRINK=false;
+/* 이 앱이 지금까지 쓴 저장 이름표만 본다 (다른 앱·데모 저장소는 절대 건드리지 않음) */
+const OLDKEYS=["hyein_work_os_v3","hyein_work_os_v2","hyein_work_os","hyein_life_demo_v1","_rescue_before_restore"];
 const KEY="hyein_work_os_v3";
 const STATUSES=["할일","진행중","대기","완료"];
 const MSTATUS=["아이디어","기획","촬영","편집","예약","발행"];
@@ -1904,10 +1906,9 @@ let noClick=false;
 function findStore(){
   let best=null;
   try{
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i); if(!k) continue;
+    for(let i=0;i<OLDKEYS.length;i++){
+      const k=OLDKEYS[i];
       if(k===KEY) continue;
-      if(/theme|gsync|vault|_rescue|_before_restore/.test(k)) continue;
       const raw=localStorage.getItem(k);
       if(!raw||raw.length<200||raw.charAt(0)!=="{") continue;
       let o=null; try{o=JSON.parse(raw);}catch(e){continue;}
@@ -1925,7 +1926,7 @@ function usedBefore(){
     for(let i=0;i<localStorage.length;i++){
       const k=localStorage.key(i)||"";
       if(k==="hyein_theme"||k==="hyein_gsync_v1"||k==="hyein_vault_v1") return true;
-      if(/_rescue|_before_restore|work_os|life_demo|mylifeos/.test(k)) return true;
+      if(/_rescue|_before_restore|work_os|life_demo/.test(k)) return true;
     }
   }catch(e){}
   return false;
