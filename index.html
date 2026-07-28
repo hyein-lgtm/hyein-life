@@ -829,6 +829,14 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .pjms b{font-weight:800;font-size:11px;color:var(--muted);flex:none}
 .pjlk{display:flex;flex-wrap:wrap;gap:6px}
 .pjlk a{font-size:11.5px;font-weight:700;color:#5b86e5;border:1px solid var(--line);border-radius:999px;padding:3px 10px;text-decoration:none}
+.pjlk span.fchip{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--blue-xl);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.fupb{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:9px}
+.fhint{font-size:11px;color:var(--muted);line-height:1.5}
+.fsz{font-size:10.5px;font-weight:800;color:var(--muted);background:var(--blue-xl);
+  border:1px solid var(--line);border-radius:999px;padding:1px 7px;margin-left:6px;white-space:nowrap}
+.frow a.fdl{color:#3b6fd4;text-decoration:none;font-weight:700}
+.frow a.fdl:hover{text-decoration:underline}
+html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e2a3e}
 .pjnote{font-size:12px;color:var(--muted);background:#f7f9fd;border-radius:10px;padding:9px 11px;line-height:1.6;white-space:pre-wrap}
 .pjacts{display:flex;gap:6px;flex-wrap:wrap;padding-top:2px}
 @media (max-width:560px){
@@ -3591,6 +3599,8 @@ function taskCard(i){
   const s=DATA[cur],pct=Math.max(0,Math.min(100,+i.progress||0));
   const td=i.todos.length?` <span class="pill">☑ ${i.todos.filter(t=>t.done).length}/${i.todos.length}</span>`:"";
   const qz=(i.quotes||[]).length?` <span class="pill">✍ ${i.quotes.length}</span>`:"";
+  const fa=(i.links||[]).filter(l=>l&&l.file&&l.file.d).length;
+  const fp=fa?` <span class="pill">📎 ${fa}</span>`:"";
   return `<div class="card" data-id="${i.id}" onpointerdown="cardDown(event,'${i.id}')">
     <div class="head"><span class="t">${chImg(cur)}${esc(i.tag||"")}</span>
       <div class="acts"><button class="drag" title="순서 이동 (누른 채 움직이기)" onpointerdown="cardDown(event,'${i.id}',1)">⠿</button><button title="상세" onclick="openDetail('${i.id}')">⤢</button>
@@ -3601,7 +3611,7 @@ function taskCard(i){
       ${i.goal?`<div class="note">🎯 ${esc(i.goal)}</div>`:""}
       <div class="meta">
         <span class="pill ${stClass(i.status)}">${esc(i.status)}</span>
-        ${i.due?`<span class="pill">📅 ${esc(i.due)} <b>${dday(i.due)}</b></span>`:""}${td}${qz}
+        ${i.due?`<span class="pill">📅 ${esc(i.due)} <b>${dday(i.due)}</b></span>`:""}${td}${qz}${fp}
       </div>
       ${stepView(pct)}
       ${i.note?`<div class="note">${esc(i.note)}</div>`:""}
@@ -3953,8 +3963,10 @@ function pjRow(i){
       ${(i.milestones||[]).length?`<div class="pjsec"><div class="pjsl">마일스톤</div>
         ${i.milestones.map((m,x)=>`<div class="pjms ${m.done?"on":""}" onclick="pjTogMs('${i.id}',${x},event)">
           <span class="bx">${m.done?"✓":""}</span><b>${esc(m.date||"")}</b>${esc(m.text)}</div>`).join("")}</div>`:""}
-      ${(i.links||[]).filter(l=>l.url).length?`<div class="pjsec"><div class="pjsl">링크</div>
-        <div class="pjlk">${i.links.filter(l=>l.url).map(l=>`<a href="${esc(l.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(l.label||l.url)} ↗</a>`).join("")}</div></div>`:""}
+      ${(i.links||[]).filter(l=>l.url||(l.file&&l.file.d)).length?`<div class="pjsec"><div class="pjsl">링크</div>
+        <div class="pjlk">${i.links.filter(l=>l.url||(l.file&&l.file.d)).map(l=>(l.file&&l.file.d)
+          ?`<span class="fchip">📎 ${esc(l.label||l.file.n||"파일")}</span>`
+          :`<a href="${esc(l.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(l.label||l.url)} ↗</a>`).join("")}</div></div>`:""}
       ${i.note?`<div class="pjnote">🗒 ${esc(i.note)}</div>`:""}
       <div class="pjacts">
         <button class="btn sm primary" onclick="openDetail('${i.id}')">상세 열기</button>
@@ -4154,14 +4166,19 @@ function renderDetail(){
     </div>`}
 
     ${cur==="book"?"":`<div class="sect">
-      <h4>🔗 자료 링크 <span class="r">피그마·드라이브·노션 등</span></h4>
-      ${i.links.length?i.links.map((l,x)=>`<div class="row">
-        <span class="grow">${l.url?`<a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.label||l.url)}</a>`:esc(l.label)}</span>
+      <h4>🔗 자료 링크 <span class="r">${cur==="estate"?"링크 · 파일 첨부 모두 가능":"피그마·드라이브·노션 등"}</span></h4>
+      ${i.links.length?i.links.map((l,x)=>`<div class="row frow">
+        <span class="grow">${lkHtml(l)}</span>
         <button class="x" onclick="delIdx('links',${x})">✕</button></div>`).join("")
         :`<div class="note">아직 없어요.</div>`}
       <div class="addline"><input class="dt" id="a_lk_l" placeholder="이름">
         <input id="a_lk_u" placeholder="https://..." onkeydown="if(event.key==='Enter')addLink()">
         <button class="btn sm" onclick="addLink()">추가</button></div>
+      ${cur==="estate"?`<input type="file" id="a_lk_f" multiple style="display:none" onchange="addFileLink(this)">
+      <div class="fupb">
+        <button type="button" class="btn sm" onclick="document.getElementById('a_lk_f').click()">📎 파일 첨부</button>
+        <span class="fhint">등기부·계약서·임장 사진 등 · 한 개당 ${FMAXMB}MB까지 · 사진은 자동으로 줄여서 담아요</span>
+      </div>`:""}
     </div>`}
 
     <div class="sect">
@@ -4220,6 +4237,50 @@ function addMs(){
   i.milestones.push({date:d,text:t,done:false});
   i.milestones.sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
   save();renderDetail();
+}
+const FMAXMB=2;
+function fSize(n){n=+n||0;return n<1024?n+"B":(n<1048576?Math.round(n/1024)+"KB":(n/1048576).toFixed(1)+"MB");}
+function lkHtml(l){
+  if(l&&l.file&&l.file.d)
+    return `<a class="fdl" href="${esc(l.file.d)}" download="${esc(l.file.n||"파일")}">📎 ${esc(l.label||l.file.n||"파일")}</a><span class="fsz">${fSize(l.file.s)}</span>`;
+  return l&&l.url?`<a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.label||l.url)}</a>`:esc((l&&l.label)||"");
+}
+function addFileLink(el){
+  const fs=[...(el.files||[])];el.value="";
+  if(!fs.length)return;
+  const i=find(detailId);if(!i)return;
+  i.links=i.links||[];
+  const lim=FMAXMB*1024*1024,skipped=[];
+  let left=fs.length;
+  const put=(f,d)=>{i.links.push({label:f.name,url:"",file:{n:f.name,t:f.type||"",s:Math.round(d.length*0.75),d:d}});};
+  const done=()=>{
+    save();renderDetail();
+    if(skipped.length)alert("너무 커서 담지 못한 파일이 있어요 (한 개당 "+FMAXMB+"MB까지)\n\n"+skipped.join("\n"));
+    else{try{toast("📎 파일을 담았어요");}catch(e){}}
+  };
+  fs.forEach(f=>{
+    if(f.size>lim){skipped.push(f.name);if(!--left)done();return;}
+    const r=new FileReader();
+    r.onload=e=>{
+      const d=e.target.result;
+      if(/^image\//.test(f.type||"")){
+        const img=new Image();
+        img.onload=()=>{
+          const M=1400,sc=Math.min(1,M/Math.max(img.width,img.height));
+          const c=document.createElement("canvas");
+          c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));
+          c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+          let out="";try{out=c.toDataURL("image/webp",0.75);}catch(err){out="";}
+          if(!out||out.indexOf("image/webp")<0){try{out=c.toDataURL("image/jpeg",0.8);}catch(err2){out="";}}
+          put(f,out||d);if(!--left)done();
+        };
+        img.onerror=()=>{put(f,d);if(!--left)done();};
+        img.src=d;
+      }else{put(f,d);if(!--left)done();}
+    };
+    r.onerror=()=>{skipped.push(f.name);if(!--left)done();};
+    r.readAsDataURL(f);
+  });
 }
 function addLink(){
   const l=(document.getElementById("a_lk_l").value||"").trim();
