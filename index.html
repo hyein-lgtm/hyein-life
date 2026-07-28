@@ -203,7 +203,7 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .qrow .x{border:none;background:transparent;color:#8290a8;cursor:pointer}
 .qrow .x:hover{color:var(--danger)}
 .addline input.pg{flex:none;width:64px}
-@media(max-width:640px){.dcell{min-height:60px}.dtag{font-size:8.5px}}
+@media(max-width:640px){.dcell{min-height:60px}.dtag{font-size:9.5px}}
 
 .empty{padding:56px 12px;text-align:center;color:#6f80a0;font-size:13px;line-height:1.9;
   border:1px dashed var(--line);border-radius:var(--r)}
@@ -496,7 +496,7 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .subhd .gcnt{margin-left:auto;font-size:11px;color:#a3b0c6;font-weight:600}
 .titem .x.tm{opacity:1;font-size:10px;font-weight:800;letter-spacing:-.03em;color:#5a6c8c;
   border:1px solid var(--line);border-radius:7px;padding:2px 6px;background:#fff;white-space:nowrap;flex:none}
-.titem .x.tm:hover{color:var(--pink);border-color:var(--pink-l);background:var(--pink-xl)}
+.titem .x.tm:hover{color:var(--blue);border-color:#bed3f7;background:var(--blue-xl)}
 .titem.on .x.tm{display:none}
 html[data-theme=dark] .titem .x.tm{background:#1e2124;color:#cbd5e6}
 .titem .x.mv{font-size:10px;opacity:.45}
@@ -981,7 +981,7 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
   .cal-body.big{gap:4px}
   .dcell{min-height:62px;padding:4px;border-radius:9px}
   .dnum{font-size:10.5px}
-  .dtag{font-size:8px;padding:1px 3px;border-radius:5px}
+  .dtag{font-size:9.5px;padding:1px 3px;border-radius:5px}
   .dtags{gap:2px}
   .monthnav{flex-wrap:wrap;gap:6px}
   .monthnav .m{min-width:auto;flex:1}
@@ -1013,7 +1013,7 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
   .tabs{display:grid!important;grid-template-columns:repeat(4,1fr);gap:5px;
     overflow:visible!important;padding:12px 12px 0!important}
   .tab{flex:none;width:100%;flex-direction:column;gap:2px;border-radius:14px;
-    padding:7px 2px 6px!important;font-size:10.5px!important;font-weight:700;line-height:1.2}
+    padding:7px 2px 6px!important;font-size:11.5px!important;font-weight:700;line-height:1.2}
   .tab .ch{width:24px;height:24px}
   .tab.on{box-shadow:0 4px 12px rgba(37,99,235,.24)}
   .tab[data-k="daily"]::after{display:none}
@@ -1024,7 +1024,7 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
 }
 @media(max-width:360px){
   .tabs{gap:4px;padding:12px 10px 0!important}
-  .tab{font-size:9.5px!important}
+  .tab{font-size:11px!important}
   .tab .ch{width:21px;height:21px}
 }
 
@@ -1446,14 +1446,15 @@ input.tlin{width:100%;font-size:13px;padding:4px 8px;border:1.5px solid var(--pi
 
 /* ===== 감성 통계 ===== */
 .stat i.sd{display:inline-block;width:5px;height:5px;border-radius:50%;
-  background:var(--pink-l);margin-right:6px;vertical-align:middle}
+  background:#c3cee2;margin-right:6px;vertical-align:middle}
+html[data-theme=dark] .stat i.sd{background:#3b465c}
 .statsay{grid-column:1/-1;display:flex;align-items:center;gap:11px;margin-top:2px;
-  background:linear-gradient(100deg,var(--pink-xl),var(--blue-xl));
-  border:1px solid var(--line);border-left:3px solid var(--pink-s);
+  background:linear-gradient(100deg,#f1fbf5,var(--blue-xl));
+  border:1px solid var(--line);border-left:3px solid var(--ok);
   border-radius:14px;padding:11px 15px}
 .statsay img{width:34px;height:34px;flex:none;object-fit:contain}
 .statsay p{margin:0;font-size:13px;font-weight:700;color:var(--ink);line-height:1.55;letter-spacing:-.02em}
-.statsay p b{color:var(--pink)}
+.statsay p b{color:#127a55}
 
 /* ===== 더보기(⋯) 메뉴 ===== */
 .moreWrap{position:relative}
@@ -1496,19 +1497,76 @@ input.tlin{width:100%;font-size:13px;padding:4px 8px;border:1.5px solid var(--pi
 /* ===== 핑크 5% 반복 ===== */
 .dcell.today .dnum::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;
   background:var(--pink-s);margin-left:4px;vertical-align:middle}
-.cheer{border-left:3px solid var(--pink-s)}
-.filters .chip.on{position:relative}
+.cheer{border-left:3px solid var(--ok)}
 
 /* ===== 다크 보정 ===== */
 html[data-theme=dark] .tl{background:#1e2124}
 html[data-theme=dark] .tl:hover{background:#2c1f2a;border-color:#5d2c3f}
 html[data-theme=dark] input.tlin{background:#1e2124;color:#e7edf8}
-html[data-theme=dark] .statsay{background:linear-gradient(100deg,#2c1f2a,#1e2a3e);border-color:#3a2a35}
+html[data-theme=dark] .statsay{background:linear-gradient(100deg,#152a22,#1e2a3e);border-color:#22402f}
+html[data-theme=dark] .statsay p b{color:#4fd3a0}
 html[data-theme=dark] .moremenu{background:#1e2124}
 html[data-theme=dark] .moremenu .mi:hover{background:#1e2a3e}
 html[data-theme=dark] .qmta{background:#111925;color:var(--ink)}
 html[data-theme=dark] .foldbox.ib .foldbtn:hover{background:#2c1f2a}
 html[data-theme=dark] .ibrow .ibb{background:#1e2124;color:#cbd5e6}
+
+/* ===== 탭 캐릭터 통일 (얼굴 원형 크롭) ===== */
+.chf{display:block;flex:none;width:28px;height:28px;border-radius:50%;overflow:hidden;
+  background:#f3f7ee;position:relative;transition:.15s}
+.chf img{position:absolute;width:160%;height:160%;left:-30%;top:-16.25%;
+  object-fit:contain;transition:.15s;filter:saturate(.6) opacity(.78)}
+.tab.on .chf{background:rgba(255,255,255,.94)}
+.tab.on .chf img{filter:none}
+.tab:hover .chf img{filter:saturate(.92) opacity(.96)}
+html[data-theme=dark] .chf{background:#3b4d24}
+
+/* ===== 통계 더보기 ===== */
+.statmore{display:none}
+.stats.smore .stat{display:block}
+
+/* ===== 모바일 재배치 · 통계 축약 · 글자 하한 ===== */
+@media(max-width:720px){
+  /* 순서: 상단바 → 오늘의 한 문장 → 탭 → (새 기록·검색·내용) → 소개 → 통계 */
+  .app{display:flex;flex-direction:column}
+  .app>.topbar{order:0}
+  .app>.todayline{order:1}
+  .app>.tabs{order:2}
+  .app>.board{order:3}
+  .app>.hero{order:4}
+  .app>.stats{order:5}
+  .app>.hero{border-top:1px solid var(--line);padding-top:18px;margin-top:6px}
+  .app>.stats{padding-bottom:22px}
+
+  /* 통계는 핵심 2개만, 나머지는 더보기 */
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stats .stat:nth-child(n+3){display:none}
+  .stats.smore .stat{display:block}
+  .statmore{display:block;grid-column:1/-1;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);border-radius:12px;padding:9px;font-size:12px;font-weight:700;
+    font-family:inherit;cursor:pointer;letter-spacing:-.02em}
+  .statmore:hover{border-color:#bed3f7;color:var(--blue);background:var(--blue-xl)}
+
+  /* 탭 캐릭터 */
+  .chf{width:26px;height:26px}
+
+  /* 글자 하한 */
+  .tab{font-size:11.5px!important}
+  .chip{font-size:11.5px}
+  .dtag{font-size:9.5px!important}
+  .dmore{font-size:10px}
+  .cal-head div,.mcal .wk div,.wday .wdw{font-size:11px}
+  .hlhint,.legend,.ehint,.setd,.qmhint,.pgt{font-size:12px}
+  .meta,.rollb,.titem .x.tm,.gcnt,.subhd .gcnt,.foldbtn .fs{font-size:11px}
+  .card .head .acts button b,.card .head .acts a.lnk b{font-size:11px}
+  .cqh,.gpct,.stuckrow .st em{font-size:11px}
+}
+@media(max-width:360px){
+  .tab{font-size:11px!important}
+  .chf{width:24px;height:24px}
+}
+html[data-theme=dark] .statmore{background:#1e2124}
+html[data-theme=dark] .statmore:hover{background:#1e2a3e}
 </style>
 </head>
 <body>
@@ -2988,6 +3046,7 @@ function setGoalV(k,v){
 /* ---- 캐릭터 헬퍼 ---- */
 const CHALIAS={};
 function chImg(k,cls){k=CHALIAS[k]||k;return `<img class="ch ${cls||""}" alt="" src="${CHAR[k]||CHAR.muse}">`;}
+function chFace(k){k=CHALIAS[k]||k;return `<span class="chf" aria-hidden="true"><img alt="" src="${CHAR[k]||CHAR.muse}"></span>`;}
 const HERO={
   project:["오늘도 차곡차곡 ✦","진행 중인 프로젝트를 한눈에. 카드 제목을 누르면 상세 화면이 열려요."],
   work:["오늘 할 일, 놓치지 않기 ✦","회의·보고·정산까지. 체크리스트를 채우면 진행률이 따라 올라가요."],
@@ -3021,7 +3080,7 @@ const SHORT={project:"프로젝트",work:"업무",daily:"투두",book:"독서",h
 function renderTabs(){
   document.getElementById("tabs").innerHTML=tabKeys().map(k=>{
     const full=esc(DATA[k].label.replace(/^\S+\s/,""));
-    return `<button class="tab ${k===cur?"on":""}" data-k="${k}" onclick="go('${k}')" onpointerdown="tabDown(event,'${k}')">${chImg(k)}<span class="tfull">${full}</span><span class="tshort">${esc(SHORT[k]||full)}</span></button>`;
+    return `<button class="tab ${k===cur?"on":""}" data-k="${k}" onclick="go('${k}')" onpointerdown="tabDown(event,'${k}')">${chFace(k)}<span class="tfull">${full}</span><span class="tshort">${esc(SHORT[k]||full)}</span></button>`;
   }).join("");
 }
 function go(k){if(noClick)return;cur=k;filter="ALL";document.getElementById("q").value="";render();}
@@ -3034,8 +3093,9 @@ function renderStats(){
   if(s.type==="dream"){
     const t=(s.items||[]),dn=t.filter(x=>x.done).length;
     const img=t.filter(x=>x.img).length;
+    el0.classList.toggle("smore",ui().statOpen===true);
     el0.innerHTML=[["적어둔 꿈",t.length+"개"],["이뤄진 것",dn+"개"],["사진 남긴 것",img+"개"]]
-      .map(c=>`<div class="stat"><i class="sd"></i>${c[0]}<b>${c[1]}</b></div>`).join("")+statsSayHtml();
+      .map(c=>`<div class="stat"><i class="sd"></i>${c[0]}<b>${c[1]}</b></div>`).join("")+statMoreBtn()+statsSayHtml();
     return;
   }
   if(s.type==="habit"){
@@ -3072,7 +3132,8 @@ function renderStats(){
       cells=[["적어둔 것",its.length+"개"],["지금 붙잡은 것",doing+"개"],["끝낸 것",done+"개"],["절반 넘은 것",half+"개"],["체크한 항목",tdDone+" / "+tdAll]];
     }
   }
-  el0.innerHTML=cells.map(c=>`<div class="stat"><i class="sd"></i>${c[0]}<b>${c[1]}</b></div>`).join("")+statsSayHtml();
+  el0.classList.toggle("smore",ui().statOpen===true);
+  el0.innerHTML=cells.map(c=>`<div class="stat"><i class="sd"></i>${c[0]}<b>${c[1]}</b></div>`).join("")+statMoreBtn()+statsSayHtml();
 }
 function renderFilters(){
   const s=DATA[cur],el=document.getElementById("filters");
@@ -4431,6 +4492,11 @@ function statSay(){
     if(done) return "여기서만 <b>"+done+"개</b>를 끝냈어요. 잘 쌓이고 있어요.";
     return "시작해둔 게 <b>"+its.length+"개</b>. 오늘은 하나만 밀어볼까요?";
   }catch(e){return "";}
+}
+function statsMore(){ ui().statOpen=!ui().statOpen; save(); renderStats(); }
+function statMoreBtn(){
+  const on=ui().statOpen===true;
+  return '<button type="button" class="statmore" aria-expanded="'+(on?"true":"false")+'" onclick="statsMore()">'+(on?"통계 접기 ▴":"통계 더보기 ▾")+'</button>';
 }
 function statsSayHtml(){
   const line=(CHEERTABS.indexOf(cur)>=0)?cheerLine(cur):statSay();
