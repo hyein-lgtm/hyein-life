@@ -3960,7 +3960,7 @@ function renderDetail(){
         <button class="btn sm" onclick="addTodo()">추가</button></div>
     </div>
 
-    <div class="sect">
+    ${cur==="book"?"":`<div class="sect">
       <h4>🚩 마일스톤 <span class="r">주요 일정</span></h4>
       ${i.milestones.length?i.milestones.map((m,x)=>`<div class="row">
         <input type="checkbox" ${m.done?"checked":""} onchange="togMs(${x})">
@@ -3971,9 +3971,9 @@ function renderDetail(){
       <div class="addline"><input class="dt" type="date" id="a_ms_d">
         <input id="a_ms_t" placeholder="마일스톤 내용" onkeydown="if(event.key==='Enter')addMs()">
         <button class="btn sm" onclick="addMs()">추가</button></div>
-    </div>
+    </div>`}
 
-    <div class="sect">
+    ${cur==="book"?"":`<div class="sect">
       <h4>🔗 자료 링크 <span class="r">피그마·드라이브·노션 등</span></h4>
       ${i.links.length?i.links.map((l,x)=>`<div class="row">
         <span class="grow">${l.url?`<a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.label||l.url)}</a>`:esc(l.label)}</span>
@@ -3982,7 +3982,7 @@ function renderDetail(){
       <div class="addline"><input class="dt" id="a_lk_l" placeholder="이름">
         <input id="a_lk_u" placeholder="https://..." onkeydown="if(event.key==='Enter')addLink()">
         <button class="btn sm" onclick="addLink()">추가</button></div>
-    </div>
+    </div>`}
 
     <div class="sect">
       <h4>✍ 문장 수집 <span class="r">${i.quotes.length}개 · 좋았던 문장·짧은 감상</span></h4>
@@ -3996,7 +3996,7 @@ function renderDetail(){
         <button class="btn sm" onclick="addQuote()">담기</button></div>
     </div>
 
-    <div class="sect">
+    ${cur==="book"?"":`<div class="sect">
       <h4>${s.type==="muse"?"📝 콘텐츠 회고":"📝 업무 일지"} <span class="r">최신순 ${i.logs.length}건</span></h4>
       ${i.logs.length?i.logs.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(l=>`<div class="row">
         <span class="logdate">${esc(l.date)}</span><span class="grow">${esc(l.text)}</span>
@@ -4005,7 +4005,7 @@ function renderDetail(){
       <div class="addline"><input class="dt" type="date" id="a_lg_d" value="${todayStr()}">
         <input id="a_lg_t" placeholder="오늘 진행한 내용" onkeydown="if(event.key==='Enter')addLog()">
         <button class="btn sm" onclick="addLog()">기록</button></div>
-    </div>
+    </div>`}
 
     <div class="field"><label>🗒 짧은 메모 (카드에 표시됨)</label><textarea onchange="setF2('note',this.value)">${esc(i.note)}</textarea></div>`;
 }
