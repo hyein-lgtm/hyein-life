@@ -317,6 +317,18 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   font-size:12px;padding:2px 4px;flex:none}
 .titem:hover .x{opacity:1}
 .titem .x:hover{color:var(--danger)}
+.titem .grip{flex:none;width:13px;margin-right:-4px;text-align:center;font-size:12px;line-height:1;
+  color:#c8d3e4;cursor:grab;opacity:0;touch-action:none;user-select:none;-webkit-user-select:none}
+.titem:hover .grip{opacity:1}
+.titem .grip:active{cursor:grabbing;color:var(--blue)}
+.titem .ttx{cursor:text}
+.ttxin{width:100%;border:none;background:transparent;padding:2px 4px;margin:-2px -4px;
+  font-size:13.5px;font-weight:600;font-family:inherit;color:var(--ink);
+  text-decoration:none;border-bottom:1.5px solid var(--blue);border-radius:4px}
+.ttxin:focus{outline:none;background:var(--blue-xl)}
+.tlist.reorder .titem{transition:transform .12s ease}
+.tlist.reorder .titem:hover{background:transparent}
+.titem.dragging{opacity:.6;background:var(--blue-xl);box-shadow:0 8px 20px rgba(15,27,51,.14)}
 .addline.daily{margin-top:12px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--r);padding:10px;box-shadow:var(--sh)}
 .addline.daily select{flex:none;width:112px;border:1px solid var(--line);border-radius:10px;
@@ -364,6 +376,7 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   .tgroup{padding:11px 12px}
   .titem{padding:9px 2px}
   .titem .x{opacity:1}
+  .titem .grip{opacity:.55;width:15px;font-size:13px;padding:2px 0}
   .addline.daily{flex-wrap:nowrap;gap:5px}
   .addline.daily select{width:78px;font-size:16px;padding:9px 4px}
   .addline.daily input{font-size:16px}
@@ -1030,6 +1043,9 @@ html[data-theme=dark] .ghd{color:#8096b5}
 html[data-theme=dark] .gcnt{color:#b7c3d7}
 html[data-theme=dark] .titem.on .ttx{color:#b8c3d6}
 html[data-theme=dark] .titem .x{color:#c2cee1}
+html[data-theme=dark] .titem .grip{color:#7a889e}
+html[data-theme=dark] .titem.dragging{background:#22304a;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+html[data-theme=dark] .ttxin{color:#e6ecf6}
 html[data-theme=dark] .addline.daily select{color:#8096b5;background:#1e2124}
 html[data-theme=dark] .btn.ghost{background:#1e2124;color:#b9c3d5}
 html[data-theme=dark] .msum{color:#b7c3d7}
@@ -1771,19 +1787,18 @@ function weekStrip(){
 }
 function setDay(k){daySel=k;const d=new Date(k+"T00:00:00");calY=d.getFullYear();calM=d.getMonth();render();}
 
-function dailyList(){
+function dailyGroups(){
   const s=ds(),all=dayTodos(daySel);
   const qe=document.getElementById("q"),q=((qe&&qe.value)||"").toLowerCase();
   const mt=t=>(!q||t.text.toLowerCase().includes(q));
-  const done=all.filter(t=>t.done).length;
-  const pct=all.length?Math.round(done/all.length*100):0;
   const ids=(s.cats||[]).map(c=>c.id);
   const orphan=all.filter(t=>ids.indexOf(t.cat)<0&&mt(t));
   let bk=(s.cats||[]).filter(c=>filter==="ALL"||filter===c.id);
   if(filter==="ALL"&&orphan.length) bk=bk.concat([{id:"__etc",name:"기타",color:"#94a3b8"}]);
-  const row=(t,c,sp)=>`<label class="titem ${t.done?"on":""}">
+  const row=(t,c,sp)=>`<label class="titem ${t.done?"on":""}" data-id="${t.id}" onpointerdown="tdDown(event,'${t.id}')">
+      <span class="grip" title="길게 눌러서 순서 바꾸기" onclick="event.preventDefault()" onpointerdown="tdDown(event,'${t.id}',1)">⠿</span>
       <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
-      <span class="ttx">${esc(t.text)}</span>${rollBadge(t)}
+      <span class="ttx" title="눌러서 글자 수정" onclick="editDaily(event,'${t.id}')">${esc(t.text)}</span>${rollBadge(t)}
       ${sp?`<button class="x mv" title="${t.part==="pm"?"오전으로 옮기기":"오후로 옮기기"}" onclick="event.preventDefault();movePart('${t.id}')">${t.part==="pm"?"☀":"🌙"}</button>`:""}
       <button class="x rt ${t.rt?"on":""}" title="${t.rt?"루틴 "+rtLabel(rtOf(t)||{days:[]}):"루틴으로 등록"}" onclick="event.preventDefault();openRoutine('${t.id}')">♺</button>
       <button class="x" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`;
@@ -1800,13 +1815,13 @@ function dailyList(){
       body=[["am","☀ 오전"],["pm","🌙 오후"]].map(h=>{
         const l=g.filter(t=>(t.part==="pm"?"pm":"am")===h[0]);
         const d=l.filter(t=>t.done).length;
-        return `<div class="subg"><div class="subhd">${h[1]}<span class="gcnt">${d}/${l.length}</span></div>
+        return `<div class="subg" data-part="${h[0]}"><div class="subhd">${h[1]}<span class="gcnt">${d}/${l.length}</span></div>
           ${l.map(t=>row(t,c,1)).join("")}${addrow(c,h[0])}</div>`;
       }).join("");
     }else{
       body=g.map(t=>row(t,c)).join("")+(c.id==="__etc"?"":addrow(c,""));
     }
-    return `<div class="tgroup ${c.split?"hassub":""}" style="--cc:${c.color}">
+    return `<div class="tgroup ${c.split?"hassub":""}" data-cat="${c.id==="__etc"?"":c.id}" style="--cc:${c.color}">
       <div class="ghd"><span class="cdot" style="background:${c.color}"></span>${esc(c.name)}
         <span class="gcnt">${gd}/${g.length}</span></div>
       ${body}
@@ -1814,6 +1829,13 @@ function dailyList(){
   }).join("");
   if(filter==="ALL") groups+=`<button class="tgroup newcat" onclick="openCats()">＋ 카테고리 추가·관리</button>`
     +`<button class="tgroup newcat rtbtn" onclick="openRoutineList()">♺ 반복 루틴 관리 ${(ds().routines||[]).length?"("+(ds().routines||[]).length+"개)":""}</button>`;
+  return groups;
+}
+function dailyList(){
+  const all=dayTodos(daySel);
+  const done=all.filter(t=>t.done).length;
+  const pct=all.length?Math.round(done/all.length*100):0;
+  const groups=dailyGroups();
   const yst=dayTodos(addDays(daySel,-1)).length;
   const rolled=all.filter(t=>(+t.roll||0)>0&&!t.done);
   const stuck=rolled.filter(t=>(+t.roll||0)>=3);
@@ -2055,6 +2077,122 @@ function addDaily(cid,part){
 function movePart(id){
   const t=dayTodos(daySel).find(x=>x.id===id); if(!t) return;
   t.part=(t.part==="pm")?"am":"pm"; render();
+}
+/* ---- 할 일 글자 수정 (글자를 누르면 바로 고치기) ---- */
+function editDaily(ev,id){
+  if(ev){ev.preventDefault();ev.stopPropagation();}
+  if(noClick||(TDRAG&&TDRAG.on))return;
+  const t=dayTodos(daySel).find(x=>x.id===id); if(!t)return;
+  const sp=document.querySelector('.titem[data-id="'+id+'"] .ttx'); if(!sp)return;
+  if(sp.querySelector("input"))return;
+  const old=t.text;
+  const inp=document.createElement("input");
+  inp.type="text"; inp.className="ttxin"; inp.value=old; inp.setAttribute("autocomplete","off");
+  sp.textContent=""; sp.appendChild(inp);
+  let closed=false;
+  const commit=ok=>{
+    if(closed)return; closed=true;
+    const v=(inp.value||"").trim();
+    let msg="";
+    if(ok&&v&&v!==old){
+      t.text=v;
+      const r=rtOf(t);
+      if(r&&r.text!==v){r.text=v;msg="루틴 문구도 같이 바뀌었어요";}
+    }
+    render();
+    if(msg)toast("♺ "+msg);
+  };
+  inp.addEventListener("pointerdown",e=>e.stopPropagation());
+  inp.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();});
+  inp.addEventListener("keydown",e=>{
+    e.stopPropagation();
+    if(e.key==="Enter"){e.preventDefault();commit(true);}
+    else if(e.key==="Escape"){e.preventDefault();commit(false);}
+  });
+  inp.addEventListener("blur",()=>commit(true));
+  inp.focus();
+  try{inp.setSelectionRange(old.length,old.length);}catch(e){}
+}
+/* ---- 할 일 순서 바꾸기 (⠿ 잡고 끌기 / 길게 눌러 끌기) ---- */
+let TDRAG=null;
+function dailyPaint(){
+  const el=document.querySelector(".tlist"); if(!el)return;
+  el.innerHTML=dailyGroups();
+  el.classList.add("reorder");
+  if(TDRAG){const nw=el.querySelector('.titem[data-id="'+TDRAG.id+'"]');if(nw)nw.classList.add("dragging");}
+}
+function tdDown(ev,id,now){
+  if(TDRAG)return;
+  const g=ev.target;
+  if(!now&&g&&g.closest&&g.closest("button,input,textarea,select,a"))return;
+  TDRAG={id:id,sx:ev.clientX,sy:ev.clientY,on:false,touch:ev.pointerType!=="mouse",t:null};
+  if(now){tdStart();}
+  else{TDRAG.t=TDRAG.touch?setTimeout(tdStart,320):null;}
+  document.addEventListener("pointermove",tdMove);
+  document.addEventListener("pointerup",tdUp);
+  document.addEventListener("pointercancel",tdUp);
+  document.addEventListener("touchmove",tdBlock,{passive:false});
+}
+function tdStart(){
+  if(!TDRAG)return;
+  TDRAG.on=true;
+  const l=document.querySelector(".tlist"); if(l)l.classList.add("reorder");
+  const el=document.querySelector('.titem[data-id="'+TDRAG.id+'"]'); if(el)el.classList.add("dragging");
+  if(navigator.vibrate){try{navigator.vibrate(12);}catch(e){}}
+}
+function tdBlock(ev){if(TDRAG&&TDRAG.on&&ev.cancelable)ev.preventDefault();}
+function tdMove(ev){
+  if(!TDRAG)return;
+  if(!TDRAG.on){
+    const d=Math.abs(ev.clientX-TDRAG.sx)+Math.abs(ev.clientY-TDRAG.sy);
+    if(TDRAG.touch){if(d>10){clearTimeout(TDRAG.t);tdEnd();}return;}
+    if(d>6){tdStart();}else{return;}
+  }
+  if(!document.elementFromPoint)return;
+  const under=document.elementFromPoint(ev.clientX,ev.clientY); if(!under||!under.closest)return;
+  const arr=(ds().days||{})[daySel]; if(!arr)return;
+  const me=arr.find(x=>x.id===TDRAG.id); if(!me)return;
+  const i=arr.indexOf(me);
+  const grp=under.closest(".tgroup"),sub=under.closest(".subg");
+  const cat=grp?(grp.dataset.cat||""):"";
+  const part=sub?sub.dataset.part:null;
+  const tgt=under.closest(".titem");
+  let moved=false;
+  if(tgt&&tgt.dataset.id&&tgt.dataset.id!==TDRAG.id){
+    const j=arr.findIndex(x=>x.id===tgt.dataset.id);
+    if(j<0)return;
+    arr.splice(j,0,arr.splice(i,1)[0]);
+    moved=true;
+  }else if(grp&&cat&&cat!==me.cat){
+    arr.splice(i,1);
+    let last=-1; arr.forEach((x,k)=>{if(x.cat===cat)last=k;});
+    arr.splice(last+1,0,me);
+    moved=true;
+  }
+  if(cat&&me.cat!==cat){me.cat=cat;moved=true;}
+  if(part&&(me.part==="pm"?"pm":"am")!==part){me.part=part;moved=true;}
+  if(moved){save();dailyPaint();}
+}
+function tdSwallow(e){e.preventDefault();e.stopPropagation();}
+function tdUp(){
+  const moved=!!(TDRAG&&TDRAG.on);
+  tdEnd();
+  if(moved){
+    noClick=true;
+    document.addEventListener("click",tdSwallow,true);
+    setTimeout(function(){noClick=false;document.removeEventListener("click",tdSwallow,true);},350);
+    render();
+  }
+}
+function tdEnd(){
+  if(TDRAG&&TDRAG.t)clearTimeout(TDRAG.t);
+  TDRAG=null;
+  const l=document.querySelector(".tlist"); if(l)l.classList.remove("reorder");
+  [].forEach.call(document.querySelectorAll(".titem.dragging"),x=>x.classList.remove("dragging"));
+  document.removeEventListener("pointermove",tdMove);
+  document.removeEventListener("pointerup",tdUp);
+  document.removeEventListener("pointercancel",tdUp);
+  document.removeEventListener("touchmove",tdBlock);
 }
 function togDaily(id){
   const t=dayTodos(daySel).find(x=>x.id===id); if(!t) return;
