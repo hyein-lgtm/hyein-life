@@ -1908,6 +1908,8 @@ function normalize(d){
   const ord=Array.isArray(d.__order)?d.__order:null;
   const bku=d.__backup||"";
   const mig=d.__mig||{};
+  const meta={};                    // __ui · __inbox 같은 설정값 보존
+  Object.keys(d).forEach(k=>{ if(k.indexOf("__")===0) meta[k]=d[k]; });
   const m={};                       // SEED 순서 유지 + 새로 생긴 탭 자동 추가
   Object.keys(SEED).forEach(k=>{ m[k]= d[k] || JSON.parse(JSON.stringify(SEED[k])); });
   Object.keys(d).forEach(k=>{ if(k.indexOf("__")!==0 && !m[k]) m[k]=d[k]; });
@@ -1983,6 +1985,7 @@ function normalize(d){
     });
   });
   const keys=Object.keys(d);
+  Object.keys(meta).forEach(k=>{ if(k!=="__order") d[k]=meta[k]; });
   d.__backup=bku;
   d.__mig=mig;
   d.__order=(ord||[]).filter(k=>keys.indexOf(k)>=0)
