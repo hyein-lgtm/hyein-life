@@ -494,6 +494,11 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .subhd{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
   color:#8394b3;letter-spacing:-.01em;padding:4px 2px 2px}
 .subhd .gcnt{margin-left:auto;font-size:11px;color:#a3b0c6;font-weight:600}
+.titem .x.tm{opacity:1;font-size:10px;font-weight:800;letter-spacing:-.03em;color:#5a6c8c;
+  border:1px solid var(--line);border-radius:7px;padding:2px 6px;background:#fff;white-space:nowrap;flex:none}
+.titem .x.tm:hover{color:var(--pink);border-color:var(--pink-l);background:var(--pink-xl)}
+.titem.on .x.tm{display:none}
+html[data-theme=dark] .titem .x.tm{background:#1e2124;color:#cbd5e6}
 .titem .x.mv{font-size:10px;opacity:.45}
 .titem .x.mv:hover{opacity:1}
 /* --- 못 한 할 일 이월 --- */
@@ -2099,6 +2104,7 @@ function dailyGroups(){
       <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
       <span class="ttx" title="눌러서 글자 수정" onclick="editDaily(event,'${t.id}')">${esc(t.text)}</span>${rollBadge(t)}
       ${sp?`<button class="x mv" title="${t.part==="pm"?"오전으로 옮기기":"오후로 옮기기"}" onclick="event.preventDefault();movePart('${t.id}')">${t.part==="pm"?"☀":"🌙"}</button>`:""}
+      ${t.done?"":`<button class="x tm" title="내일로 미루기" aria-label="내일로 미루기" onclick="event.preventDefault();pushDaily('${t.id}')">내일→</button>`}
       <button class="x rt ${t.rt?"on":""}" title="${t.rt?"루틴 "+rtLabel(rtOf(t)||{days:[]}):"루틴으로 등록"}" aria-label="루틴으로 등록" onclick="event.preventDefault();openRoutine('${t.id}')">♺</button>
       <button class="x ed" title="글자 수정" aria-label="글자 수정" onclick="event.preventDefault();editDaily(event,'${t.id}')">✎</button>
       <button class="x" title="삭제" aria-label="삭제" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`;
@@ -2323,6 +2329,34 @@ function autoRoll(){
     s.days[k]=stay;
   });
   return n;
+}
+function pushDaily(id){
+  const s=ds(), day=daySel, nxt=addDays(day,1);
+  const list=dayTodos(day), x=list.findIndex(v=>v.id===id);
+  if(x<0)return;
+  const t=list[x], name=t.text||"할 일";
+  if(t.done){try{toast("이미 끝낸 일이에요 :)");}catch(e){}return;}
+  let skipped=false;
+  if(t.rt){
+    if(!s.skip)s.skip={}; if(!s.skip[day])s.skip[day]=[];
+    if(s.skip[day].indexOf(t.rt)<0){s.skip[day].push(t.rt);skipped=true;}
+  }
+  if(!s.days)s.days={};
+  s.days[day]=list.filter(v=>v.id!==id);
+  if(!s.days[nxt])s.days[nxt]=[];
+  const moved={id:uid(),cat:t.cat,part:t.part==="pm"?"pm":"am",text:t.text,done:false,
+    roll:(+t.roll||0)+1, from:t.from||day, rt:t.rt||""};
+  s.days[nxt].push(moved);
+  save();render();
+  const short=name.length>12?name.slice(0,12)+"…":name;
+  toastU("→ '"+short+"' "+korDate(nxt)+"로 미뤘어요",function(){
+    const b=ds();
+    b.days[nxt]=(b.days[nxt]||[]).filter(v=>v.id!==moved.id);
+    if(skipped&&b.skip&&b.skip[day])b.skip[day]=b.skip[day].filter(r=>r!==t.rt);
+    if(!b.days[day])b.days[day]=[];
+    b.days[day].splice(Math.min(x,b.days[day].length),0,t);
+    daySel=day;save();render();toast("↩ 되돌렸어요");
+  });
 }
 function rollFind(id){return dayTodos(daySel).find(x=>x.id===id);}
 function rollDrop(id){
