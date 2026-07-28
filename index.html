@@ -215,6 +215,23 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   border-radius:11px;background:#fff;outline:none;transition:.15s}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-l)}
 .field textarea{min-height:76px;resize:vertical;line-height:1.6}
+mark.hl{background:linear-gradient(transparent 42%,#ffe97a 42%);color:inherit;
+  padding:0 1px;border-radius:2px;font-weight:700}
+html[data-theme=dark] mark.hl{background:linear-gradient(transparent 42%,#8a7318 42%);color:#f3f6fb}
+.hlbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:7px}
+.hlb{background:#fff7d1;border-color:#f0dd8a}
+.hlhint{font-size:10.5px;color:var(--muted);line-height:1.5}
+.notepv{margin-top:8px;font-size:13px;line-height:1.8;color:var(--ink);white-space:pre-wrap;
+  background:#fcfdff;border:1px dashed var(--line);border-radius:12px;padding:11px 13px;word-break:break-word}
+.notepv .pvph{color:#b3bfd2;font-size:11.5px}
+html[data-theme=dark] .notepv{background:#1a2230}
+.cq{margin-top:9px;background:#fbfcff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;display:grid;gap:6px}
+.cqh{font-size:10.5px;font-weight:900;color:var(--muted);letter-spacing:.02em}
+.cqr{display:flex;gap:7px;align-items:flex-start}
+.cqp{flex:none;font-size:10px;font-weight:800;color:var(--blue-d);background:var(--blue-l);
+  border-radius:999px;padding:1px 7px;margin-top:2px}
+.cqt{flex:1;font-size:12.5px;line-height:1.65;color:var(--ink);word-break:break-word}
+html[data-theme=dark] .cq{background:#18202c}
 .field textarea.bignote{min-height:300px;font-size:14px;line-height:1.75;padding:14px 15px;background:#fcfdff}
 .field textarea.bignote:focus{background:#fff}
 .field .bnl{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -2560,7 +2577,7 @@ function museCard(i){
       ${stepView(pct)}
       ${perf}
       ${i.goal?`<div class="note">🎯 ${esc(i.goal)}</div>`:""}
-      ${i.note?`<div class="note">${esc(i.note)}</div>`:""}
+      ${i.note?`<div class="note">${hlHtml(i.note)}</div>`:""}
     </div></div>`;
 }
 /* --- Google Drive 동기화 --- */
@@ -2889,13 +2906,22 @@ function renderFilters(){
     .concat(tags.map(t=>`<button class="chip ${filter===t?"on":""}" onclick="setF('${esc(t)}')">${esc(t)}</button>`)).join("");
 }
 function setF(t){filter=t;render();}
+function isDoneCard(i){
+  if(!i)return 0;
+  if(i.status==="완료"||i.status==="발행")return 1;
+  if((+i.progress||0)>=100)return 1;
+  return 0;
+}
 function visible(){
   const q=(document.getElementById("q").value||"").toLowerCase();
-  return DATA[cur].items.filter(i=>{
+  const list=DATA[cur].items.filter(i=>{
     if(filter!=="ALL"&&i.tag!==filter) return false;
     if(q&&!((i.title+" "+(i.note||"")+" "+(i.goal||"")+" "+(i.tag||"")).toLowerCase().includes(q))) return false;
     return true;
   });
+  return list.map((i,x)=>[i,x])
+    .sort((a,b)=>(isDoneCard(a[0])-isDoneCard(b[0]))||(a[1]-b[1]))
+    .map(p=>p[0]);
 }
 
 function habitView(){
@@ -3621,7 +3647,11 @@ function taskCard(i){
         ${i.due?`<span class="pill">📅 ${esc(i.due)} <b>${dday(i.due)}</b></span>`:""}${td}${qz}${fp}
       </div>
       ${stepView(pct)}
-      ${i.note?`<div class="note">${esc(i.note)}</div>`:""}
+      ${cur==="book"&&(i.quotes||[]).length?`<div class="cq">
+        <div class="cqh">✍ 모아둔 문장 ${i.quotes.length}개</div>
+        ${i.quotes.map(qq=>`<div class="cqr"><span class="cqp">${qq.page?"p."+esc(qq.page):"—"}</span><span class="cqt">${esc(qq.text)}</span></div>`).join("")}
+      </div>`:""}
+      ${i.note?`<div class="note">${hlHtml(i.note)}</div>`:""}
     </div></div>`;
 }
 /* --- 2026 북극성 (연간 목표) --- */
@@ -3974,7 +4004,7 @@ function pjRow(i){
         <div class="pjlk">${i.links.filter(l=>l.url||(l.file&&l.file.d)).map(l=>(l.file&&l.file.d)
           ?`<span class="fchip">📎 ${esc(l.label||l.file.n||"파일")}</span>`
           :`<a href="${esc(l.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(l.label||l.url)} ↗</a>`).join("")}</div></div>`:""}
-      ${i.note?`<div class="pjnote">🗒 ${esc(i.note)}</div>`:""}
+      ${i.note?`<div class="pjnote">🗒 ${hlHtml(i.note)}</div>`:""}
       <div class="pjacts">
         <button class="btn sm primary" onclick="openDetail('${i.id}')">상세 열기</button>
         <button class="btn sm" onclick="openEdit('${i.id}')">빠른 수정</button>
@@ -4215,15 +4245,59 @@ function renderDetail(){
       ? `<div class="field"><label class="bnl"><span>🗒 공부 메모 <span style="font-weight:600">— 여기에 전부 적어두세요</span></span>
           <span class="cnt" id="noteCnt">${(i.note||"").length}자</span></label>
         <textarea class="bignote" id="bigNote" placeholder="오늘 배운 것, 헷갈리는 것, 임장 후기, 계산해본 숫자… 자유롭게 적어두세요."
-          oninput="noteCount(this)" onchange="setF2('note',this.value)">${esc(i.note)}</textarea></div>`
-      : `<div class="field"><label>🗒 짧은 메모 (카드에 표시됨)</label><textarea onchange="setF2('note',this.value)">${esc(i.note)}</textarea></div>`}`;
+          oninput="noteCount(this)" onchange="applyNote(this)">${esc(i.note)}</textarea>
+        ${hlBar("bigNote")}</div>`
+      : `<div class="field"><label>🗒 짧은 메모 (카드에 표시됨)</label>
+        <textarea id="smNote" onchange="applyNote(this)">${esc(i.note)}</textarea>
+        ${hlBar("smNote")}</div>`}`;
   if(cur==="estate"){const bn=document.getElementById("bigNote");if(bn)noteCount(bn);}
+}
+function hlBar(id){
+  const i=find(detailId),t=(i&&i.note)||"";
+  return `<div class="hlbar">
+    <button type="button" class="btn sm hlb" onclick="noteHl('${id}')">🖍 형광펜</button>
+    <span class="hlhint">칠할 곳을 드래그한 뒤 눌러요 · 다시 누르면 지워져요</span>
+  </div>
+  <div class="notepv" id="notePv">${t.indexOf("==")>=0?hlHtml(t):'<span class="pvph">칠한 부분이 여기에 노랗게 보여요</span>'}</div>`;
 }
 function noteCount(el){
   const c=document.getElementById("noteCnt");
   if(c)c.textContent=(el.value||"").length+"자";
   el.style.height="auto";
   el.style.height=Math.max(300,el.scrollHeight+4)+"px";
+}
+function hlHtml(t){return esc(t||"").replace(/==([^=]+)==/g,'<mark class="hl">$1</mark>');}
+function applyNote(el){
+  if(!el)return;
+  const i=find(detailId);if(!i)return;
+  i.note=el.value;save();
+  const pv=document.getElementById("notePv");
+  if(pv){const h=hlHtml(i.note);
+    pv.innerHTML=h?h:'<span class="pvph">칠한 부분이 여기에 노랗게 보여요</span>';}
+  const c=document.getElementById("noteCnt");if(c)c.textContent=(el.value||"").length+"자";
+}
+function noteHl(id){
+  const el=document.getElementById(id);if(!el)return;
+  const v=el.value,a=el.selectionStart,b=el.selectionEnd;
+  if(a===b){try{toast("칠할 부분을 먼저 드래그해서 골라주세요");}catch(e){}el.focus();return;}
+  let sel=v.slice(a,b);
+  /* 앞뒤 공백은 칠하지 않기 */
+  const lead=sel.length-sel.replace(/^\s+/,"").length;
+  sel=sel.replace(/^\s+/,"");
+  const tail=sel.length-sel.replace(/\s+$/,"").length;
+  sel=sel.replace(/\s+$/,"");
+  if(!sel){try{toast("칠할 부분을 먼저 드래그해서 골라주세요");}catch(e){}el.focus();return;}
+  const A=a+lead,B=b-tail;
+  let out,na,nb;
+  if(/^==[\s\S]+==$/.test(sel)){out=sel.slice(2,-2);na=A;nb=A+out.length;}
+  else if(v.slice(Math.max(0,A-2),A)==="=="&&v.slice(B,B+2)==="=="){
+    el.value=v.slice(0,A-2)+sel+v.slice(B+2);
+    el.setSelectionRange(A-2,B-2);applyNote(el);el.focus();return;
+  }
+  else{out="=="+sel+"==";na=A;nb=A+out.length;}
+  el.value=v.slice(0,A)+out+v.slice(B);
+  el.setSelectionRange(na,nb);
+  applyNote(el);el.focus();
 }
 function setF2(k,v){
   const i=find(detailId);if(!i)return;
