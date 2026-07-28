@@ -2850,6 +2850,8 @@ function renderStats(){
 }
 function renderFilters(){
   const s=DATA[cur],el=document.getElementById("filters");
+  if(cur==="project"){el.innerHTML="";el.style.display="none";return;}
+  el.style.display="";
   if(s.type==="dream"){
     el.innerHTML=[["ALL","전체"],["TODO","아직"],["DONE","이뤄짐"]]
       .map(c=>`<button class="chip ${filter===c[0]?"on":""}" onclick="setF('${c[0]}')">${c[1]}</button>`).join("");
@@ -3983,14 +3985,14 @@ function render(){
       <button class="btn sm primary" onclick="openDay(todayStr())">＋ 오늘 기록</button>
     </div>`;
   }
-  if(cur==="project") head=northPanel()+`<div class="sechead">🗂 프로젝트 카드 <span>${list.length}개</span></div>`+head;
+  if(cur==="project") head=northPanel();
   else if(cur!=="book"&&cur!=="habit") head=nsStrip(cur)+head;
   if(cur==="estate") head=estatePanel()+`<div class="sechead">🏠 내 부동산 공부 카드 <span>${list.length}개</span></div>`+head;
   const body=s.type==="dream" ? dreamView()
     : s.type==="muse" ? museView()
     : s.type==="daily" ? dailyView()
     : s.type==="habit" ? habitView()
-    : cur==="project" ? pjView(list)
+    : cur==="project" ? ""
     : (list.length
       ? `<div class="grid">${list.map(taskCard).join("")}</div>`
       : `<div class="empty">${chImg(cur)}표시할 카드가 없어요.<br>［＋ 새 카드］로 추가해보세요.</div>`);
@@ -3998,7 +4000,9 @@ function render(){
   document.getElementById("tbNow").textContent=s.label;
   const bn=document.getElementById("btnNew");
   if(bn){bn.textContent=s.type==="daily"?"＋ 할 일 쓰기":s.type==="habit"?"＋ 오늘 기록":s.type==="dream"?"＋ 꿈 추가":"＋ 새 카드";
-    bn.setAttribute("onclick",s.type==="dream"?"openDream()":"openEdit()");}
+    bn.setAttribute("onclick",s.type==="dream"?"openDream()":"openEdit()");
+    bn.style.display=(cur==="project")?"none":"";}
+  const sq=document.getElementById("q"); if(sq)sq.style.display=(cur==="project")?"none":"";
   save();
   try{renderBk();renderInstall();}catch(e){}
 }
