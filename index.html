@@ -625,6 +625,79 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
 .nsempty{border:1px dashed var(--line);border-radius:13px;padding:20px 12px;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.7}
 /* 다른 탭 목표 스트립 */
 .nsstrip{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:12px;padding:9px 11px;border:1px solid var(--line);border-radius:13px;background:var(--card)}
+/* ===== 목표 레이스 (프로젝트 대시보드) ===== */
+.rtrack{margin-top:15px;background:rgba(255,255,255,.66);border:1px solid rgba(15,27,51,.07);
+  border-radius:17px;padding:14px 15px 12px}
+.rthd{display:flex;align-items:flex-end;gap:10px}
+.rtbig{font-size:36px;font-weight:900;line-height:.92;letter-spacing:-.055em;flex:none;color:#5b86e5}
+.rtbig i{font-style:normal;font-size:15px;font-weight:800;margin-left:1px}
+.rtbig.good{color:#1a9c66}.rtbig.warn{color:#e2a03f}.rtbig.bad{color:#e05b5b}
+.rtsub{padding-bottom:4px;line-height:1.45;min-width:0}
+.rtsub b{display:block;font-size:12.5px;font-weight:900;color:var(--ink);letter-spacing:-.025em}
+.rtsub span{font-size:11px;font-weight:700;color:var(--muted)}
+.rroad{position:relative;height:14px;border-radius:99px;margin:40px 2px 0;
+  background:repeating-linear-gradient(90deg,rgba(15,27,51,.11) 0 10px,rgba(15,27,51,.045) 10px 20px)}
+.rfill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;
+  background:linear-gradient(90deg,#8fb5f8,#5b86e5);transition:width .55s cubic-bezier(.34,1.3,.5,1)}
+.rroad.good .rfill{background:linear-gradient(90deg,#5fd6a6,#1a9c66)}
+.rroad.warn .rfill{background:linear-gradient(90deg,#f6cf87,#e2a03f)}
+.rroad.bad .rfill{background:linear-gradient(90deg,#f6adad,#e05b5b)}
+.rpace{position:absolute;top:-38px;bottom:-7px;width:0;transform:translateX(-50%);z-index:1}
+.rpace i{position:absolute;top:36px;bottom:0;left:-1px;width:2px;border-radius:2px;
+  background:repeating-linear-gradient(180deg,rgba(15,27,51,.42) 0 3px,transparent 3px 6px)}
+.rpace em{position:absolute;top:0;left:50%;transform:translateX(-50%);white-space:nowrap;font-style:normal;
+  font-size:9.5px;font-weight:800;color:var(--muted);background:rgba(255,255,255,.94);
+  border:1px solid var(--line);border-radius:99px;padding:1px 6px}
+.rrun{position:absolute;top:-17px;transform:translateX(-50%);font-size:21px;line-height:1;z-index:3;
+  transition:left .55s cubic-bezier(.34,1.3,.5,1);filter:drop-shadow(0 2px 3px rgba(15,27,51,.2));
+  animation:rbob 1.7s ease-in-out infinite}
+@keyframes rbob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+.rflag{position:absolute;right:-6px;top:-16px;font-size:18px;line-height:1;opacity:.9;z-index:2}
+.rmsg{display:flex;align-items:flex-start;gap:9px;margin-top:18px;background:var(--blue-xl);
+  border:1px solid var(--line);border-radius:13px;padding:10px 12px}
+.rmsg .re{font-size:19px;line-height:1.2;flex:none}
+.rmsg p{margin:0;font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:-.025em;
+  line-height:1.55;word-break:keep-all}
+.rmsg p b{color:#2f62c8}
+.rmsg p span{display:block;margin-top:2px;font-size:11px;font-weight:700;color:var(--muted)}
+.rmeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.rchip{font-size:10.5px;font-weight:800;color:var(--muted);background:rgba(15,27,51,.055);
+  border-radius:99px;padding:3px 9px}
+.rchip b{color:var(--ink)}
+.rchip.hi{background:rgba(91,134,229,.13);color:#2f62c8}
+.rchip.hi b{color:#2f62c8}
+/* ---- 분기 코스 ---- */
+.qroute{display:grid;grid-template-columns:repeat(4,1fr);padding:17px 15px 4px}
+.qstop{position:relative;padding:0 4px;cursor:pointer}
+.qstop:before{content:"";position:absolute;top:9px;left:0;right:0;height:3px;background:#e5eaf3;z-index:0}
+.qstop:first-child:before{left:50%}
+.qstop:last-child:before{right:50%}
+.qstop.past:before,.qstop.now:before{background:#a9c6f7}
+.qdot{position:relative;z-index:1;width:21px;height:21px;margin:0 auto 6px;border-radius:50%;
+  background:var(--card);border:3px solid #dde4ef;display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:900;color:var(--muted);line-height:1}
+.qstop.past .qdot{border-color:#a9c6f7;background:#a9c6f7;color:#fff}
+.qstop.now .qdot{border-color:#5b86e5;background:#5b86e5;color:#fff;box-shadow:0 0 0 4px rgba(91,134,229,.17)}
+.qstop.fin .qdot{border-color:#f0c14b;background:var(--card);font-size:11px}
+.qstop:hover .qdot{border-color:#5b86e5}
+.qnm{text-align:center;font-size:10.5px;font-weight:900;color:var(--muted);line-height:1.3;margin-bottom:4px}
+.qnm span{display:block;font-size:9px;font-weight:700;opacity:.72}
+.qstop.now .qnm{color:#2f62c8}
+.qtx{font-size:10.8px;font-weight:700;line-height:1.5;color:var(--ink);text-align:center;
+  word-break:keep-all;min-height:32px}
+.qstop.past .qtx{opacity:.6}
+.qtx i{font-style:normal;color:var(--muted);font-weight:600;opacity:.7}
+.qstop:hover .qtx{color:var(--blue)}
+/* ---- 목표 카드 러너 ---- */
+.nsbar{margin-top:15px}
+.nsrun{position:absolute;top:-14px;transform:translateX(-50%);font-size:13.5px;line-height:1;
+  pointer-events:none;transition:left .4s cubic-bezier(.34,1.3,.5,1);z-index:2;
+  filter:drop-shadow(0 1px 2px rgba(15,27,51,.18))}
+.nsdone{font-size:10px;font-weight:900;color:#0f7a52;background:rgba(26,156,102,.14);
+  border-radius:999px;padding:2px 7px}
+.nsleft{font-size:10.5px;font-weight:800;color:#7a8aa5}
+.nsleft.ok{color:#1a9c66}
+@media (prefers-reduced-motion:reduce){.rrun{animation:none}}
 .nsl{font-size:10.5px;font-weight:900;color:#fff;background:var(--ink);border-radius:999px;padding:2px 8px;flex:none}
 .nsc{display:inline-flex;align-items:baseline;gap:6px;font-size:11.5px;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
 .nsc b{font-weight:800;letter-spacing:-.02em}
@@ -643,6 +716,12 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   .nsnum{font-size:17px}
   .nspct{font-size:15px}
   .nsstrip{padding:8px 9px;gap:6px}
+  .rtrack{padding:12px 12px 11px;border-radius:15px}
+  .rtbig{font-size:30px}
+  .qroute{padding:15px 10px 4px}
+  .qstop{padding:0 2px}
+  .qnm{font-size:9.5px}
+  .qtx{font-size:10px;min-height:38px}
 }
 /* --- 비밀 탭: 꿈 보드 --- */
 #toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);z-index:9999;
@@ -1184,6 +1263,25 @@ html[data-theme=dark] .nsbar i{background:#213769}
 html[data-theme=dark] .nsbar i.full{background:#1ca56c}
 html[data-theme=dark] .nsbar i.late{background:#e4a74e}
 html[data-theme=dark] .nsarea{background:#213151}
+html[data-theme=dark] .rtrack{background:rgba(12,20,35,.35);border-color:#2b3a55}
+html[data-theme=dark] .rroad{background:repeating-linear-gradient(90deg,rgba(255,255,255,.10) 0 10px,rgba(255,255,255,.04) 10px 20px)}
+html[data-theme=dark] .rpace i{background:repeating-linear-gradient(180deg,rgba(255,255,255,.5) 0 3px,transparent 3px 6px)}
+html[data-theme=dark] .rpace em{background:#1e2b42;border-color:#2b3a55;color:#b6c3d6}
+html[data-theme=dark] .rmsg{background:#1e2b42;border-color:#2b3a55}
+html[data-theme=dark] .rmsg p b{color:#9eb8f0}
+html[data-theme=dark] .rchip{background:rgba(255,255,255,.07);color:#b6c3d6}
+html[data-theme=dark] .rchip b{color:#e6ecf6}
+html[data-theme=dark] .rchip.hi{background:#213151;color:#9eb8f0}
+html[data-theme=dark] .rchip.hi b{color:#9eb8f0}
+html[data-theme=dark] .qstop:before{background:#26334b}
+html[data-theme=dark] .qstop.past:before,html[data-theme=dark] .qstop.now:before{background:#33518c}
+html[data-theme=dark] .qdot{background:#1b2739;border-color:#2b3a55;color:#8d9bb2}
+html[data-theme=dark] .qstop.past .qdot{background:#33518c;border-color:#33518c;color:#dbe6ff}
+html[data-theme=dark] .qstop.now .qdot{background:#3b6ad4;border-color:#3b6ad4;box-shadow:0 0 0 4px rgba(59,106,212,.22)}
+html[data-theme=dark] .qstop.now .qnm{color:#9eb8f0}
+html[data-theme=dark] .nsdone{color:#58e3a9;background:rgba(26,156,102,.2)}
+html[data-theme=dark] .nsleft{color:#9aa8bd}
+html[data-theme=dark] .nsleft.ok{color:#58e3a9}
 html[data-theme=dark] .nsl{color:#ffffff}
 html[data-theme=dark] .nsc em{color:#9eb8f0}
 html[data-theme=dark] .nsc em.full{color:#58e3a9}
@@ -3599,53 +3697,86 @@ function nsQopts(cq){
   return l.map(q=>`<option value="${q}" ${cq===q?"selected":""}>Q${q}까지 (${(q-1)*3+1}~${q*3}월)</option>`).join("");
 }
 function nsQlist(){const c=nsQnow();const a=[];for(let q=c;q<=4;q++)a.push(q);return a.length?a:[4];}
+const NSEMO={manual:"✍",project:"🗂",work:"💼",daily:"✅",book:"📚",habit:"🏃",muse:"✨",estate:"🏠"};
 function nsBar(g,kind){
   const p=nsPct(g),v=nsVal(g),t=+g.target||0,a=NSAREA[g.area]||NSAREA.manual;
   const auto=g.auto&&g.auto!=="none",el=nsElapsed();
   const cls=p>=100?"full":(p<Math.max(0,el-12)?"late":"");
   const kc=(kind||nsKind(g))==="sub"?"issub":"iscore";
+  const left=Math.max(0,t-v);
   return `<div class="nsg ${cls} ${kc}" onclick="openGoal('${g.id}')">
     <div class="nsgt"><b>${esc(g.title||"제목 없음")}</b>
+      ${p>=100?`<span class="nsdone">🎉 완주</span>`:""}
       ${auto?`<span class="nsauto" title="다른 탭에서 자동 집계">⚡ 자동</span>`:""}
       <span class="nsq">Q${g.q}</span></div>
     <div class="nsgm"><span class="nsnum">${nfm(v)}<em> / ${nfm(t)}${esc(g.unit||"")}</em></span>
       <span class="nspct ${cls}">${p}<i>%</i></span></div>
-    <div class="nsbar"><i style="width:${p}%" class="${cls}"></i><u style="left:${el}%"></u></div>
-    <div class="nsgf"><span class="nsarea">${esc(a.n)}</span>${g.note?`<span class="nsnote">${esc(g.note)}</span>`:""}</div>
+    <div class="nsbar"><i style="width:${p}%" class="${cls}"></i><u style="left:${el}%"></u>
+      <b class="nsrun" style="left:${Math.min(100,p)}%">${p>=100?"🏆":"🏃"}</b></div>
+    <div class="nsgf"><span class="nsarea">${NSEMO[g.area]||"✍"} ${esc(a.n)}</span>
+      ${p>=100?`<span class="nsleft ok">다 채웠어요</span>`:`<span class="nsleft">${nfm(left)}${esc(g.unit||"")} 더 가면 도착</span>`}
+      ${g.note?`<span class="nsnote">${esc(g.note)}</span>`:""}</div>
   </div>`;
 }
+function nsCheer(all,el){
+  const g=all-el;
+  if(all>=100) return {e:"🏆",t:"올해 목표 <b>완주</b>! 진짜 해냈어요.",s:"남은 기간은 보너스 트랙이에요."};
+  if(all<=0)   return {e:"🥾",t:"아직 <b>출발선</b>이에요.",s:"작은 목표 하나부터 채우면 바퀴가 굴러가요."};
+  if(g>=12)    return {e:"🚀",t:"계획보다 <b>"+g+"%p 앞서</b> 달리는 중!",s:"이 페이스면 여유 있게 도착해요."};
+  if(g>=0)     return {e:"🔥",t:"딱 <b>페이스대로</b> 가고 있어요.",s:"지금처럼만 하면 돼요."};
+  if(g>=-12)   return {e:"👟",t:"살짝 <b>"+(-g)+"%p 뒤</b>에 있어요.",s:"이번 주에 한 칸만 당기면 따라잡아요."};
+  return {e:"🧭",t:"<b>"+(-g)+"%p 뒤처졌어요.</b>",s:"핵심 목표 하나만 골라서 거기부터 밀어봐요."};
+}
 function northPanel(){
-  const n=ns(),all=nsAll(),el=nsElapsed(),qn=nsQnow(),qs=nsQlist();
+  const n=ns(),all=nsAll(),el=nsElapsed(),qn=nsQnow();
   const gap=all-el,tone=all>=el?"good":(gap>-15?"warn":"bad");
+  const c=nsCheer(all,el);
   const srt=a=>a.slice().sort((x,y)=>(x.q-y.q)||(nsPct(y)-nsPct(x)));
   const core=srt(nsCore()),sub=srt(nsSub());
-  const q4=qs.map(q=>`<div class="nsq4 ${q===qn?"on":""}" onclick="openQ(${q})">
-      <div class="qh">Q${q}<span>${(q-1)*3+1}~${q*3}월</span>${q===qn?`<b class="qnow">지금</b>`:""}</div>
-      <div class="qb">${n.q[q]?esc(n.q[q]):`<i>＋ 이 분기에 끝낼 한 가지</i>`}</div></div>`).join("");
+  const total=n.goals.length,fin=n.goals.filter(g=>nsPct(g)>=100).length;
+  const route=[1,2,3,4].map(q=>{
+    const st=q<qn?"past":(q===qn?"now":"");
+    return `<div class="qstop ${st} ${q===4?"fin":""}" onclick="openQ(${q})" title="Q${q} 한 줄 쓰기">
+      <div class="qdot">${q<qn?"✓":(q===4?"🏁":q)}</div>
+      <div class="qnm">Q${q}<span>${(q-1)*3+1}~${q*3}월</span></div>
+      <div class="qtx">${n.q[q]?esc(n.q[q]):`<i>＋ 한 줄</i>`}</div>
+    </div>`;
+  }).join("");
   const coreBlock=core.length
     ? `<div class="nsgs">${core.map(g=>nsBar(g,"core")).join("")}</div>`
-    : `<div class="nsempty">핵심 목표가 아직 없어요.<br>올해 꼭 이뤄야 할 2~3개만 정해보세요.</div>`;
+    : `<div class="nsempty">아직 달릴 코스가 없어요.<br>올해 꼭 이루고 싶은 2~3개만 정해보세요.</div>`;
   const subBlock=sub.length
     ? `<div class="nsbhead sub"><b>🌱 서브 목표</b><span>${sub.length}개</span><i>되면 좋은 것들</i></div>
        <div class="nsgs sub">${sub.map(g=>nsBar(g,"sub")).join("")}</div>`
     : "";
   return `<div class="north">
     <div class="nstop">
-      <div class="nstl2"><span class="nsyy">${n.year}</span><b>북극성</b><span class="nsdday">D-${nsDays()}</span></div>
+      <div class="nstl2"><span class="nsyy">${n.year}</span><b>북극성</b><span class="nsdday">골인까지 D-${nsDays()}</span></div>
       <div class="nsstate" onclick="openNorth()">
         ${n.statement?`<h3>${esc(n.statement)}</h3>`:`<h3 class="ph">올해를 한 문장으로 적어보세요 ✎</h3>`}
         ${n.why?`<p>${esc(n.why)}</p>`:""}
       </div>
-      <div class="nsgauge">
-        <div class="ngnum ${tone}">${all}<i>%</i></div>
-        <div class="ngside">
-          <div class="ngbar"><i style="width:${all}%" class="${tone}"></i><u style="left:${el}%"></u></div>
-          <div class="ngtx"><span>전체 달성 (핵심 ${nsCoreAll()}%)</span><span>올해 ${el}% 지남</span></div>
+      <div class="rtrack">
+        <div class="rthd">
+          <div class="rtbig ${tone}">${all}<i>%</i></div>
+          <div class="rtsub"><b>여기까지 왔어요</b><span>핵심 ${nsCoreAll()}% · 올해는 ${el}% 지남</span></div>
+        </div>
+        <div class="rroad ${tone}">
+          <div class="rfill" style="width:${all}%"></div>
+          <div class="rpace" style="left:${Math.min(94,Math.max(6,el))}%"><em>지금쯤 여기</em><i></i></div>
+          <div class="rrun" style="left:${Math.min(97,all)}%">${all>=100?"🎉":"🏃"}</div>
+          <div class="rflag">🏁</div>
+        </div>
+        <div class="rmsg"><span class="re">${c.e}</span><p>${c.t}<span>${c.s}</span></p></div>
+        <div class="rmeta">
+          <span class="rchip">목표 <b>${total}개</b></span>
+          <span class="rchip ${fin?"hi":""}">완주 <b>${fin}개</b></span>
+          <span class="rchip">남은 거리 <b>${Math.max(0,100-all)}%</b></span>
         </div>
       </div>
     </div>
-    <div class="nsq4s">${q4}</div>
-    <div class="nsbhead"><b>⭐ 핵심 목표</b><span>${core.length}개</span><i>이게 흔들리면 올해가 흔들림</i>
+    <div class="qroute">${route}</div>
+    <div class="nsbhead"><b>⭐ 핵심 목표</b><span>${core.length}개</span><i>이게 흔들리면 올해가 흔들려요</i>
       <button class="btn sm" onclick="openNorth()">문장 수정</button>
       <button class="btn sm primary" onclick="openGoal()">＋ 목표</button></div>
     ${coreBlock}
@@ -3847,7 +3978,7 @@ function render(){
     </div>`;
   }
   if(cur==="project") head=northPanel()+`<div class="sechead">🗂 프로젝트 카드 <span>${list.length}개</span></div>`+head;
-  else head=nsStrip(cur)+head;
+  else if(cur!=="book"&&cur!=="habit") head=nsStrip(cur)+head;
   if(cur==="estate") head=estatePanel()+`<div class="sechead">🏠 내 부동산 공부 카드 <span>${list.length}개</span></div>`+head;
   const body=s.type==="dream" ? dreamView()
     : s.type==="muse" ? museView()
