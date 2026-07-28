@@ -215,6 +215,13 @@ textarea.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:
   border-radius:11px;background:#fff;outline:none;transition:.15s}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-l)}
 .field textarea{min-height:76px;resize:vertical;line-height:1.6}
+.field textarea.bignote{min-height:300px;font-size:14px;line-height:1.75;padding:14px 15px;background:#fcfdff}
+.field textarea.bignote:focus{background:#fff}
+.field .bnl{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.field .bnl .cnt{font-size:10.5px;font-weight:800;color:var(--muted);
+  background:var(--blue-xl);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+html[data-theme=dark] .field textarea.bignote{background:#1a2230}
+html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
 .sect{border:1px solid var(--line);border-radius:14px;padding:15px;background:#fbfdff}
@@ -4152,7 +4159,7 @@ function renderDetail(){
         <button class="btn sm" onclick="addTodo()">추가</button></div>
     </div>
 
-    ${cur==="book"?"":`<div class="sect">
+    ${(cur==="book"||cur==="estate")?"":`<div class="sect">
       <h4>🚩 마일스톤 <span class="r">주요 일정</span></h4>
       ${i.milestones.length?i.milestones.map((m,x)=>`<div class="row">
         <input type="checkbox" ${m.done?"checked":""} onchange="togMs(${x})">
@@ -4181,7 +4188,7 @@ function renderDetail(){
       </div>`:""}
     </div>`}
 
-    <div class="sect">
+    ${cur==="estate"?"":`<div class="sect">
       <h4>✍ 문장 수집 <span class="r">${i.quotes.length}개 · 좋았던 문장·짧은 감상</span></h4>
       ${i.quotes.length?i.quotes.map((qq,x)=>`<div class="qrow">
         <span class="qpage">${qq.page?"p."+esc(qq.page):"—"}</span>
@@ -4191,9 +4198,9 @@ function renderDetail(){
       <div class="addline"><input class="pg" id="a_q_p" placeholder="쪽">
         <input id="a_q_t" placeholder="문장이나 짧은 감상 입력 후 Enter" onkeydown="if(event.key==='Enter')addQuote()">
         <button class="btn sm" onclick="addQuote()">담기</button></div>
-    </div>
+    </div>`}
 
-    ${cur==="book"?"":`<div class="sect">
+    ${(cur==="book"||cur==="estate")?"":`<div class="sect">
       <h4>${s.type==="muse"?"📝 콘텐츠 회고":"📝 업무 일지"} <span class="r">최신순 ${i.logs.length}건</span></h4>
       ${i.logs.length?i.logs.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(l=>`<div class="row">
         <span class="logdate">${esc(l.date)}</span><span class="grow">${esc(l.text)}</span>
@@ -4204,7 +4211,19 @@ function renderDetail(){
         <button class="btn sm" onclick="addLog()">기록</button></div>
     </div>`}
 
-    <div class="field"><label>🗒 짧은 메모 (카드에 표시됨)</label><textarea onchange="setF2('note',this.value)">${esc(i.note)}</textarea></div>`;
+    ${cur==="estate"
+      ? `<div class="field"><label class="bnl"><span>🗒 공부 메모 <span style="font-weight:600">— 여기에 전부 적어두세요</span></span>
+          <span class="cnt" id="noteCnt">${(i.note||"").length}자</span></label>
+        <textarea class="bignote" id="bigNote" placeholder="오늘 배운 것, 헷갈리는 것, 임장 후기, 계산해본 숫자… 자유롭게 적어두세요."
+          oninput="noteCount(this)" onchange="setF2('note',this.value)">${esc(i.note)}</textarea></div>`
+      : `<div class="field"><label>🗒 짧은 메모 (카드에 표시됨)</label><textarea onchange="setF2('note',this.value)">${esc(i.note)}</textarea></div>`}`;
+  if(cur==="estate"){const bn=document.getElementById("bigNote");if(bn)noteCount(bn);}
+}
+function noteCount(el){
+  const c=document.getElementById("noteCnt");
+  if(c)c.textContent=(el.value||"").length+"자";
+  el.style.height="auto";
+  el.style.height=Math.max(300,el.scrollHeight+4)+"px";
 }
 function setF2(k,v){
   const i=find(detailId);if(!i)return;
