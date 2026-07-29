@@ -4856,7 +4856,9 @@ function autoTag(i,key){
 function autoProgress(i,key){
   if(!i.todos.length)return "";
   i.progress=Math.round(i.todos.filter(t=>t.done).length/i.todos.length*100);
-  if(i.progress===100) i.status="완료"; else if(i.progress>0&&i.status==="할일") i.status="진행중";
+  if(i.progress===100) i.status="완료";
+  else if(i.status==="완료") i.status=(i.progress>0)?"진행중":"할일";   /* 체크를 풀면 완료도 풀립니다 */
+  else if(i.progress>0&&i.status==="할일") i.status="진행중";
   return autoTag(i,key);
 }
 /* 분류가 저절로 바뀌면 알려주고, 그 카드가 필터에 가려지지 않게 필터를 풀어줍니다 */
