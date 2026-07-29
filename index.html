@@ -95,6 +95,10 @@ a{color:var(--blue)}
   padding:5px 12px;font-size:12px;font-weight:600;transition:.15s}
 .chip:hover{border-color:#bed3f7;color:var(--blue)}
 .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+/* 완독 = 핑크 */
+.chip.tdone{border-color:var(--pink-l);color:var(--pink);background:var(--pink-xl)}
+.chip.tdone:hover{border-color:var(--pink-s);color:var(--pink)}
+.chip.on.tdone{background:var(--pink);border-color:var(--pink);color:#fff}
 /* cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}
 .grid.cal{grid-template-columns:repeat(auto-fill,minmax(304px,1fr))}
@@ -104,6 +108,8 @@ a{color:var(--blue)}
 .card .head{display:flex;align-items:center;gap:8px;padding:13px 15px 0;font-size:11.5px;font-weight:700;color:var(--blue)}
 .card .head .t{background:var(--blue-l);padding:3px 9px;border-radius:999px;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
+.card .head .t.tdone{background:var(--pink-l);color:var(--pink)}
+.card.tdone{border-color:var(--pink-l)}
 .card .head .acts{margin-left:auto;display:flex;gap:4px;opacity:1;transition:.15s;flex-wrap:wrap;justify-content:flex-end}
 .card .head .acts button,.card .head .acts a.lnk{display:inline-flex;align-items:center;gap:3px;
   height:24px;width:auto;padding:0 8px;border-radius:8px;border:1px solid var(--line);
@@ -858,6 +864,7 @@ html[data-theme=dark] .titem .x.tm{background:#1e2124;color:#cbd5e6}
 .pjar{font-size:11px;color:var(--muted);flex:none;width:11px}
 .pjt{font-size:14.5px;font-weight:800;letter-spacing:-.025em;flex:1;min-width:120px}
 .pjtag{font-size:10.5px;font-weight:800;color:var(--muted);background:#f1f4fa;border-radius:999px;padding:2px 8px}
+.pjtag.tdone{background:var(--pink-l);color:var(--pink)}
 .pjd{font-size:11px;font-weight:700;color:var(--muted)}
 .pjd.near{color:#e05b5b}
 .pjck{font-size:11px;font-weight:800;color:var(--muted);margin-left:auto}
@@ -1098,6 +1105,9 @@ html[data-theme=dark] .foldbtn:hover{background:#1e2a3e}
 .vwarn b{color:var(--ink)}
 .vwarn.red{background:#fff6f6;border-color:#ffd7d7;color:#c0392b}
 .vwarn.red b{color:#c0392b}
+.vcaut{font-size:11.5px;line-height:1.6;background:#fff8e8;border:1px solid #f0dcae;color:#8a6410;
+  border-radius:11px;padding:11px 12px;word-break:keep-all}
+.vcaut b{color:#7a5407}
 .vpin{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;
   font-size:17px;font-weight:800;letter-spacing:6px;text-align:center;font-family:inherit;
   color:var(--ink);background:var(--card);box-sizing:border-box}
@@ -1237,6 +1247,8 @@ html[data-theme=dark] .vhide:hover,html[data-theme=dark] .vhide:active{color:#9e
 html[data-theme=dark] .vrow{background:#1b2739;border-color:#2c3a52}
 html[data-theme=dark] .vin,html[data-theme=dark] .vpin{background:#1b2739;border-color:#2c3a52;color:#e6ecf6}
 html[data-theme=dark] .vb{background:#1b2739;border-color:#2c3a52;color:#b6c3d6}
+html[data-theme=dark] .vcaut{background:#3a3122;border-color:#5c4c2b;color:#ffd98f}
+html[data-theme=dark] .vcaut b{color:#ffe6b0}
 html[data-theme=dark] .vwarn.red{background:#3a1f22;border-color:#5c2b30;color:#ffb4b4}
 html[data-theme=dark] .vwarn.red b{color:#ffb4b4}
 html[data-theme=dark] .vpw{color:#8ab4ff}
@@ -1391,6 +1403,11 @@ html[data-theme=dark] .pj.st-hold{border-left-color:#e4a74e}
 html[data-theme=dark] .pj.open{border-color:#253143}
 html[data-theme=dark] .pjh:hover{background:#222e53}
 html[data-theme=dark] .pjtag{background:#213151}
+html[data-theme=dark] .pjtag.tdone{background:#4a2438;color:#ffb3d1}
+html[data-theme=dark] .card .head .t.tdone{background:#4a2438;color:#ffb3d1}
+html[data-theme=dark] .card.tdone{border-color:#5d2c3f}
+html[data-theme=dark] .chip.tdone{background:#2c1f2a;border-color:#5d2c3f;color:#ff8ab5}
+html[data-theme=dark] .chip.on.tdone{background:#f6538d;border-color:#f6538d;color:#fff}
 html[data-theme=dark] .pjd.near{color:#eda1a1}
 html[data-theme=dark] .pjh .drag{color:#bbc3d3}
 html[data-theme=dark] .pjck2 .bx,html[data-theme=dark] .pjms .bx{border:1.5px solid #263143;color:#ffffff}
@@ -3224,7 +3241,7 @@ function renderFilters(){
   }
   const tags=s.tags||[];
   el.innerHTML=[`<button class="chip ${filter==="ALL"?"on":""}" onclick="setF('ALL')">ALL ★</button>`]
-    .concat(tags.map(t=>`<button class="chip ${filter===t?"on":""}" onclick="setF('${esc(t)}')">${esc(t)}</button>`)).join("");
+    .concat(tags.map(t=>`<button class="chip ${filter===t?"on":""}${t===DONETAG()?" tdone":""}" onclick="setF('${esc(t)}')">${esc(t)}</button>`)).join("");
 }
 function setF(t){filter=t;render();}
 function isDoneCard(i){
@@ -3966,8 +3983,9 @@ function taskCard(i){
   const qz=(i.quotes||[]).length?` <span class="pill">✍ ${i.quotes.length}</span>`:"";
   const fa=(i.links||[]).filter(l=>l&&l.file&&l.file.d).length;
   const fp=fa?` <span class="pill">📎 ${fa}</span>`:"";
-  return `<div class="card" data-id="${i.id}" onpointerdown="cardDown(event,'${i.id}')">
-    <div class="head"><span class="t">${chImg(cur)}${esc(i.tag||"")}</span>
+  const pk=(i.tag===DONETAG())?" tdone":"";
+  return `<div class="card${pk}" data-id="${i.id}" onpointerdown="cardDown(event,'${i.id}')">
+    <div class="head"><span class="t${pk}">${chImg(cur)}${esc(i.tag||"")}</span>
       <div class="acts"><button class="drag" title="누른 채 움직여서 순서 바꾸기" aria-label="순서 이동" onpointerdown="cardDown(event,'${i.id}',1)">⠿<b>이동</b></button><button title="전체 내용 열기" aria-label="상세 열기" onclick="openDetail('${i.id}')">⤢<b>상세</b></button>
       <button title="제목·메모 빠르게 고치기" aria-label="수정" onclick="openEdit('${i.id}')">✎<b>수정</b></button>
       <button class="dl" title="카드 삭제" aria-label="삭제" onclick="delItem('${i.id}')">✕<b>삭제</b></button></div></div>
@@ -4301,7 +4319,7 @@ function pjTogTodo(id,tid,ev){
   if(ev)ev.stopPropagation();
   const i=find(id);if(!i)return;
   const t=(i.todos||[]).find(x=>x.id===tid);if(!t)return;
-  t.done=!t.done;autoProgress(i);render();
+  const _ch=autoProgress(i);autoTagSay(_ch);render();
 }
 function pjTogMs(id,x,ev){
   if(ev)ev.stopPropagation();
@@ -4318,7 +4336,7 @@ function pjRow(i){
       <span class="pjar">${op?"▾":"▸"}</span>
       <span class="pjt">${esc(i.title)}</span>
       <span class="pill ${stClass(i.status)}">${esc(i.status)}</span>
-      ${i.tag?`<span class="pjtag">${esc(i.tag)}</span>`:""}
+      ${i.tag?`<span class="pjtag${i.tag===DONETAG()?" tdone":""}">${esc(i.tag)}</span>`:""}
       ${i.due?`<span class="pjd ${near?"near":""}">📅 ${esc(i.due.slice(5))} ${esc(dd)}</span>`:""}
       ${td.length?`<span class="pjck">☑ ${dn}/${td.length}</span>`:""}
       <button class="drag" title="순서 이동" onpointerdown="cardDown(event,'${i.id}',1)">⠿</button>
@@ -4824,19 +4842,40 @@ function setF2(k,v){
   i[k]=(k==="progress")?Math.max(0,Math.min(100,+v||0)):v;
   save();renderDetail();
 }
-function autoProgress(i){
-  if(!i.todos.length)return;
+/* 「완독」 분류가 있는 탭(독서)에서, 체크리스트를 다 채우면 분류가 저절로 완독이 됩니다.
+   체크를 다시 풀면 「읽는중」으로 되돌아갑니다. 바뀐 분류 이름을 돌려줍니다. */
+function DONETAG(){ return "완독"; }
+function autoTag(i,key){
+  const s=DATA[key||cur];
+  if(!s||!Array.isArray(s.tags)||s.tags.indexOf(DONETAG())<0) return "";
+  const was=i.tag;
+  if((+i.progress||0)>=100) i.tag=DONETAG();
+  else if(i.tag===DONETAG()) i.tag=(s.tags.indexOf("읽는중")>=0)?"읽는중":(s.tags[0]||i.tag);
+  return (was===i.tag)?"":i.tag;
+}
+function autoProgress(i,key){
+  if(!i.todos.length)return "";
   i.progress=Math.round(i.todos.filter(t=>t.done).length/i.todos.length*100);
   if(i.progress===100) i.status="완료"; else if(i.progress>0&&i.status==="할일") i.status="진행중";
+  return autoTag(i,key);
+}
+/* 분류가 저절로 바뀌면 알려주고, 그 카드가 필터에 가려지지 않게 필터를 풀어줍니다 */
+function autoTagSay(ch){
+  if(!ch)return;
+  if(filter!=="ALL"&&filter!==ch) filter="ALL";
+  try{ toast(ch===DONETAG()?"📚 다 읽었네요! 「완독」으로 바꿨어요":"↩ 「"+ch+"」으로 되돌렸어요"); }catch(e){}
 }
 function addTodo(){
   const el=document.getElementById("a_todo"),v=(el.value||"").trim();if(!v)return;
-  const i=find(detailId);i.todos.push({id:uid(),text:v,done:false});autoProgress(i);save();renderDetail();
+  const i=find(detailId);i.todos.push({id:uid(),text:v,done:false});
+  const ch=autoProgress(i);save();renderDetail();render();autoTagSay(ch);
   const n=document.getElementById("a_todo");if(n)n.focus();
 }
 function togTodo(tid){
   const i=find(detailId),t=i.todos.find(x=>x.id===tid);if(!t)return;
-  t.done=!t.done;autoProgress(i);save();renderDetail();
+  t.done=!t.done;
+  const ch=autoProgress(i);
+  save();renderDetail();render();autoTagSay(ch);
 }
 const SUBNAME={todos:"체크리스트 항목",milestones:"마일스톤",links:"링크",quotes:"문장",logs:"기록"};
 /* 상세 화면 안의 모든 줄을 그 자리에서 고칠 수 있게 */
@@ -4868,10 +4907,10 @@ function delSub(key,tid){
   const x=i[key].findIndex(v=>v.id===tid);if(x<0)return;
   const gone=i[key][x],id=detailId;
   i[key].splice(x,1);
-  if(key==="todos")autoProgress(i);save();renderDetail();
-  toastU("🗑 "+(SUBNAME[key]||"항목")+"을 지웠어요",function(){
+  const ch0=(key==="todos")?autoProgress(i):"";save();renderDetail();render();
+  toastU("🗑 "+(SUBNAME[key]||"항목")+"을 지웠어요"+(ch0?" · 분류는 「"+ch0+"」로 바뀌었어요":""),function(){
     const j=find(id)||i;j[key].splice(Math.min(x,j[key].length),0,gone);
-    if(key==="todos")autoProgress(j);save();renderDetail();toast("↩ 되돌렸어요");
+    if(key==="todos")autoProgress(j);save();renderDetail();render();toast("↩ 되돌렸어요");
   });
 }
 function delIdx(key,x){
@@ -5099,7 +5138,7 @@ function vLock(){
 function vJump(){closeEdit();setTimeout(openVault,110);}
 function openVault(){
   vLock();
-  document.getElementById("mTitle").textContent="🔒 개인 금고";
+  document.getElementById("mTitle").textContent="🔒 개인 금고 (실험 기능)";
   document.getElementById("mIc").innerHTML="🔒";
   const f=document.getElementById("mForm");
   f.setAttribute("data-vault","1");
@@ -5130,6 +5169,11 @@ function vFormHtml(it){
     </div>
   </div>`;
 }
+/* 정식 비밀번호 관리 앱으로 오해하지 않도록, 금고 화면 어디에서나 먼저 보이는 주의 문구 */
+function vCaution(){
+  return `<div class="vcaut">⚠ <b>실험적 편의 기능입니다.</b> 금융·업무용 중요 비밀번호 저장은 권장하지 않습니다.<br>
+    은행·증권·회사 계정처럼 중요한 것은 전용 비밀번호 관리 앱을 써 주세요.</div>`;
+}
 function vHtml(){
   const msg=vMsg?`<div class="vwarn red">${esc(vMsg)}</div>`:"";
   if(!vCrypto())
@@ -5137,7 +5181,8 @@ function vHtml(){
   if(!VKEY){
     if(!vHas())
       return `<div class="vwrap">
-        <div class="vwarn">사이트마다 쓰는 아이디와 비밀번호를 이 기기 안에만 잠가서 보관해요.<br>
+        ${vCaution()}
+        <div class="vwarn">가벼운 메모 대신 쓰는 잠금 상자예요. 사이트마다 쓰는 아이디와 비밀번호를 이 기기 안에만 잠가서 보관해요.<br>
         먼저 <b>숫자 4~6자리 PIN</b>을 정해 주세요. 이 PIN으로 내용을 암호로 잠그기 때문에
         <b>PIN을 잊으면 되살릴 방법이 없어요.</b></div>
         ${msg}
@@ -5147,6 +5192,7 @@ function vHtml(){
         <button class="btn primary" onclick="vSetup()">금고 만들기</button>
       </div>`;
     return `<div class="vwrap">
+      ${vCaution()}
       <div class="vwarn">PIN을 넣으면 금고가 열려요. 창을 닫거나 3분 동안 쓰지 않으면 저절로 다시 잠겨요.</div>
       ${msg}
       <input class="vpin" id="vp1" type="password" inputmode="numeric" maxlength="6" placeholder="PIN" autocomplete="off" data-focus
@@ -5175,6 +5221,7 @@ function vHtml(){
   const add=(vEdit==="__new")?vFormHtml(null)
     :`<button class="btn primary" onclick="vPick('__new')">+ 새로 추가</button>`;
   return `<div class="vwrap">
+    ${vCaution()}
     ${msg}
     <div>${rows||'<div class="vempty">아직 저장한 게 없어요.</div>'}</div>
     ${add}
