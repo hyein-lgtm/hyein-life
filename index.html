@@ -4680,10 +4680,10 @@ function renderDetail(){
   const pct=Math.max(0,Math.min(100,+i.progress||0));
   document.getElementById("dForm").innerHTML=`
     <input class="detail-title" value="${esc(i.title)}" onchange="setF2('title',this.value)">
-    <div class="three">
+    <div class="${cur==="book"?"two":"three"}">
       <div class="field"><label>분류</label><select onchange="setF2('tag',this.value)">${tagOpts}</select></div>
       <div class="field"><label>상태</label><select onchange="setF2('status',this.value)">${statusList().map(t=>`<option ${i.status===t?"selected":""}>${t}</option>`).join("")}</select></div>
-      <div class="field"><label>담당 / 협업</label><input value="${esc(i.owner)}" onchange="setF2('owner',this.value)"></div>
+      ${cur==="book"?"":`<div class="field"><label>담당 / 협업</label><input value="${esc(i.owner)}" onchange="setF2('owner',this.value)"></div>`}
     </div>
     <div class="two">
       <div class="field"><label>시작일</label><input type="date" value="${esc(i.start)}" onchange="setF2('start',this.value)"></div>
@@ -4691,7 +4691,7 @@ function renderDetail(){
     </div>
     ${cur==="project"?"":`<div class="field"><label>어디까지 왔어?</label>${stepPick(stepIdx(pct),"setStepD")}</div>`}
     <div class="field"><label>${s.type==="muse"?"🎯 이 콘텐츠의 목표 (예: 저장수 500)":"🎯 목표 (한 줄)"}</label><input value="${esc(i.goal)}" onchange="setF2('goal',this.value)"></div>
-    <div class="field"><label>📄 상세 설명</label><textarea onchange="setF2('desc',this.value)">${esc(i.desc)}</textarea></div>
+    ${cur==="book"?"":`<div class="field"><label>📄 상세 설명</label><textarea onchange="setF2('desc',this.value)">${esc(i.desc)}</textarea></div>`}
     ${s.type==="muse"?`
     <div class="sect plan">
       <h4>🎬 릴스 기획 <span class="r">첫 1.5초가 전부예요</span></h4>
