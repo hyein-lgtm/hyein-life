@@ -265,6 +265,29 @@ html[data-theme=dark] .hlwrap.big>.hlback{background:#1a2230}
 @keyframes hlpopin{from{opacity:0;transform:translateY(3px) scale(.96)}to{opacity:1;transform:none}}
 html[data-theme=dark] #hlpop .hlpopb{background:#4b3f12;border-color:#7d6c22;color:#ffe9a3;
   box-shadow:0 7px 20px rgba(0,0,0,.45)}
+/* ---- 메모 첨부 사진 ---- */
+.npwrap{margin-top:9px;display:grid;gap:8px}
+.npbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.npgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:7px}
+.npc{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);
+  background:#f6f8fc;aspect-ratio:1/1}
+.npc>img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.npx{position:absolute;top:3px;right:3px;width:21px;height:21px;border-radius:50%;border:none;padding:0;
+  background:rgba(12,18,32,.6);color:#fff;font-size:11px;line-height:21px;cursor:pointer}
+.npx:hover{background:rgba(196,42,54,.92)}
+html[data-theme=dark] .npc{background:#18202c}
+#nplb{position:fixed;left:0;top:0;right:0;bottom:0;z-index:9999;display:none}
+#nplb.on{display:block}
+#nplb .nplbbg{position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(8,12,22,.9)}
+#nplb .nplbi{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);
+  max-width:94vw;max-height:76vh;border-radius:12px;background:#fff;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+#nplb .nplbbar{position:absolute;left:0;right:0;bottom:14px;display:flex;justify-content:center;
+  align-items:center;gap:7px;flex-wrap:wrap;padding:0 10px}
+#nplb .nplbb{font-size:12px;font-weight:800;padding:8px 13px;border-radius:999px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.11);color:#fff}
+#nplb .nplbb:hover{background:rgba(255,255,255,.2)}
+#nplb .nplbb.dg{border-color:rgba(255,124,124,.55);color:#ffd7d7}
+#nplb .nplbn{font-size:12px;font-weight:800;color:#dce5f6;padding:0 5px}
 .cq{margin-top:9px;background:#fbfcff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;display:grid;gap:6px}
 .cqh{font-size:10.5px;font-weight:900;color:var(--muted);letter-spacing:.02em}
 .cqr{display:flex;gap:7px;align-items:flex-start}
@@ -2059,6 +2082,7 @@ function normalize(d){
       i.links=i.links||(i.link?[{label:"링크",url:i.link}]:[]);
       i.goal=i.goal||""; i.desc=i.desc||""; i.owner=i.owner||""; i.start=i.start||"";
       i.status=i.status||"할일"; i.progress=+i.progress||0; i.due=i.due||""; i.note=i.note||"";
+      i.pics=Array.isArray(i.pics)?i.pics.filter(q=>q&&q.d):[];
       delete i.link;
       return i;
     });
@@ -4806,7 +4830,7 @@ function renderDetail(){
         <div class="hlwrap big"><div class="hlback" id="hb_bigNote" aria-hidden="true"></div>
         <textarea class="bignote" id="bigNote" data-hl="1" placeholder="오늘 배운 것, 헷갈리는 것, 임장 후기, 계산해본 숫자… 자유롭게 적어두세요."
           oninput="noteCount(this);applyNote(this)" onchange="applyNote(this)">${esc(eq2zw(i.note))}</textarea></div>
-        ${hlBar("bigNote")}</div>`
+        ${hlBar("bigNote")}${npStrip(i)}</div>`
       : `<div class="field"><label>🗒 짧은 메모 (카드에 표시됨)</label>
         <div class="hlwrap"><div class="hlback" id="hb_smNote" aria-hidden="true"></div>
         <textarea id="smNote" oninput="applyNote(this)" onchange="applyNote(this)">${esc(eq2zw(i.note))}</textarea></div>
@@ -4948,6 +4972,7 @@ function hlWatch(el){
     else hlHidePop();
   });
   el.addEventListener("input",function(){hlHidePop();});
+  el.addEventListener("paste",function(e){try{npPaste(e,el);}catch(err){}});
   el.addEventListener("scroll",function(){hlHidePop();});
   el.addEventListener("blur",function(){setTimeout(hlHidePop,160);});
 }
@@ -4964,6 +4989,156 @@ document.addEventListener("selectionchange",function(){
 });
 window.addEventListener("scroll",hlHidePop,true);
 window.addEventListener("resize",hlHidePop);
+/* ---- 공부 메모 사진 (붙여넣기 / 고르기) --------------------------------- */
+var NPMAX=1600, NPQ=0.78, NPLIM=40, NPI=-1;
+function npStrip(i){
+  var ps=(i&&i.pics)||[];
+  return `<div class="npwrap">
+    <div class="npbar">
+      <button type="button" class="btn sm" onclick="document.getElementById('npFile').click()">🖼 사진 넣기</button>
+      <input type="file" id="npFile" accept="image/*" multiple style="display:none" onchange="npPick(this)">
+      <span class="hlhint">메모 안에서 Ctrl+V(⌘V)로 캡처를 바로 붙일 수 있어요${ps.length?" · 지금 "+ps.length+"장":""}</span>
+    </div>
+    ${ps.length?`<div class="npgrid">${ps.map((q,x)=>`<div class="npc">
+      <img src="${esc(q.d)}" alt="첨부 사진 ${x+1}" loading="lazy" onclick="npOpen(${x})">
+      <button type="button" class="npx" title="사진 지우기" aria-label="사진 지우기" onclick="npDel(${x})">✕</button>
+    </div>`).join("")}</div>`:""}
+  </div>`;
+}
+function npRefresh(){
+  var w=document.querySelector(".npwrap"),i=find(detailId);
+  if(!w||!i){try{renderDetail();}catch(e){}return;}
+  var t=document.createElement("div");
+  t.innerHTML=npStrip(i);
+  w.parentNode.replaceChild(t.firstElementChild,w);
+}
+function npCompress(f,cb){
+  var r=new FileReader();
+  r.onload=function(e){
+    var raw=e.target.result,im=new Image();
+    im.onload=function(){
+      var sc=Math.min(1,NPMAX/Math.max(im.width,im.height));
+      var c=document.createElement("canvas");
+      c.width=Math.max(1,Math.round(im.width*sc));
+      c.height=Math.max(1,Math.round(im.height*sc));
+      c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+      var out="";
+      try{out=c.toDataURL("image/webp",NPQ);}catch(err){out="";}
+      if(!out||out.indexOf("image/webp")<0){try{out=c.toDataURL("image/jpeg",0.82);}catch(e2){out="";}}
+      cb(out||raw,c.width,c.height);
+    };
+    im.onerror=function(){cb(raw,0,0);};
+    im.src=raw;
+  };
+  r.onerror=function(){cb("",0,0);};
+  r.readAsDataURL(f);
+}
+function npPut(d,w,h){
+  if(LOSTMODE)return false;
+  var i=find(detailId);
+  if(!i||!d)return false;
+  i.pics=i.pics||[];
+  if(i.pics.length>=NPLIM){alert("사진은 한 메모에 최대 "+NPLIM+"장까지예요.");return false;}
+  i.pics.push({id:uid(),d:d,w:w||0,h:h||0,s:Math.round(d.length*0.75),t:Date.now()});
+  try{localStorage.setItem(KEY,JSON.stringify(DATA));}
+  catch(e){
+    i.pics.pop();
+    alert("저장 공간이 꽉 차서 사진을 담지 못했어요.\n오래된 사진을 지우거나, 설정 → 백업에서 「파일로 내보내기」를 먼저 해주세요.");
+    return false;
+  }
+  try{gsTouch();}catch(e){}
+  return true;
+}
+function npAddFiles(fs){
+  fs=(fs||[]).filter(function(f){return f&&/^image\//.test(f.type||"");});
+  if(!fs.length)return;
+  var n=0,k=0;
+  (function step(){
+    if(k>=fs.length){
+      npRefresh();
+      try{toast(n?("🖼 사진 "+n+"장을 담았어요"):"사진을 담지 못했어요");}catch(e){}
+      return;
+    }
+    npCompress(fs[k++],function(d,w,h){if(npPut(d,w,h))n++;step();});
+  })();
+}
+function npPick(el){var fs=[].slice.call(el.files||[]);el.value="";npAddFiles(fs);}
+function npPaste(e,el){
+  if(!el||el.id!=="bigNote")return;
+  var dt=e.clipboardData||window.clipboardData;
+  if(!dt)return;
+  var fs=[],it=dt.items||[],k;
+  for(k=0;k<it.length;k++)
+    if(it[k].kind==="file"&&/^image\//.test(it[k].type||"")){var f=it[k].getAsFile();if(f)fs.push(f);}
+  if(!fs.length&&dt.files)for(k=0;k<dt.files.length;k++)
+    if(/^image\//.test(dt.files[k].type||""))fs.push(dt.files[k]);
+  if(!fs.length)return;
+  e.preventDefault();
+  hlHidePop();
+  npAddFiles(fs);
+}
+function npLb(){
+  var b=document.getElementById("nplb");
+  if(!b){
+    b=document.createElement("div");
+    b.id="nplb";
+    b.innerHTML='<div class="nplbbg"></div><img class="nplbi" id="nplbi" alt="첨부 사진 크게 보기">'
+      +'<div class="nplbbar"><button type="button" class="nplbb" id="nplbp">‹ 이전</button>'
+      +'<span class="nplbn" id="nplbn"></span>'
+      +'<button type="button" class="nplbb" id="nplbx">다음 ›</button>'
+      +'<button type="button" class="nplbb dg" id="nplbd">🗑 지우기</button>'
+      +'<button type="button" class="nplbb" id="nplbc">닫기 ✕</button></div>';
+    document.body.appendChild(b);
+    b.querySelector(".nplbbg").addEventListener("click",npClose);
+    b.querySelector("#nplbc").addEventListener("click",npClose);
+    b.querySelector("#nplbp").addEventListener("click",function(){npStep(-1);});
+    b.querySelector("#nplbx").addEventListener("click",function(){npStep(1);});
+    b.querySelector("#nplbd").addEventListener("click",function(){npDel(NPI,true);});
+  }
+  return b;
+}
+function npPics(){var i=find(detailId);return (i&&i.pics)||[];}
+function npPaint(){
+  var ps=npPics(),b=document.getElementById("nplb");
+  if(!b)return;
+  if(!ps.length){npClose();return;}
+  if(NPI<0)NPI=0;
+  if(NPI>=ps.length)NPI=ps.length-1;
+  b.querySelector("#nplbi").src=ps[NPI].d;
+  b.querySelector("#nplbn").textContent=(NPI+1)+" / "+ps.length;
+  var one=ps.length<2;
+  b.querySelector("#nplbp").style.display=one?"none":"";
+  b.querySelector("#nplbx").style.display=one?"none":"";
+}
+function npOpen(x){
+  var ps=npPics();
+  if(!ps[x])return;
+  NPI=x;npLb().classList.add("on");npPaint();
+}
+function npStep(d){
+  var ps=npPics();
+  if(!ps.length)return;
+  NPI=(NPI+d+ps.length)%ps.length;npPaint();
+}
+function npClose(){var b=document.getElementById("nplb");if(b)b.classList.remove("on");NPI=-1;}
+function npDel(x,fromLb){
+  var i=find(detailId);
+  if(!i||!i.pics||!i.pics[x])return;
+  if(!confirm("이 사진을 지울까요?"))return;
+  i.pics.splice(x,1);
+  save();npRefresh();
+  if(fromLb){
+    if(!i.pics.length)npClose();
+    else{if(NPI>=i.pics.length)NPI=i.pics.length-1;npPaint();}
+  }
+}
+document.addEventListener("keydown",function(e){
+  var b=document.getElementById("nplb");
+  if(!b||!b.classList.contains("on"))return;
+  if(e.key==="Escape"){npClose();e.preventDefault();}
+  else if(e.key==="ArrowLeft")npStep(-1);
+  else if(e.key==="ArrowRight")npStep(1);
+});
 function applyNote(el){
   if(!el)return;
   if(el.id!=="f_note"){const i=find(detailId);if(i){i.note=zw2eq(el.value);save();}}
