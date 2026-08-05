@@ -343,6 +343,21 @@ html[data-theme=dark] .padib,html[data-theme=dark] .padin{background:#1e2124;col
 html[data-theme=dark] .padck{background:#1e2124;border-color:#3a4657}
 html[data-theme=dark] .padck.on{background:var(--blue);border-color:var(--blue)}
 html[data-theme=dark] #padFab{background:#4b3f12;border-color:#7d6c22;color:#ffe9a3}
+.padgrip{flex:none;width:13px;display:flex;align-items:center;justify-content:center;color:#c3ccdd;
+  font-size:11px;line-height:1.6;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;visibility:hidden;margin-top:1px}
+.padr:hover .padgrip,.padr:focus-within .padgrip{visibility:visible}
+.padgrip:active{cursor:grabbing;color:var(--blue)}
+@media(hover:none){.padgrip{visibility:visible}}
+.padr.drag{opacity:.3}
+.padph{height:26px;border:1.5px dashed var(--blue);border-radius:8px;background:var(--blue-l);margin:2px 0}
+.padg.dropin{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-l)}
+#padDragGhost{position:fixed;left:0;top:0;z-index:9997;pointer-events:none;
+  background:var(--card);border:1px solid var(--blue);border-radius:9px;padding:5px 10px;
+  font-size:12px;font-weight:700;color:var(--ink);box-shadow:0 12px 28px rgba(13,31,66,.28);
+  max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.96}
+body.paddragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
+html[data-theme=dark] .padgrip{color:#4a5768}
 body.padon #padFab{display:none}
 @media(min-width:1360px){
   body.padon{padding-right:312px}
@@ -5832,16 +5847,17 @@ function padMonth(){var d=new Date();return (d.getMonth()+1)+"월";}
 function padRender(soft){
   var body=document.getElementById("padBody");
   if(!body)return;
+  if(PADDRAG&&PADDRAG.on)return;
   if(soft){var a=document.activeElement;if(a&&a.closest&&a.closest("#pad"))return;}
   var p=padD(),h="";
   if(!p.groups.length){
     h='<div class="padempty">아직 메모가 없어요.<br>위 「＋ 묶음」을 눌러 <b>'+esc(padMonth())+
-      '</b> 처럼 묶음을 만들고<br>그 안에 할 일을 한 줄씩 적어보세요.</div>';
+      '</b> 처럼 묶음을 만들고<br>그 안에 할 일을 한 줄씩 적어보세요.<br>줄 앞의 ⠿ 를 끌면 순서를 바꾸거나<br>다른 묶음으로 옮길 수 있어요.</div>';
   }
   for(var i=0;i<p.groups.length;i++){
     var g=p.groups[i],tot=g.items.length,dn=0;
     for(var k=0;k<tot;k++)if(g.items[k].done)dn++;
-    h+='<div class="padg">'+
+    h+='<div class="padg" data-g="'+g.id+'">'+
       '<div class="padgh" onclick="padFold(\''+g.id+'\')">'+
       '<span class="cr">'+(g.open?"▾":"▸")+'</span>'+
       '<span class="padgt">'+esc(g.title||"제목 없음")+'</span>'+
@@ -5850,10 +5866,11 @@ function padRender(soft){
       '<button type="button" class="padgm" title="묶음 지우기" onclick="event.stopPropagation();padDelGroup(\''+g.id+'\')">✕</button>'+
       '</div>';
     if(g.open){
-      h+='<div class="padgb">';
+      h+='<div class="padgb" data-g="'+g.id+'">';
       for(var k=0;k<tot;k++){
         var t=g.items[k];
-        h+='<div class="padr'+(t.done?" done":"")+'">'+
+        h+='<div class="padr'+(t.done?" done":"")+'" data-g="'+g.id+'" data-i="'+t.id+'">'+
+          '<span class="padgrip" title="끌어서 옮기기" onpointerdown="padGripDown(event,\''+g.id+'\',\''+t.id+'\')">⠿</span>'+
           '<button type="button" class="padck'+(t.done?" on":"")+'" aria-label="완료 체크" onclick="padCheck(\''+g.id+'\',\''+t.id+'\')">'+(t.done?"✓":"")+'</button>'+
           '<div class="padt" onclick="padEdit(\''+g.id+'\',\''+t.id+'\')">'+esc(t.t)+'</div>'+
           '<button type="button" class="padx" aria-label="지우기" onclick="padDel(\''+g.id+'\',\''+t.id+'\')">✕</button>'+
@@ -5946,6 +5963,127 @@ function padEdit(gid,tid){
   if(!t){padDel(gid,tid);return;}
   it.t=t;padSave();padRender();
 }
+/* ---- 할 일 드래그로 옮기기 (같은 묶음 순서 + 다른 묶음 이동) ------------- */
+var PADDRAG=null;
+function padGripDown(e,gid,tid){
+  if(e.pointerType==="mouse"&&e.button!==0)return;
+  var row=(e.target&&e.target.closest)?e.target.closest(".padr"):null;
+  if(!row)return;
+  try{e.preventDefault();}catch(x){}
+  try{e.stopPropagation();}catch(x){}
+  PADDRAG={gid:gid,tid:tid,row:row,x:e.clientX,y:e.clientY,on:false,ph:null,ghost:null,dropg:null};
+  document.addEventListener("pointermove",padDragMove,{passive:false});
+  document.addEventListener("pointerup",padDragUp,true);
+  document.addEventListener("pointercancel",padDragUp,true);
+}
+function padDragBegin(){
+  var d=PADDRAG;if(!d)return;
+  d.on=true;
+  document.body.classList.add("paddragging");
+  var ph=document.createElement("div");
+  ph.className="padph";ph.id="padPh";
+  if(d.row.parentNode)d.row.parentNode.insertBefore(ph,d.row);
+  d.ph=ph;
+  d.row.classList.add("drag");
+  var g=document.createElement("div");
+  g.id="padDragGhost";
+  var tx=d.row.querySelector(".padt");
+  g.textContent=tx?tx.textContent:"";
+  document.body.appendChild(g);
+  d.ghost=g;
+}
+function padDropClear(){
+  if(PADDRAG)PADDRAG.dropg=null;
+  var a=document.querySelectorAll(".padg.dropin");
+  for(var i=0;i<a.length;i++)a[i].classList.remove("dropin");
+}
+function padDragMove(e){
+  var d=PADDRAG;if(!d)return;
+  if(!d.on){
+    if(Math.abs(e.clientX-d.x)<4&&Math.abs(e.clientY-d.y)<4)return;
+    padDragBegin();
+  }
+  try{e.preventDefault();}catch(x){}
+  if(d.ghost)d.ghost.style.transform="translate("+(e.clientX+13)+"px,"+(e.clientY-15)+"px)";
+  var bd=document.getElementById("padBody");
+  if(bd&&bd.getBoundingClientRect){
+    var r=bd.getBoundingClientRect();
+    if(e.clientY<r.top+36)bd.scrollTop-=14;
+    else if(e.clientY>r.bottom-36)bd.scrollTop+=14;
+  }
+  if(d.ghost)d.ghost.style.display="none";
+  var el=document.elementFromPoint?document.elementFromPoint(e.clientX,e.clientY):null;
+  if(d.ghost)d.ghost.style.display="";
+  padDropClear();
+  if(!el||!el.closest||!d.ph)return;
+  var row=el.closest(".padr");
+  if(row&&row!==d.row&&row.parentNode){
+    var rr=row.getBoundingClientRect();
+    var after=(e.clientY>rr.top+rr.height/2);
+    row.parentNode.insertBefore(d.ph,after?row.nextSibling:row);
+    return;
+  }
+  var gh=el.closest(".padgh");
+  var gg=el.closest(".padg");
+  var gb=el.closest(".padgb");
+  if(gh&&gg){
+    var ob=gg.querySelector(".padgb");
+    if(ob){ob.insertBefore(d.ph,ob.firstChild);}
+    else{gg.classList.add("dropin");d.dropg=gg.getAttribute("data-g");}
+    return;
+  }
+  if(gb){
+    if(d.ph.parentNode!==gb){
+      var inp=gb.querySelector(".padin");
+      gb.insertBefore(d.ph,inp||null);
+    }
+    return;
+  }
+  if(gg){
+    var ob2=gg.querySelector(".padgb");
+    if(ob2){var inp2=ob2.querySelector(".padin");ob2.insertBefore(d.ph,inp2||null);}
+    else{gg.classList.add("dropin");d.dropg=gg.getAttribute("data-g");}
+  }
+}
+function padDragUp(){
+  var d=PADDRAG;
+  document.removeEventListener("pointermove",padDragMove);
+  document.removeEventListener("pointerup",padDragUp,true);
+  document.removeEventListener("pointercancel",padDragUp,true);
+  PADDRAG=null;
+  if(!d)return;
+  document.body.classList.remove("paddragging");
+  if(d.ghost&&d.ghost.parentNode)d.ghost.parentNode.removeChild(d.ghost);
+  if(!d.on){padDropClear();return;}
+  var tg=null,idx=-1;
+  if(d.dropg){tg=d.dropg;idx=-1;}
+  else if(d.ph&&d.ph.parentNode&&d.ph.parentNode.classList&&d.ph.parentNode.classList.contains("padgb")){
+    tg=d.ph.parentNode.getAttribute("data-g");
+    var ch=d.ph.parentNode.children,n=0;
+    for(var i=0;i<ch.length;i++){
+      if(ch[i]===d.ph)break;
+      if(ch[i].classList&&ch[i].classList.contains("padr")&&ch[i]!==d.row)n++;
+    }
+    idx=n;
+  }
+  padDropClear();
+  if(d.row&&d.row.classList)d.row.classList.remove("drag");
+  if(d.ph&&d.ph.parentNode)d.ph.parentNode.removeChild(d.ph);
+  if(!tg){padRender();return;}
+  padMove(d.gid,d.tid,tg,idx);
+}
+function padMove(sg,tid,tg,idx){
+  var a=padG(sg),b=padG(tg);
+  if(!a||!b){padRender();return;}
+  var pos=-1;
+  for(var i=0;i<a.items.length;i++)if(a.items[i].id===tid)pos=i;
+  if(pos<0){padRender();return;}
+  var it=a.items.splice(pos,1)[0];
+  if(idx<0||idx>b.items.length)idx=b.items.length;
+  b.items.splice(idx,0,it);
+  padSave();padRender();
+  if(sg!==tg){try{toast("✓ 「"+(b.title||"묶음")+"」로 옮겼어요");}catch(e){}}
+}
 function padInit(){
   padD();padApply();padRender();
   if(!window._padWrap){
@@ -5963,12 +6101,48 @@ function padInit(){
     },true);
   }
 }
+/* ---- 날짜가 바뀌면 오늘 데일리 투두로 자동 이동 --------------------------- */
+var DAYNOW=todayStr();
+function dayBusy(){
+  try{
+    var ov=document.getElementById("overlay");
+    if(ov&&ov.classList.contains("on"))return true;
+    if(detailId)return true;
+    if(typeof PADDRAG!=="undefined"&&PADDRAG&&PADDRAG.on)return true;
+    var lb=document.getElementById("nplb");
+    if(lb&&lb.classList.contains("on"))return true;
+  }catch(e){}
+  return false;
+}
+function dayRoll(hard){
+  var t;
+  try{t=todayStr();}catch(e){return;}
+  if(t===DAYNOW)return;
+  if(dayBusy())return;                 // 창이 열려 있으면 방해하지 않고 다음에 다시 시도
+  DAYNOW=t;
+  daySel=t;
+  var dt=new Date(t+"T00:00:00");
+  if(!isNaN(dt.getTime())){calY=dt.getFullYear();calM=dt.getMonth();}
+  var toDaily=false;
+  try{ toDaily=(!!DATA.daily)&&(tabKeys().indexOf("daily")>=0)&&(hard===true||cur==="daily"); }catch(e){}
+  if(toDaily&&cur!=="daily"){
+    cur="daily";filter="ALL";
+    var q=document.getElementById("q");if(q)q.value="";
+  }
+  try{render();}catch(e){}
+  try{toast("🌱 날짜가 바뀌었어요 · "+(dt.getMonth()+1)+"월 "+dt.getDate()+"일 데일리로 옮겼어요");}catch(e){}
+}
+document.addEventListener("visibilitychange",function(){
+  if(!document.hidden){try{dayRoll(true);}catch(e){}}
+});
+window.addEventListener("focus",function(){try{dayRoll(true);}catch(e){}});
 document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeEdit();});
 document.getElementById("detail").addEventListener("click",e=>{if(e.target.id==="detail")closeDetail();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeEdit();if(detailId)closeDetail();}});
 setInterval(()=>{
   const d=new Date();
   document.getElementById("clock").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+  try{dayRoll();}catch(e){}
 },1000);
 renderLogo();
 setTheme(themeGet());
