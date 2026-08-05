@@ -244,10 +244,17 @@ html[data-theme=dark] mark.hl{background:linear-gradient(transparent 42%,#8a7318
 .hlbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:7px}
 .hlb{background:#fff7d1;border-color:#f0dd8a}
 .hlhint{font-size:10.5px;color:var(--muted);line-height:1.5}
-.notepv{margin-top:8px;font-size:13px;line-height:1.8;color:var(--ink);white-space:pre-wrap;
-  background:#fcfdff;border:1px dashed var(--line);border-radius:12px;padding:11px 13px;word-break:break-word}
-.notepv .pvph{color:#7d8ba3;font-size:11.5px}
-html[data-theme=dark] .notepv{background:#1a2230}
+.hlwrap{position:relative;border-radius:11px}
+.hlwrap>textarea{background:transparent!important;position:relative;z-index:1;display:block;width:100%;
+  box-sizing:border-box;margin:0;resize:none;overflow-y:hidden}
+.hlback{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0;margin:0;
+  pointer-events:none;overflow:hidden;box-sizing:border-box;border:1px solid transparent;border-radius:11px;
+  background:#fff;color:transparent;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word}
+.hlback mark.hl{font-weight:inherit;padding:0;border-radius:2px;color:transparent}
+.hlwrap.big>.hlback{background:#fcfdff}
+.hlwrap.big:focus-within>.hlback{background:#fff}
+html[data-theme=dark] .hlback{background:#1e2124}
+html[data-theme=dark] .hlwrap.big>.hlback{background:#1a2230}
 .cq{margin-top:9px;background:#fbfcff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;display:grid;gap:6px}
 .cqh{font-size:10.5px;font-weight:900;color:var(--muted);letter-spacing:.02em}
 .cqr{display:flex;gap:7px;align-items:flex-start}
@@ -4616,8 +4623,9 @@ function openEdit(id){
       <div class="field"><label>마감일</label><input id="f_due" type="date" value="${esc(v.due||"")}"></div></div>
       <div class="field"><label>목표 한 줄</label><input id="f_goaltext" value="${esc(v.goal||"")}"></div>`;
   }
-  html+=`<div class="field"><label>🗒 메모</label><textarea id="f_note" oninput="applyNote(this)">${esc(v.note||"")}</textarea>${hlBar("f_note",v.note||"")}</div>`;
+  html+=`<div class="field"><label>🗒 메모</label><div class="hlwrap"><div class="hlback" id="hb_f_note" aria-hidden="true"></div><textarea id="f_note" oninput="applyNote(this)">${esc(eq2zw(v.note||""))}</textarea></div>${hlBar("f_note")}</div>`;
   document.getElementById("mForm").innerHTML=html;
+  hlSyncAll();
   document.getElementById("overlay").classList.add("on");
   document.getElementById("f_title").focus();
 }
@@ -4638,7 +4646,7 @@ function saveEdit(){
   if(!title){alert("제목을 입력해주세요.");return;}
   const isNew=!editing;
   const o=editing||{id:uid()};
-  o.title=title;o.tag=g("f_tag")?g("f_tag").value:"";o.note=g("f_note").value;
+  o.title=title;o.tag=g("f_tag")?g("f_tag").value:"";o.note=zw2eq(g("f_note").value);
   {
     o.status=g("f_status").value;o.progress=Math.max(0,Math.min(100,+g("f_progress").value||0));
     o.start=g("f_start").value;o.due=g("f_due").value;o.goal=g("f_goaltext").value;
@@ -4784,39 +4792,81 @@ function renderDetail(){
 
     ${cur==="estate"
       ? `<div class="field"><label class="bnl"><span>🗒 공부 메모 <span style="font-weight:600">— 여기에 전부 적어두세요</span></span>
-          <span class="cnt" id="noteCnt">${(i.note||"").length}자</span></label>
+          <span class="cnt" id="noteCnt">${plainLen(i.note)}자</span></label>
+        <div class="hlwrap big"><div class="hlback" id="hb_bigNote" aria-hidden="true"></div>
         <textarea class="bignote" id="bigNote" data-hl="1" placeholder="오늘 배운 것, 헷갈리는 것, 임장 후기, 계산해본 숫자… 자유롭게 적어두세요."
-          oninput="noteCount(this);applyNote(this)" onchange="applyNote(this)">${esc(i.note)}</textarea>
+          oninput="noteCount(this);applyNote(this)" onchange="applyNote(this)">${esc(eq2zw(i.note))}</textarea></div>
         ${hlBar("bigNote")}</div>`
       : `<div class="field"><label>🗒 짧은 메모 (카드에 표시됨)</label>
-        <textarea id="smNote" oninput="applyNote(this)" onchange="applyNote(this)">${esc(i.note)}</textarea>
+        <div class="hlwrap"><div class="hlback" id="hb_smNote" aria-hidden="true"></div>
+        <textarea id="smNote" oninput="applyNote(this)" onchange="applyNote(this)">${esc(eq2zw(i.note))}</textarea></div>
         ${hlBar("smNote")}</div>`}`;
   if(cur==="estate"){const bn=document.getElementById("bigNote");if(bn)noteCount(bn);}
+  hlSyncAll();
 }
-function hlBar(id,txt){
-  let t=txt;
-  if(t===undefined){const i=find(detailId);t=(i&&i.note)||"";}
-  t=t||"";
+function hlBar(id){
   return `<div class="hlbar">
     <button type="button" class="btn sm hlb" onclick="noteHl('${id}')">🖍 형광펜</button>
     <span class="hlhint">메모에서 칠할 곳을 드래그한 뒤 이 버튼을 눌러요 · 다시 누르면 지워져요</span>
-  </div>
-  <div class="notepv" id="pv_${id}">${t.indexOf("==")>=0?hlHtml(t):'<span class="pvph">칠한 부분이 여기에 노랗게 보여요</span>'}</div>`;
+  </div>`;
 }
 function noteCount(el){
   const c=document.getElementById("noteCnt");
-  if(c)c.textContent=(el.value||"").length+"자";
-  el.style.height="auto";
-  el.style.height=Math.max(300,el.scrollHeight+4)+"px";
+  if(c)c.textContent=plainLen(el.value)+"자";
 }
 function hlHtml(t){return esc(t||"").replace(/==([^=]+)==/g,'<mark class="hl">$1</mark>');}
+var ZW=String.fromCharCode(8203);
+function plainLen(t){return String(t==null?"":t).split(ZW).join("").replace(/==([^=]+)==/g,"$1").length;}
+function eq2zw(t){t=String(t==null?"":t).split(ZW).join("");return t.replace(/==([^=]+)==/g,ZW+"$1"+ZW);}
+function zw2eq(v){
+  v=String(v==null?"":v);
+  while(v.indexOf(ZW+ZW)>=0)v=v.split(ZW+ZW).join("");
+  var parts=v.split(ZW),n=parts.length-1;
+  if(n<=0)return v;
+  var out=parts[0];
+  for(var k=1;k<=n;k++)out+=((k===n&&n%2===1)?"":"==")+parts[k];
+  return out;
+}
+function hlBackHtml(v){
+  v=String(v==null?"":v);
+  var parts=v.split(ZW),h=esc(parts[0]);
+  for(var k=1;k<parts.length;k++){
+    if(k%2===1)h+='<mark class="hl">'+ZW+esc(parts[k]);
+    else h+=ZW+'</mark>'+esc(parts[k]);
+  }
+  if((parts.length-1)%2===1)h+='</mark>';
+  return h;
+}
+var HLCSS=["fontFamily","fontSize","fontWeight","fontStyle","fontVariant","lineHeight","letterSpacing",
+  "wordSpacing","textTransform","textIndent","textAlign","direction","tabSize","paddingTop","paddingRight",
+  "paddingBottom","paddingLeft","borderTopWidth","borderRightWidth","borderBottomWidth","borderLeftWidth","borderRadius"];
+function hlSync(el){
+  if(!el)return;
+  var min=el.classList.contains("bignote")?300:76;
+  el.style.height="auto";
+  el.style.height=Math.max(min,el.scrollHeight+2)+"px";
+  var hb=document.getElementById("hb_"+el.id);
+  if(!hb)return;
+  var s=getComputedStyle(el);
+  for(var k=0;k<HLCSS.length;k++){try{hb.style[HLCSS[k]]=s[HLCSS[k]];}catch(e){}}
+  hb.style.borderStyle="solid";hb.style.borderColor="transparent";
+  hb.innerHTML=hlBackHtml(el.value)+"\n";
+  hb.scrollTop=el.scrollTop;
+  if(!el.dataset.hlsc){el.dataset.hlsc="1";
+    el.addEventListener("scroll",function(){var h=document.getElementById("hb_"+el.id);if(h)h.scrollTop=el.scrollTop;});
+    el.addEventListener("blur",function(){try{applyNote(el);}catch(e){}});
+  }
+}
+function hlSyncAll(){
+  var ns=document.querySelectorAll(".hlwrap>textarea");
+  for(var k=0;k<ns.length;k++)hlSync(ns[k]);
+}
+window.addEventListener("resize",function(){try{hlSyncAll();}catch(e){}});
 function applyNote(el){
   if(!el)return;
-  if(el.id!=="f_note"){const i=find(detailId);if(i){i.note=el.value;save();}}
-  const pv=document.getElementById("pv_"+el.id);
-  if(pv){const h=hlHtml(el.value);
-    pv.innerHTML=h?h:'<span class="pvph">칠한 부분이 여기에 노랗게 보여요</span>';}
-  const c=document.getElementById("noteCnt");if(c)c.textContent=(el.value||"").length+"자";
+  if(el.id!=="f_note"){const i=find(detailId);if(i){i.note=zw2eq(el.value);save();}}
+  hlSync(el);
+  const c=document.getElementById("noteCnt");if(c)c.textContent=plainLen(el.value)+"자";
 }
 function noteHl(id){
   const el=document.getElementById(id);if(!el)return;
@@ -4831,12 +4881,12 @@ function noteHl(id){
   if(!sel){try{toast("칠할 부분을 먼저 드래그해서 골라주세요");}catch(e){}el.focus();return;}
   const A=a+lead,B=b-tail;
   let out,na,nb;
-  if(/^==[\s\S]+==$/.test(sel)){out=sel.slice(2,-2);na=A;nb=A+out.length;}
-  else if(v.slice(Math.max(0,A-2),A)==="=="&&v.slice(B,B+2)==="=="){
-    el.value=v.slice(0,A-2)+sel+v.slice(B+2);
-    el.setSelectionRange(A-2,B-2);applyNote(el);el.focus();return;
+  if(sel.length>2&&sel.charAt(0)===ZW&&sel.charAt(sel.length-1)===ZW){out=sel.slice(1,-1);na=A;nb=A+out.length;}
+  else if(v.charAt(A-1)===ZW&&v.charAt(B)===ZW){
+    el.value=v.slice(0,A-1)+sel+v.slice(B+1);
+    el.setSelectionRange(A-1,B-1);applyNote(el);el.focus();return;
   }
-  else{out="=="+sel+"==";na=A;nb=A+out.length;}
+  else{sel=sel.split(ZW).join("");out=ZW+sel+ZW;na=A;nb=A+out.length;}
   el.value=v.slice(0,A)+out+v.slice(B);
   el.setSelectionRange(na,nb);
   applyNote(el);el.focus();
