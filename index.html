@@ -288,6 +288,66 @@ html[data-theme=dark] .npc{background:#18202c}
 #nplb .nplbb:hover{background:rgba(255,255,255,.2)}
 #nplb .nplbb.dg{border-color:rgba(255,124,124,.55);color:#ffd7d7}
 #nplb .nplbn{font-size:12px;font-weight:800;color:#dce5f6;padding:0 5px}
+/* ---- 📌 옆에 붙는 중요 메모판 (월별 묶음 + 체크리스트) ---- */
+#padFab{position:fixed;right:16px;bottom:18px;z-index:39;width:52px;height:52px;border-radius:50%;
+  border:1px solid #e6cf6e;background:#ffe9a8;color:#5a4a0e;font-size:20px;line-height:1;cursor:pointer;
+  box-shadow:0 10px 26px rgba(20,30,60,.22);display:flex;align-items:center;justify-content:center;
+  padding:0;-webkit-tap-highlight-color:transparent}
+#padFab:active{transform:translateY(1px)}
+#padFab .padbdg{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:999px;
+  background:#e0483f;color:#fff;font-size:10.5px;font-weight:900;line-height:20px;padding:0 5px;
+  font-style:normal;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+#pad{position:fixed;right:0;top:0;bottom:0;width:300px;max-width:90vw;z-index:40;
+  display:flex;flex-direction:column;background:var(--card);border-left:1px solid var(--line);
+  box-shadow:-14px 0 38px rgba(13,31,66,.16);transform:translateX(103%);
+  transition:transform .2s ease-out;overscroll-behavior:contain}
+#pad.on{transform:none}
+.padhd{flex:none;display:flex;align-items:center;gap:7px;padding:13px 12px 9px;border-bottom:1px solid var(--line)}
+.padhd b{font-size:13px;font-weight:900;letter-spacing:-.01em;white-space:nowrap}
+.padhd .padsub{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.padhd .sp{flex:1}
+.padib{border:1px solid var(--line);background:#fff;color:#41546f;border-radius:9px;
+  padding:5px 8px;font-size:11.5px;font-weight:800;cursor:pointer;white-space:nowrap}
+.padib:hover{border-color:var(--blue);color:var(--blue-d)}
+.padbody{flex:1;overflow:auto;padding:11px 11px 40px;-webkit-overflow-scrolling:touch}
+.padg{border:1px solid var(--line);border-radius:13px;margin-bottom:9px;background:#fbfcff;overflow:hidden}
+.padgh{display:flex;align-items:center;gap:6px;padding:8px 9px;cursor:pointer}
+.padgh .cr{flex:none;font-size:9px;color:var(--muted);width:10px;text-align:center}
+.padgt{flex:1;font-size:12.5px;font-weight:900;color:var(--ink);word-break:break-word;line-height:1.4}
+.padgn{flex:none;font-size:10px;font-weight:900;color:var(--blue-d);background:var(--blue-l);
+  border-radius:999px;padding:1px 6px}
+.padgn.all{color:#166534;background:#dcfce7}
+.padgm{flex:none;border:none;background:transparent;color:#b7c2d6;font-size:11.5px;cursor:pointer;
+  padding:2px 3px;border-radius:6px;line-height:1}
+.padgm:hover{background:var(--blue-l);color:var(--blue-d)}
+.padgb{padding:1px 9px 9px;display:grid;gap:2px}
+.padr{display:flex;align-items:flex-start;gap:7px;padding:4px 5px;border-radius:8px}
+.padr:hover{background:#fff}
+.padck{flex:none;width:16px;height:16px;margin-top:1px;border-radius:5px;border:1.5px solid #c6d2e8;
+  background:#fff;cursor:pointer;padding:0;font-size:9.5px;line-height:13px;color:#fff;font-weight:900}
+.padck.on{background:var(--blue);border-color:var(--blue)}
+.padt{flex:1;font-size:12px;line-height:1.6;color:var(--ink);word-break:break-word;cursor:text}
+.padr.done .padt{color:var(--muted);text-decoration:line-through}
+.padx{flex:none;border:none;background:transparent;color:#c3ccdd;font-size:11px;cursor:pointer;
+  padding:0 2px;visibility:hidden;line-height:1.6}
+.padr:hover .padx,.padr:focus-within .padx{visibility:visible}
+.padx:hover{color:#d8453b}
+.padin{width:100%;box-sizing:border-box;border:1px dashed #cfdaee;background:#fff;border-radius:9px;
+  padding:6px 8px;font-size:12px;color:var(--ink);font-family:inherit;margin-top:3px}
+.padin:focus{outline:none;border-style:solid;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-l)}
+.padempty{font-size:11.5px;color:var(--muted);line-height:1.8;padding:16px 8px;text-align:center}
+html[data-theme=dark] #pad{box-shadow:-14px 0 38px rgba(0,0,0,.5)}
+html[data-theme=dark] .padg{background:#18202c}
+html[data-theme=dark] .padr:hover{background:#1e2733}
+html[data-theme=dark] .padib,html[data-theme=dark] .padin{background:#1e2124;color:#e7edf8}
+html[data-theme=dark] .padck{background:#1e2124;border-color:#3a4657}
+html[data-theme=dark] .padck.on{background:var(--blue);border-color:var(--blue)}
+html[data-theme=dark] #padFab{background:#4b3f12;border-color:#7d6c22;color:#ffe9a3}
+body.padon #padFab{display:none}
+@media(min-width:1360px){
+  body.padon{padding-right:312px}
+  body.padon #pad{box-shadow:-8px 0 26px rgba(13,31,66,.08)}
+}
 .cq{margin-top:9px;background:#fbfcff;border:1px solid var(--line);border-radius:12px;padding:9px 11px;display:grid;gap:6px}
 .cqh{font-size:10.5px;font-weight:900;color:var(--muted);letter-spacing:.02em}
 .cqr{display:flex;gap:7px;align-items:flex-start}
@@ -5740,6 +5800,169 @@ function resetAll(){
   DATA=normalize(JSON.parse(JSON.stringify(SEED)));cur="project";render();
 }
 
+/* ---- 📌 옆에 붙는 중요 메모판 (월별 묶음 + 체크리스트) ------------------- */
+function padD(){
+  if(!DATA.__pad||typeof DATA.__pad!=="object")DATA.__pad={};
+  var p=DATA.__pad;
+  if(!Array.isArray(p.groups))p.groups=[];
+  p.groups=p.groups.filter(function(g){return g&&typeof g==="object";});
+  p.groups.forEach(function(g){
+    if(!g.id)g.id=uid();
+    g.title=String(g.title==null?"":g.title);
+    g.open=(g.open===false)?false:true;
+    if(!Array.isArray(g.items))g.items=[];
+    g.items=g.items.filter(function(t){return t&&t.t;}).map(function(t){
+      return {id:t.id||uid(),t:String(t.t),done:!!t.done};
+    });
+  });
+  if(p.open!==true&&p.open!==false)p.open=(window.innerWidth>=1360);
+  return p;
+}
+function padG(id){var gs=padD().groups;for(var i=0;i<gs.length;i++)if(gs[i].id===id)return gs[i];return null;}
+function padSave(){try{save();}catch(e){}}
+function padLeft(){
+  var n=0;padD().groups.forEach(function(g){g.items.forEach(function(t){if(!t.done)n++;});});return n;
+}
+function padBadge(){
+  var n=padLeft(),b=document.getElementById("padBdg"),l=document.getElementById("padLeft");
+  if(b){b.textContent=n>99?"99+":String(n);b.style.display=n?"":"none";}
+  if(l)l.textContent=n?"남은 일 "+n+"개":"";
+}
+function padMonth(){var d=new Date();return (d.getMonth()+1)+"월";}
+function padRender(soft){
+  var body=document.getElementById("padBody");
+  if(!body)return;
+  if(soft){var a=document.activeElement;if(a&&a.closest&&a.closest("#pad"))return;}
+  var p=padD(),h="";
+  if(!p.groups.length){
+    h='<div class="padempty">아직 메모가 없어요.<br>위 「＋ 묶음」을 눌러 <b>'+esc(padMonth())+
+      '</b> 처럼 묶음을 만들고<br>그 안에 할 일을 한 줄씩 적어보세요.</div>';
+  }
+  for(var i=0;i<p.groups.length;i++){
+    var g=p.groups[i],tot=g.items.length,dn=0;
+    for(var k=0;k<tot;k++)if(g.items[k].done)dn++;
+    h+='<div class="padg">'+
+      '<div class="padgh" onclick="padFold(\''+g.id+'\')">'+
+      '<span class="cr">'+(g.open?"▾":"▸")+'</span>'+
+      '<span class="padgt">'+esc(g.title||"제목 없음")+'</span>'+
+      (tot?'<span class="padgn'+(dn===tot?" all":"")+'">'+dn+'/'+tot+'</span>':'')+
+      '<button type="button" class="padgm" title="이름 바꾸기" onclick="event.stopPropagation();padRenameGroup(\''+g.id+'\')">✏</button>'+
+      '<button type="button" class="padgm" title="묶음 지우기" onclick="event.stopPropagation();padDelGroup(\''+g.id+'\')">✕</button>'+
+      '</div>';
+    if(g.open){
+      h+='<div class="padgb">';
+      for(var k=0;k<tot;k++){
+        var t=g.items[k];
+        h+='<div class="padr'+(t.done?" done":"")+'">'+
+          '<button type="button" class="padck'+(t.done?" on":"")+'" aria-label="완료 체크" onclick="padCheck(\''+g.id+'\',\''+t.id+'\')">'+(t.done?"✓":"")+'</button>'+
+          '<div class="padt" onclick="padEdit(\''+g.id+'\',\''+t.id+'\')">'+esc(t.t)+'</div>'+
+          '<button type="button" class="padx" aria-label="지우기" onclick="padDel(\''+g.id+'\',\''+t.id+'\')">✕</button>'+
+          '</div>';
+      }
+      h+='<input class="padin" id="padin_'+g.id+'" placeholder="＋ 할 일 (Enter)" '+
+         'onkeydown="if(event.key===\'Enter\'){event.preventDefault();padAdd(\''+g.id+'\',this);}">';
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+  body.innerHTML=h;
+  padBadge();
+}
+function padApply(){
+  var p=padD(),el=document.getElementById("pad");
+  if(!el)return;
+  if(p.open){el.classList.add("on");document.body.classList.add("padon");}
+  else{el.classList.remove("on");document.body.classList.remove("padon");}
+  try{hlSyncAll();}catch(e){}
+}
+function padToggle(f){
+  var p=padD();
+  p.open=(f===undefined)?!p.open:!!f;
+  padSave();padApply();
+  if(p.open)padRender();
+}
+function padAddGroup(){
+  var t=prompt("묶음 이름을 적어주세요 (예: 10월, 이번 주, 꼭 기억할 것)",padMonth());
+  if(t===null)return;
+  t=String(t).trim();
+  if(!t)return;
+  var p=padD();
+  p.groups.push({id:uid(),title:t,open:true,items:[]});
+  padSave();padRender();
+  setTimeout(function(){
+    var el=document.getElementById("padin_"+p.groups[p.groups.length-1].id);
+    if(el)el.focus();
+  },30);
+}
+function padRenameGroup(id){
+  var g=padG(id);if(!g)return;
+  var t=prompt("묶음 이름 바꾸기",g.title);
+  if(t===null)return;
+  t=String(t).trim();
+  if(!t)return;
+  g.title=t;padSave();padRender();
+}
+function padDelGroup(id){
+  var g=padG(id);if(!g)return;
+  var n=g.items.length;
+  if(!confirm("「"+(g.title||"제목 없음")+"」 묶음을 지울까요?"+(n?"\n안에 있는 "+n+"개 항목도 함께 지워져요.":"")))return;
+  var p=padD();
+  p.groups=p.groups.filter(function(x){return x.id!==id;});
+  padSave();padRender();
+}
+function padFold(id){
+  var g=padG(id);if(!g)return;
+  g.open=!g.open;padSave();padRender();
+}
+function padAdd(gid,el){
+  var g=padG(gid);if(!g||!el)return;
+  var t=String(el.value||"").trim();
+  if(!t){el.value="";return;}
+  g.items.push({id:uid(),t:t,done:false});
+  padSave();padRender();
+  setTimeout(function(){
+    var n=document.getElementById("padin_"+gid);
+    if(n){n.value="";n.focus();try{n.scrollIntoView({block:"nearest"});}catch(e){}}
+  },20);
+}
+function padCheck(gid,tid){
+  var g=padG(gid);if(!g)return;
+  for(var i=0;i<g.items.length;i++)if(g.items[i].id===tid)g.items[i].done=!g.items[i].done;
+  padSave();padRender();
+}
+function padDel(gid,tid){
+  var g=padG(gid);if(!g)return;
+  g.items=g.items.filter(function(t){return t.id!==tid;});
+  padSave();padRender();
+}
+function padEdit(gid,tid){
+  var g=padG(gid);if(!g)return;
+  var it=null;
+  for(var i=0;i<g.items.length;i++)if(g.items[i].id===tid)it=g.items[i];
+  if(!it)return;
+  var t=prompt("메모 고치기 (비우면 지워져요)",it.t);
+  if(t===null)return;
+  t=String(t).trim();
+  if(!t){padDel(gid,tid);return;}
+  it.t=t;padSave();padRender();
+}
+function padInit(){
+  padD();padApply();padRender();
+  if(!window._padWrap){
+    window._padWrap=1;
+    var _pr=window.render;
+    if(typeof _pr==="function"){
+      window.render=function(){var v=_pr.apply(this,arguments);try{padRender(true);}catch(e){}return v;};
+    }
+    document.addEventListener("mousedown",function(e){
+      if(window.innerWidth>=1360)return;
+      var p=document.getElementById("pad");
+      if(!p||!p.classList.contains("on"))return;
+      if(e.target&&e.target.closest&&(e.target.closest("#pad")||e.target.closest("#padFab")))return;
+      padToggle(false);
+    },true);
+  }
+}
 document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeEdit();});
 document.getElementById("detail").addEventListener("click",e=>{if(e.target.id==="detail")closeDetail();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeEdit();if(detailId)closeDetail();}});
@@ -5751,10 +5974,22 @@ renderLogo();
 setTheme(themeGet());
 render();
 renderInstall();
+try{padInit();}catch(e){}
 if(LOSTFROM){ try{save();}catch(e){} try{toast("✓ 이전 기록을 찾아서 되살렸어요");}catch(e){} }
 if(LOSTMODE){ try{lostShow();}catch(e){} }
 if(gsOn()&&!LOSTMODE){gsMeta.dirty=false;gsSaveMeta();setTimeout(()=>{gsSync();},1200);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)gsSync();});}
 </script>
+<button type="button" id="padFab" title="중요 메모판 열기" aria-label="중요 메모판 열기" onclick="padToggle(true)">📌<i class="padbdg" id="padBdg" style="display:none">0</i></button>
+<aside id="pad" aria-label="중요 메모판">
+  <div class="padhd">
+    <b>📌 중요 메모</b>
+    <span class="padsub" id="padLeft"></span>
+    <span class="sp"></span>
+    <button type="button" class="padib" onclick="padAddGroup()" title="새 묶음 만들기">＋ 묶음</button>
+    <button type="button" class="padib" onclick="padToggle(false)" title="메모판 닫기" aria-label="메모판 닫기">✕</button>
+  </div>
+  <div class="padbody" id="padBody"></div>
+</aside>
 </body>
 </html>
