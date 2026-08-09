@@ -1102,6 +1102,19 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
   .form{padding:16px;max-height:none;flex:1 1 auto;min-height:0;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
   .two,.three{grid-template-columns:1fr;gap:10px}
+  /* 마감 알림 배너 */
+  .duebar{margin:0 0 12px;padding:11px 12px;border-radius:14px}
+  .dbl{flex-direction:column;gap:6px;margin-top:9px}
+  .dbi{width:100%;border-radius:12px;padding:11px 12px;min-height:44px}
+  .dbt{flex:1 1 auto;max-width:none}
+  .dbd{margin-left:auto}
+  .dbmore{align-self:flex-start}
+  /* 독서 쪽수 · 별점 */
+  .pgrow{gap:7px}
+  .pgin{padding:0 10px}
+  .star{width:46px;height:46px;font-size:27px}
+  /* 손가락으로 누르기 좋은 최소 크기 */
+  .row .x,.qrow .x,.frow .x,.titem .x{min-width:38px;min-height:38px}
   /* 캘린더 */
   .calbox{padding:11px}
   .cal-body.big{gap:4px}
@@ -1667,6 +1680,7 @@ html[data-theme=dark] .chf{background:#3b4d24}
   .app{display:flex;flex-direction:column}
   .app>.topbar{order:0}
   .app>.todayline{order:1}
+  .app>.duebar{order:1}
   .app>.tabs{order:2}
   .app>.board{order:3}
   .app>.hero{order:4}
@@ -1703,6 +1717,72 @@ html[data-theme=dark] .chf{background:#3b4d24}
 }
 html[data-theme=dark] .statmore{background:#1e2124}
 html[data-theme=dark] .statmore:hover{background:#1e2a3e}
+
+/* ===== 마감 알림 배너 ===== */
+.duebar{display:none;margin:0 0 14px;border:1px solid #ffd9c2;background:#fff8f3;
+  border-radius:16px;padding:12px 14px;box-shadow:0 2px 10px rgba(180,90,20,.06)}
+.duebar.on{display:block}
+.duebar.hot{border-color:#ffc9c9;background:#fff6f6}
+.dbh{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;
+  color:#b4560f;letter-spacing:-.02em;line-height:1.35}
+.duebar.hot .dbh{color:#c02626}
+.dbh .x{margin-left:auto;flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;color:#9aa7bd;font-size:12px;line-height:1;cursor:pointer;font-family:inherit}
+.dbh .x:hover{color:var(--danger);border-color:#f5c2d0}
+.dbl{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.dbi{display:inline-flex;align-items:center;gap:7px;max-width:100%;
+  border:1px solid var(--line);background:var(--card);border-radius:999px;
+  padding:8px 12px;font-size:12.5px;font-weight:700;font-family:inherit;
+  color:var(--text);cursor:pointer;letter-spacing:-.02em;text-align:left}
+.dbi:hover{border-color:#bed3f7;background:var(--blue-xl)}
+.dbe{flex:0 0 auto;font-size:11px;font-weight:800;color:var(--muted)}
+.dbt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+.dbd{flex:0 0 auto;font-size:11px;font-weight:800;padding:2px 7px;border-radius:7px}
+.dbi.over .dbd{background:#ffe2e2;color:#c02626}
+.dbi.today .dbd{background:#ffeecd;color:#a35b00}
+.dbi.soon .dbd{background:#e6efff;color:#2563eb}
+.dbmore{align-self:center;font-size:11.5px;font-weight:700;color:var(--muted)}
+
+/* ===== 독서: 쪽수 진행률 · 별점 ===== */
+.pgrow{display:flex;align-items:center;gap:8px}
+.pgin{display:flex;align-items:center;gap:5px;flex:1 1 0;min-width:0;
+  border:1px solid var(--line);border-radius:11px;background:var(--card);padding:0 11px}
+.pgin:focus-within{border-color:#bed3f7;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.pgin input{flex:1 1 0;min-width:0;border:0!important;background:transparent!important;
+  padding:11px 0!important;box-shadow:none!important;font-weight:700;-moz-appearance:textfield}
+.pgin input::-webkit-outer-spin-button,.pgin input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.pgin span{flex:0 0 auto;font-size:12px;font-weight:700;color:var(--muted)}
+.pgsl{flex:0 0 auto;color:var(--muted);font-weight:800}
+.pgbar{height:9px;border-radius:99px;background:var(--blue-xl);overflow:hidden;margin-top:10px}
+.pgbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#60a5fa,#2563eb);
+  transition:width .25s ease-out}
+.pgbar.sm{height:7px;margin-top:0}
+.pghint{margin-top:7px;font-size:12px;font-weight:600;color:var(--muted)}
+.pgt{font-weight:800;color:var(--blue)}
+.cpg{display:flex;align-items:center;gap:9px;margin-top:9px}
+.cpg .pgbar{flex:1 1 0}
+.cpgt{flex:0 0 auto;font-size:11.5px;font-weight:800;color:var(--blue)}
+.stars{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.star{width:44px;height:44px;border:0;background:none;padding:0;cursor:pointer;
+  font-size:25px;line-height:1;color:#d3dae6;font-family:inherit}
+.star.on{color:#f5a524}
+.starn{margin-left:6px;font-size:12.5px;font-weight:800;color:#c98209}
+.starn.off{color:var(--muted);font-weight:600}
+.pill.rate{background:#fff5e3;color:#a35b00;border-color:#ffe0ad}
+.crev{margin-top:8px;font-size:12.5px;font-weight:600;color:var(--muted);
+  border-left:3px solid #ffd9a6;padding-left:9px;line-height:1.5}
+
+html[data-theme=dark] .duebar{background:#2a2320;border-color:#4a3a2c}
+html[data-theme=dark] .duebar.hot{background:#2e2020;border-color:#5a2f2f}
+html[data-theme=dark] .dbh{color:#f0b183}
+html[data-theme=dark] .duebar.hot .dbh{color:#f2a2a2}
+html[data-theme=dark] .dbh .x{background:#1e2124;color:#b9c3d4}
+html[data-theme=dark] .dbi.over .dbd{background:#4e2020;color:#ffb3b3}
+html[data-theme=dark] .dbi.today .dbd{background:#4a3618;color:#ffd08a}
+html[data-theme=dark] .dbi.soon .dbd{background:#1e3355;color:#9dc0ff}
+html[data-theme=dark] .pill.rate{background:#3d2f16;color:#ffd08a;border-color:#5a441d}
+html[data-theme=dark] .star{color:#3a4048}
+html[data-theme=dark] .crev{border-left-color:#5a441d}
 </style>
 </head>
 <body>
@@ -1726,6 +1806,7 @@ html[data-theme=dark] .statmore:hover{background:#1e2a3e}
   </div>
 
   <div class="todayline" id="todayline"></div>
+  <div class="duebar" id="duebar" aria-live="polite"></div>
 
   <div class="stats" id="stats"></div>
   <div class="tabs" id="tabs"></div>
@@ -1905,15 +1986,18 @@ const SEED = {
     label:"📚 독서", icon:"📚", tags:["읽는중","완독","예정"],
     items:[
       {id:"b1",title:"부의 추월차선",tag:"읽는중",status:"진행중",progress:45,due:"2026-08-10",owner:"",
+       pages:408,page:184,rating:0,review:"",
        goal:"8월 10일까지 완독 + 실행 항목 3개 뽑기",
        todos:[{id:"t1",text:"1~3부 읽기",done:true},{id:"t2",text:"4~5부 읽기",done:false},{id:"t3",text:"서평 정리",done:false}],
        milestones:[],links:[],logs:[{date:"2026-07-19",text:"'추월차선은 시스템을 소유하는 것' — 내 콘텐츠도 자산화 관점으로"}],
        quotes:[{id:"q1",page:"48",text:"돈은 목표가 아니라 시간을 사는 수단이다."},
                {id:"q2",page:"131",text:"과정을 소유하지 못하면 결과도 소유할 수 없다."}],note:""},
       {id:"b2",title:"원씽 (The One Thing)",tag:"완독",status:"완료",progress:100,due:"2026-07-05",owner:"",
+       pages:264,page:264,rating:5,review:"할 일을 줄이는 게 아니라 '하나만 남기는' 책. 아침 루틴이 바뀜.",
        goal:"'단 하나의 질문' 아침 루틴에 적용",todos:[],milestones:[],links:[],
        logs:[{date:"2026-07-05",text:"완독. 매일 아침 '오늘의 단 하나' 적기 시작"}],note:""},
       {id:"b3",title:"아주 작은 습관의 힘",tag:"예정",status:"할일",progress:0,due:"",owner:"",
+       pages:320,page:0,rating:0,review:"",
        goal:"운동 챌린지와 병행해서 읽기",todos:[],milestones:[],links:[],logs:[],note:""}
     ]
   },
@@ -2159,6 +2243,11 @@ function normalize(d){
       i.goal=i.goal||""; i.desc=i.desc||""; i.owner=i.owner||""; i.start=i.start||"";
       i.status=i.status||"할일"; i.progress=+i.progress||0; i.due=i.due||""; i.note=i.note||"";
       i.pics=Array.isArray(i.pics)?i.pics.filter(q=>q&&q.d):[];
+      i.pages=Math.max(0,Math.round(+i.pages||0));      /* 독서: 총 쪽수 */
+      i.page=Math.max(0,Math.round(+i.page||0));        /* 독서: 지금까지 읽은 쪽 */
+      if(i.pages&&i.page>i.pages)i.page=i.pages;
+      i.rating=Math.max(0,Math.min(5,Math.round(+i.rating||0)));
+      i.review=i.review||"";
       delete i.link;
       return i;
     });
@@ -3375,7 +3464,7 @@ function visible(){
   const q=(document.getElementById("q").value||"").toLowerCase();
   const list=DATA[cur].items.filter(i=>{
     if(filter!=="ALL"&&i.tag!==filter) return false;
-    if(q&&!((i.title+" "+(i.note||"")+" "+(i.goal||"")+" "+(i.tag||"")).toLowerCase().includes(q))) return false;
+    if(q&&!((i.title+" "+(i.note||"")+" "+(i.goal||"")+" "+(i.tag||"")+" "+(i.review||"")).toLowerCase().includes(q))) return false;
     return true;
   });
   return list.map((i,x)=>[i,x])
@@ -4064,6 +4153,108 @@ function delDream(id){
   const s=dm();s.items=(s.items||[]).filter(x=>x.id!==id);closeEdit();render();
 }
 /* --- 진행 단계 (진행률 % 대체) --- */
+/* ================= 마감 알림 =================
+   전 탭 카드의 마감일을 모아 「지난 마감 · 오늘 · 3일 내」만 상단에 띄웁니다.
+   완료된 카드는 제외하고, ✕ 를 누르면 그날 하루만 접어둡니다. */
+const DUESOON=3;
+function dueDiff(d){
+  const t=new Date(d+"T00:00:00"),n=new Date();n.setHours(0,0,0,0);
+  return Math.round((t-n)/86400000);
+}
+function dueHidden(){ return ui().dueHide===todayStr(); }
+function dueHide(){ ui().dueHide=todayStr(); save(); renderDue();
+  try{toast("오늘은 접어둘게요 · 내일 다시 알려드려요");}catch(e){} }
+function dueList(){
+  const out=[];
+  tabKeys().forEach(function(k){
+    const st=DATA[k];
+    if(!st||st.secret||st.type==="dream"||st.type==="habit"||st.type==="daily")return;
+    (st.items||[]).forEach(function(i){
+      if(!i||!i.due||isDoneCard(i))return;
+      const g=dueDiff(i.due);
+      if(g>DUESOON)return;
+      out.push({k:k,id:i.id,title:i.title||"제목 없음",g:g});
+    });
+  });
+  return out.sort(function(a,b){return a.g-b.g;});
+}
+function dueTxt(g){ return g<0?("D+"+(-g)):g===0?"D-DAY":("D-"+g); }
+function renderDue(){
+  const box=document.getElementById("duebar"); if(!box)return;
+  const l=dueList();
+  if(!l.length||dueHidden()){ box.className="duebar"; box.innerHTML=""; return; }
+  const over=l.filter(function(x){return x.g<0;}).length;
+  const tod=l.filter(function(x){return x.g===0;}).length;
+  let head;
+  if(over&&tod) head="⏰ 지난 마감 "+over+"건 · 오늘 마감 "+tod+"건";
+  else if(over) head="⏰ 마감이 지난 게 "+over+"건 있어요";
+  else if(tod)  head="⏰ 오늘 마감 "+tod+"건";
+  else          head="📅 "+DUESOON+"일 안에 마감 "+l.length+"건";
+  const top=l.slice(0,8);
+  box.className="duebar on"+(over?" hot":"");
+  box.innerHTML='<div class="dbh"><span>'+head+'</span>'+
+    '<button class="x" type="button" title="오늘은 접어두기" aria-label="알림 접어두기" onclick="dueHide()">✕</button></div>'+
+    '<div class="dbl">'+top.map(function(x){
+      return '<button type="button" class="dbi '+(x.g<0?"over":x.g===0?"today":"soon")+'" '+
+        'onclick="dueGo(\''+x.k+'\',\''+x.id+'\')">'+
+        '<span class="dbe">'+esc(SHORT[x.k]||"")+'</span>'+
+        '<span class="dbt">'+esc(x.title)+'</span>'+
+        '<span class="dbd">'+dueTxt(x.g)+'</span></button>';
+    }).join("")+
+    (l.length>top.length?'<span class="dbmore">+'+(l.length-top.length)+'건 더</span>':"")+
+    '</div>';
+}
+function dueGo(k,id){
+  if(noClick)return;
+  if(!DATA[k])return;
+  cur=k; filter="ALL";
+  const q=document.getElementById("q"); if(q)q.value="";
+  render();
+  setTimeout(function(){ try{ openDetail(id); }catch(e){} },40);
+}
+
+/* ================= 독서: 쪽수로 진행률 계산 ================= */
+function bkPct(i){
+  const t=+i.pages||0,pg=+i.page||0;
+  if(!t) return null;
+  return Math.max(0,Math.min(100,Math.round(pg/t*100)));
+}
+function bkApply(i){
+  const pc=bkPct(i);
+  if(pc!==null){
+    i.progress=pc;
+    if(pc>=100) i.status="완료";
+    else if(i.status==="완료") i.status=pc>0?"진행중":"할일";
+    else if(pc>0&&i.status==="할일") i.status="진행중";
+  }
+  const ch=autoTag(i,"book");
+  save();renderDetail();render();autoTagSay(ch);
+}
+function setPages(v){
+  const i=find(detailId);if(!i)return;
+  i.pages=Math.max(0,Math.round(+v||0));
+  if(i.pages&&i.page>i.pages)i.page=i.pages;
+  bkApply(i);
+}
+function setPage(v){
+  const i=find(detailId);if(!i)return;
+  let pg=Math.max(0,Math.round(+v||0));
+  if(i.pages&&pg>i.pages)pg=i.pages;
+  i.page=pg;
+  bkApply(i);
+}
+function setRate(n){
+  const i=find(detailId);if(!i)return;
+  n=Math.max(0,Math.min(5,+n||0));
+  i.rating=(i.rating===n)?0:n;        /* 같은 별을 다시 누르면 해제 */
+  save();renderDetail();render();
+}
+function starHtml(n,fn){
+  let h='<div class="stars" role="group" aria-label="별점">';
+  for(let x=1;x<=5;x++) h+='<button type="button" class="star '+(x<=n?"on":"")+'" aria-label="별 '+x+'점" onclick="'+fn+'('+x+')">'+(x<=n?"★":"☆")+'</button>';
+  h+= n?'<span class="starn">'+n+'.0</span>':'<span class="starn off">눌러서 남겨보세요</span>';
+  return h+'</div>';
+}
 const STEPS=[{v:0,n:"시작 전"},{v:25,n:"조금 했어"},{v:50,n:"절반쯤"},{v:80,n:"거의 다"},{v:100,n:"완료"}];
 function stepIdx(p){
   const x=Math.max(0,Math.min(100,+p||0));
@@ -4104,6 +4295,8 @@ function taskCard(i){
   const qz=(i.quotes||[]).length?` <span class="pill">✍ ${i.quotes.length}</span>`:"";
   const fa=(i.links||[]).filter(l=>l&&l.file&&l.file.d).length;
   const fp=fa?` <span class="pill">📎 ${fa}</span>`:"";
+  const bp=(cur==="book"&&(+i.pages||0))?` <span class="pill">📖 ${(+i.page||0)}/${(+i.pages||0)}쪽</span>`:"";
+  const br=(cur==="book"&&(+i.rating||0))?` <span class="pill rate">${"★".repeat(+i.rating)}</span>`:"";
   const pk=(i.tag===DONETAG())?" tdone":"";
   return `<div class="card${pk}" data-id="${i.id}" onpointerdown="cardDown(event,'${i.id}')">
     <div class="head"><span class="t${pk}">${chImg(cur)}${esc(i.tag||"")}</span>
@@ -4115,9 +4308,12 @@ function taskCard(i){
       ${i.goal?`<div class="note">🎯 ${esc(i.goal)}</div>`:""}
       <div class="meta">
         <span class="pill ${stClass(i.status)}">${esc(i.status)}</span>
-        ${i.due?`<span class="pill">📅 ${esc(i.due)} <b>${dday(i.due)}</b></span>`:""}${td}${qz}${fp}
+        ${i.due?`<span class="pill">📅 ${esc(i.due)} <b>${dday(i.due)}</b></span>`:""}${bp}${br}${td}${qz}${fp}
       </div>
-      ${stepView(pct)}
+      ${(cur==="book"&&(+i.pages||0))
+        ? `<div class="cpg"><div class="pgbar sm"><i style="width:${pct}%"></i></div><span class="cpgt">${pct}%</span></div>`
+        : stepView(pct)}
+      ${cur==="book"&&i.review?`<div class="crev">"${esc(i.review)}"</div>`:""}
       ${cur==="book"&&(i.quotes||[]).length?`<div class="cq">
         <div class="cqh">✍ 모아둔 문장 ${i.quotes.length}개</div>
         ${i.quotes.map(qq=>`<div class="cqr"><span class="cqp">${qq.page?"p."+esc(qq.page):"—"}</span><span class="cqt">${esc(qq.text)}</span></div>`).join("")}
@@ -4493,6 +4689,7 @@ function pjAll(v){const l=visible();l.forEach(i=>{pjOpen[i.id]=!!v;});render();}
 
 function render(){
   renderTabs();renderHero();renderToday();renderStats();renderFilters();
+  try{renderDue();}catch(e){}
   const s=DATA[cur],list=visible();
   let head="";
   if(s.type==="muse"){head="";}
@@ -4807,9 +5004,26 @@ function renderDetail(){
       <div class="field"><label>시작일</label><input type="date" value="${esc(i.start)}" onchange="setF2('start',this.value)"></div>
       <div class="field"><label>마감일 ${i.due?"("+dday(i.due)+")":""}</label><input type="date" value="${esc(i.due)}" onchange="setF2('due',this.value)"></div>
     </div>
-    ${cur==="project"?"":`<div class="field"><label>어디까지 왔어?</label>${stepPick(stepIdx(pct),"setStepD")}</div>`}
+    ${cur==="project"?"":(cur==="book"?`<div class="field">
+      <label>📖 어디까지 읽었어? ${bkPct(i)!==null?`<span class="pgt">${bkPct(i)}%</span>`:""}</label>
+      <div class="pgrow">
+        <div class="pgin"><input type="number" min="0" step="1" inputmode="numeric" value="${i.page||""}" placeholder="0" aria-label="지금까지 읽은 쪽" onchange="setPage(this.value)"><span>쪽까지</span></div>
+        <span class="pgsl">/</span>
+        <div class="pgin"><input type="number" min="0" step="1" inputmode="numeric" value="${i.pages||""}" placeholder="총 쪽수" aria-label="총 쪽수" onchange="setPages(this.value)"><span>쪽</span></div>
+      </div>
+      ${bkPct(i)!==null
+        ? `<div class="pgbar"><i style="width:${bkPct(i)}%"></i></div>
+           <div class="pghint">${(+i.pages||0)-(+i.page||0)>0?((+i.pages||0)-(+i.page||0))+"쪽 남았어요":"다 읽었어요! 🎉 별점도 남겨보세요"}</div>`
+        : `<div class="pghint">총 쪽수를 적으면 진행률이 저절로 계산돼요.</div>`}
+    </div>`:`<div class="field"><label>어디까지 왔어?</label>${stepPick(stepIdx(pct),"setStepD")}</div>`)}
     <div class="field"><label>${s.type==="muse"?"🎯 이 콘텐츠의 목표 (예: 저장수 500)":"🎯 목표 (한 줄)"}</label><input value="${esc(i.goal)}" onchange="setF2('goal',this.value)"></div>
     ${cur==="book"?"":`<div class="field"><label>📄 상세 설명</label><textarea onchange="setF2('desc',this.value)">${esc(i.desc)}</textarea></div>`}
+    ${cur==="book"?`<div class="sect">
+      <h4>⭐ 읽고 나서 <span class="r">완독한 뒤에 채우면 딱 좋아요</span></h4>
+      <div class="field"><label>별점</label>${starHtml(+i.rating||0,"setRate")}</div>
+      <div class="field"><label>한줄평</label>
+        <input value="${esc(i.review||"")}" placeholder="예: 실행 리스트 뽑기엔 최고. 중반부는 좀 반복됨" onchange="setF2('review',this.value)"></div>
+    </div>`:""}
     ${s.type==="muse"?`
     <div class="sect plan">
       <h4>🎬 릴스 기획 <span class="r">첫 1.5초가 전부예요</span></h4>
