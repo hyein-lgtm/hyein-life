@@ -1150,6 +1150,9 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
   .form{padding:16px;max-height:none;flex:1 1 auto;min-height:0;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .two,.three{grid-template-columns:1fr;gap:10px}
+/* 메모 체크리스트 — 손가락으로 누르기 좋게 */
+.mckr{padding:8px 0;font-size:14px}
+.mckr input[type=checkbox]{width:21px;height:21px}
 /* 이번 주 배너 */
 .duebar{margin:0 0 12px;padding:12px;border-radius:14px}
 .odb .btn{flex:1 1 44%}
@@ -1738,6 +1741,28 @@ html[data-theme=dark] .statmore:hover{background:#1e2a3e}
 html[data-theme=dark] .mcard.pinned{border-color:#5a441d;background:linear-gradient(180deg,#2c2416,var(--card) 42%)}
 html[data-theme=dark] .pinbtn.on{border-color:#5a441d;background:#332a17;color:#ffd08a}
 
+/* --- 메모 체크리스트 --- */
+.mckwrap{display:flex;flex-direction:column;gap:2px;margin:2px 0}
+.mckr{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:12px;line-height:1.6}
+.mckr input[type=checkbox]{flex:0 0 auto;width:17px;height:17px;margin:1px 0 0;accent-color:var(--blue);cursor:pointer}
+.mckr span{flex:1 1 auto;min-width:0;word-break:break-word}
+.mckr.done span{text-decoration:line-through;color:#7a879b}
+.mckmore{font-size:11px;font-weight:700;color:var(--muted);padding-left:25px}
+.mckbar{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;color:var(--blue)}
+.mckbar .mckp{flex:1 1 auto;height:6px;border-radius:99px;background:var(--blue-xl);overflow:hidden}
+.mckbar .mckp i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#60a5fa,#2563eb);transition:width .25s}
+.mckbar.allx{color:#08795a}
+.mckbar.allx .mckp i{background:linear-gradient(90deg,#4ade80,#0ea472)}
+.ckhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ckhead .btn{margin-left:auto}
+.addline textarea.ckin{flex:1 1 auto;min-width:0;font-size:14px;padding:10px 11px;
+  border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);
+  outline:none;resize:none;min-height:40px;max-height:160px;line-height:1.5;font-family:inherit}
+.addline textarea.ckin:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-l)}
+.ckadd{border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:11px;
+  padding:11px 14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;width:100%;text-align:center}
+.ckadd:hover{border-color:var(--line-hover);color:var(--blue);background:var(--blue-xl);border-style:solid}
+
 /* ===== 이번 주 배너 : 해낸 것을 먼저, 밀린 것은 '정리' 로 ===== */
 .duebar{display:none;margin:0 0 14px;border:1px solid #cdeadd;background:#f4fbf8;
   border-radius:16px;padding:13px 15px;box-shadow:0 2px 10px rgba(14,164,114,.05)}
@@ -2020,7 +2045,12 @@ const SEED = {
        note:"- 혼캠 시리즈 다음 편: 비 오는 날 차박\n- '13년차가 퇴사 안 하는 이유' 텍스트형\n- ==저장수 높은 건 결국 '나도 저러고 싶다' 감정==\n\n훅부터 먼저 쓰고 영상은 나중에."},
       {id:"m2",title:"팀 회의 메모 (8/7)",tag:"일·업무",pin:false,at:"2026-08-07",
        note:"리브랜딩 공지 일정 8/14 확정.\n컬러 가이드는 이번 주 안에 결정하기로.\n디자이너에게 명함 시안 먼저 요청."},
-      {id:"m3",title:"그냥 적어두는 것들",tag:"생활",pin:false,at:"2026-08-05",
+      {id:"m3",title:"주문한 것 · 도착 확인",tag:"생활",pin:true,at:"2026-08-09",note:"",
+       todos:[{id:"c1",text:"무선 이어폰 (8/11 도착 예정)",done:false},
+              {id:"c2",text:"강아지 사료 2kg",done:false},
+              {id:"c3",text:"주방 세제",done:true},
+              {id:"c4",text:"책상 조명 — 반품할지 고민",done:false}]},
+      {id:"m4",title:"그냥 적어두는 것들",tag:"생활",pin:false,at:"2026-08-05",
        note:"요즘 아침에 눈이 잘 떠진다.\n커피는 11시 이후로 안 마시는 게 확실히 낫다."}
     ]
   },
@@ -3553,7 +3583,8 @@ function visible(){
   const q=(document.getElementById("q").value||"").toLowerCase();
   const list=DATA[cur].items.filter(i=>{
     if(filter!=="ALL"&&i.tag!==filter) return false;
-    if(q&&!((i.title+" "+(i.note||"")+" "+(i.goal||"")+" "+(i.tag||"")+" "+(i.review||"")).toLowerCase().includes(q))) return false;
+    const ckTxt=(DATA[cur].type==="memo"&&(i.todos||[]).length)?" "+i.todos.map(function(t){return t.text;}).join(" "):"";
+    if(q&&!((i.title+" "+(i.note||"")+" "+(i.goal||"")+" "+(i.tag||"")+" "+(i.review||"")+ckTxt).toLowerCase().includes(q))) return false;
     return true;
   });
   return list.map((i,x)=>[i,x])
@@ -4555,6 +4586,16 @@ function memoPreview(t){
 }
 function memoCard(i){
   const pic=(i.pics||[])[0];
+  const ts=i.todos||[], dn=ckDone(i);
+  const shown=ckSort(ts).slice(0,5);
+  const ck=ts.length?`<div class="mckbar ${dn===ts.length?"allx":""}">
+      <span>${dn===ts.length?"다 했어요 ✨":"☑ "+dn+"/"+ts.length}</span>
+      <span class="mckp"><i style="width:${Math.round(dn/ts.length*100)}%"></i></span></div>
+    <div class="mckwrap">${shown.map(function(t){
+      return `<label class="mckr ${t.done?"done":""}">
+        <input type="checkbox" ${t.done?"checked":""} aria-label="${esc(t.text)}" onclick="event.stopPropagation()" onchange="memoTog('${i.id}','${t.id}')">
+        <span>${esc(t.text)}</span></label>`;
+    }).join("")}${ts.length>shown.length?`<div class="mckmore">+${ts.length-shown.length}개 더</div>`:""}</div>`:"";
   return `<div class="mcard${i.pin?" pinned":""}" data-id="${i.id}">
     <div class="mcth">
       <span class="mctt" onclick="openDetail('${i.id}')">${i.pin?'<span class="mcpin">📌</span> ':""}${esc(i.title||"제목 없는 메모")}</span>
@@ -4564,8 +4605,9 @@ function memoCard(i){
       </div>
     </div>
     ${pic?`<img class="mcpic" alt="" src="${pic.d}" onclick="openDetail('${i.id}')">`:""}
+    ${ck}
     ${i.note?`<div class="mcbody" onclick="openDetail('${i.id}')">${memoPreview(i.note)}</div>`
-      :`<div class="mcbody" onclick="openDetail('${i.id}')">내용이 비어 있어요.</div>`}
+      :(ck?"":`<div class="mcbody" onclick="openDetail('${i.id}')">내용이 비어 있어요.</div>`)}
     <div class="mcfoot">${i.tag?`<span class="mctag">${esc(i.tag)}</span>`:""}
       <span>${esc(i.at||"")}</span>
       ${(i.pics||[]).length>1?`<span>📷 ${i.pics.length}</span>`:""}</div>
@@ -4576,6 +4618,60 @@ function memoView(){
   if(!l.length) return emptyBox();
   return `<div class="mgrid">${l.map(memoCard).join("")}</div>`;
 }
+/* --- 메모 체크리스트 : 체크 안 한 게 위, 체크한 건 아래로 --- */
+function ckSort(list){
+  return (list||[]).map(function(t,x){return [t,x];})
+    .sort(function(a,b){ return (a[0].done?1:0)-(b[0].done?1:0) || a[1]-b[1]; })
+    .map(function(pr){return pr[0];});
+}
+function ckDone(i){ return (i.todos||[]).filter(function(t){return t.done;}).length; }
+function memoTog(mid,tid){
+  const i=find(mid,"memo"); if(!i)return;
+  const t=(i.todos||[]).find(function(x){return x.id===tid;}); if(!t)return;
+  t.done=!t.done; save();
+  if(detailId===mid) renderDetail();
+  render();
+}
+/* 여러 줄을 한 번에 붙여넣으면 줄마다 항목이 됩니다 */
+function memoAddCk(mid){
+  const el=document.getElementById("m_ck"); if(!el)return;
+  const raw=el.value||"";
+  const lines=raw.split(/\r?\n/).map(function(x){return x.replace(/^\s*[-*·•]\s*/,"").trim();}).filter(Boolean);
+  if(!lines.length){ el.value=""; return; }
+  const i=find(mid,"memo"); if(!i)return;
+  i.todos=i.todos||[];
+  lines.forEach(function(t){ i.todos.push({id:uid(),text:t,done:false}); });
+  el.value=""; save(); renderDetail(); render();
+  const n=document.getElementById("m_ck"); if(n){ckGrow(n);n.focus();}
+  if(lines.length>1){ try{toast(lines.length+"개 담았어요");}catch(e){} }
+}
+function ckGrow(el){ if(!el)return; el.style.height="auto"; el.style.height=Math.min(160,Math.max(40,el.scrollHeight))+"px"; }
+function memoDelCk(mid,tid){
+  const i=find(mid,"memo"); if(!i)return;
+  const x=(i.todos||[]).findIndex(function(t){return t.id===tid;}); if(x<0)return;
+  const gone=i.todos[x]; i.todos.splice(x,1); save(); renderDetail(); render();
+  toastU("지웠어요 · "+(gone.text.length>12?gone.text.slice(0,12)+"…":gone.text), function(){
+    const j=find(mid,"memo"); if(!j)return;
+    j.todos.splice(Math.min(x,j.todos.length),0,gone); save();
+    if(detailId===mid)renderDetail(); render();
+  });
+}
+function memoClearDone(mid){
+  const i=find(mid,"memo"); if(!i)return;
+  const kept=(i.todos||[]).filter(function(t){return !t.done;});
+  const gone=(i.todos||[]).filter(function(t){return t.done;});
+  if(!gone.length)return;
+  i.todos=kept; save(); renderDetail(); render();
+  toastU("체크한 "+gone.length+"개를 지웠어요", function(){
+    const j=find(mid,"memo"); if(!j)return;
+    j.todos=(j.todos||[]).concat(gone); save();
+    if(detailId===mid)renderDetail(); render();
+  });
+}
+function ckOpenSet(){ const u=ui(); return u.memoCk||(u.memoCk={}); }
+function memoCkOn(mid){ ckOpenSet()[mid]=true; save(); renderDetail();
+  setTimeout(function(){const e=document.getElementById("m_ck");if(e)e.focus();},60); }
+
 function memoPin(id){
   const i=find(id); if(!i)return;
   i.pin=!i.pin; save(); render();
@@ -5424,6 +5520,24 @@ function renderMemoDetail(s,i){
     <div class="field">
       <button type="button" class="pinbtn ${i.pin?"on":""}" onclick="memoPinD()">${i.pin?"📌 위에 고정됨 — 누르면 풀려요":"📍 위에 고정하기"}</button>
     </div>
+    ${((i.todos||[]).length||ckOpenSet()[i.id])?`<div class="sect">
+      <div class="ckhead"><h4 style="margin:0">☑ 체크리스트 <span class="r">${ckDone(i)}/${(i.todos||[]).length} 완료</span></h4>
+        ${ckDone(i)?`<button type="button" class="btn sm" onclick="memoClearDone('${i.id}')">체크한 것 지우기</button>`:""}</div>
+      ${(i.todos||[]).length?ckSort(i.todos).map(function(t){
+        const x=i.todos.indexOf(t);
+        return `<div class="row">
+          <input type="checkbox" ${t.done?"checked":""} aria-label="${esc(t.text)}" onchange="memoTog('${i.id}','${t.id}')">
+          <span class="grow ${t.done?"done":""}">${esc(t.text)}</span>
+          <button class="x ed" title="글자 수정" aria-label="글자 수정" onclick="editRow(this,'todos',${x},'text')">${IC.pen}</button>
+          <button class="x" title="삭제" aria-label="삭제" onclick="memoDelCk('${i.id}','${t.id}')">✕</button></div>`;
+      }).join(""):`<div class="note">아래에 적으면 하나씩 담겨요. 여러 줄을 한 번에 붙여넣어도 돼요.</div>`}
+      <div class="addline"><textarea id="m_ck" class="ckin" rows="1" autocomplete="off"
+        placeholder="살 것·확인할 것 적고 Enter · 여러 줄 붙여넣기도 돼요"
+        oninput="ckGrow(this)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();memoAddCk('${i.id}');}"
+        onpaste="const el=this;setTimeout(function(){if((el.value||'').indexOf(String.fromCharCode(10))>=0)memoAddCk('${i.id}');},0)"></textarea>
+        <button class="btn sm" onclick="memoAddCk('${i.id}')">담기</button></div>
+    </div>`:`<button type="button" class="ckadd" onclick="memoCkOn('${i.id}')">☑ 체크리스트 만들기</button>`}
     <div class="field"><label class="bnl"><span>🗒 내용</span>
       <span class="cnt" id="noteCnt">${plainLen(i.note)}자</span></label>
       <div class="hlwrap big"><div class="hlback" id="hb_bigNote" aria-hidden="true"></div>
