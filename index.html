@@ -1159,8 +1159,9 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
   .form{padding:16px;max-height:none;flex:1 1 auto;min-height:0;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .two,.three{grid-template-columns:1fr;gap:10px}
-/* 마감 알림 배너 */
-  .duebar{margin:0 0 12px;padding:11px 12px;border-radius:14px}
+/* 이번 주 배너 */
+.duebar{margin:0 0 12px;padding:12px;border-radius:14px}
+.odb .btn{flex:1 1 44%}
 .dbl{flex-direction:column;gap:6px;margin-top:9px}
 .dbi{width:100%;border-radius:12px;padding:11px 12px;min-height:44px}
 .dbt{flex:1 1 auto;max-width:none}
@@ -1721,14 +1722,25 @@ html[data-theme=dark] .chf{background:#3b4d24}
 }
 html[data-theme=dark] .statmore{background:#1e2124}
 html[data-theme=dark] .statmore:hover{background:#1e2a3e}
-/* ===== 마감 알림 배너 ===== */
-.duebar{display:none;margin:0 0 14px;border:1px solid #ffd9c2;background:#fff8f3;
-  border-radius:16px;padding:12px 14px;box-shadow:0 2px 10px rgba(180,90,20,.06)}
+/* ===== 이번 주 배너 : 해낸 것을 먼저, 밀린 것은 '정리' 로 ===== */
+.duebar{display:none;margin:0 0 14px;border:1px solid #cdeadd;background:#f4fbf8;
+  border-radius:16px;padding:13px 15px;box-shadow:0 2px 10px rgba(14,164,114,.05)}
 .duebar.on{display:block}
-.duebar.hot{border-color:#ffc9c9;background:#fff6f6}
 .dbh{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;
-  color:#b4560f;letter-spacing:-.02em;line-height:1.35}
-.duebar.hot .dbh{color:#c02626}
+  color:#0b6b50;letter-spacing:-.02em;line-height:1.4}
+.dbh b{color:#08795a}
+.dbsub{margin-top:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.dbact{margin-top:11px;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.dbnote{font-size:12px;font-weight:600;color:var(--muted)}
+/* 밀린 것 정리 모달 */
+.odrow{display:flex;flex-direction:column;gap:9px;padding:12px;border:1px solid var(--line);
+  border-radius:13px;background:var(--surface-3)}
+.odt{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;letter-spacing:-.02em}
+.odw{font-size:11px;font-weight:800;color:var(--muted);flex:0 0 auto}
+.odn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.odb{display:flex;flex-wrap:wrap;gap:6px}
+.odb .btn{flex:1 1 auto;min-width:86px;text-align:center}
+.oddone{text-align:center;padding:28px 12px;font-size:14px;font-weight:700;color:#0b6b50;line-height:1.9}
 .dbh .x{margin-left:auto;flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--line);
   background:#fff;color:var(--muted);font-size:12px;line-height:1;cursor:pointer;font-family:inherit}
 .dbh .x:hover{color:var(--danger);border-color:#f5c2d0}
@@ -1773,11 +1785,12 @@ html[data-theme=dark] .statmore:hover{background:#1e2a3e}
 .pill.rate{background:#fff5e3;color:#a35b00;border-color:#ffe0ad}
 .crev{margin-top:8px;font-size:12px;font-weight:600;color:var(--muted);
   border-left:3px solid #ffd9a6;padding-left:9px;line-height:1.5}
-html[data-theme=dark] .duebar{background:#2a2320;border-color:#4a3a2c}
-html[data-theme=dark] .duebar.hot{background:#2e2020;border-color:#5a2f2f}
-html[data-theme=dark] .dbh{color:#f0b183}
-html[data-theme=dark] .duebar.hot .dbh{color:#f2a2a2}
-html[data-theme=dark] .dbh .x{background:#1e2124;color:#b9c3d4}
+html[data-theme=dark] .duebar{background:#13302a;border-color:#22513f}
+html[data-theme=dark] .dbh{color:#7fe0be}
+html[data-theme=dark] .dbh b{color:#a5f0d5}
+html[data-theme=dark] .dbh .x{background:var(--surface-2);color:#b9c3d4}
+html[data-theme=dark] .oddone{color:#7fe0be}
+html[data-theme=dark] .odrow{background:#1a2230}
 html[data-theme=dark] .dbi.over .dbd{background:#4e2020;color:#ffb3b3}
 html[data-theme=dark] .dbi.today .dbd{background:#4a3618;color:#ffd08a}
 html[data-theme=dark] .dbi.soon .dbd{background:#1e3355;color:#9dc0ff}
@@ -2250,6 +2263,10 @@ function normalize(d){
       if(i.pages&&i.page>i.pages)i.page=i.pages;
       i.rating=Math.max(0,Math.min(5,Math.round(+i.rating||0)));
       i.review=i.review||"";
+      if(i.doneAt===undefined){                       /* 언제 끝냈는지 — 이번 주 집계에 씁니다 */
+        const fin=(i.status==="완료"||i.status==="발행"||(+i.progress||0)>=100);
+        i.doneAt=fin?(i.due||"2000-01-01"):"";        /* 예전 기록은 마감일로 어림잡기 */
+      }
       delete i.link;
       return i;
     });
@@ -4208,30 +4225,99 @@ function dueList(){
   return out.sort(function(a,b){return a.g-b.g;});
 }
 function dueTxt(g){ return g<0?("D+"+(-g)):g===0?"D-DAY":("D-"+g); }
+/* 이번 주에 '해낸 것' 세기 — 날짜가 남아 있는 것만 정직하게 셉니다 */
+function weekDone(){
+  const a=weekStart(todayStr()), b=addDays(a,6);
+  const inw=function(d){return d&&d>=a&&d<=b;};
+  let todo=0,hab=0,card=0,log=0;
+  const days=(ds().days||{});
+  Object.keys(days).forEach(function(k){ if(inw(k)) todo+=(days[k]||[]).filter(function(t){return t.done;}).length; });
+  const H=hs();
+  if(H) Object.keys(H.entries||{}).forEach(function(k){ if(inw(k)) hab+=(H.entries[k]||[]).length; });
+  tabKeys().forEach(function(k){
+    const st=DATA[k]; if(!st||st.secret||!Array.isArray(st.items))return;
+    st.items.forEach(function(i){
+      if(inw(i.doneAt)) card++;
+      (i.logs||[]).forEach(function(l){ if(inw(l.date)) log++; });
+    });
+  });
+  return {todo:todo,hab:hab,card:card,log:log,total:todo+hab+card+log};
+}
+function weekDoneTxt(w){
+  const p=[];
+  if(w.card)p.push("카드 "+w.card+"개 완료");
+  if(w.todo)p.push("할 일 "+w.todo+"개");
+  if(w.hab) p.push("운동 "+w.hab+"회");
+  if(w.log) p.push("기록 "+w.log+"건");
+  return p.join(" · ");
+}
 function renderDue(){
   const box=document.getElementById("duebar"); if(!box)return;
   const l=dueList();
-  if(!l.length||dueHidden()){ box.className="duebar"; box.innerHTML=""; return; }
-  const over=l.filter(function(x){return x.g<0;}).length;
-  const tod=l.filter(function(x){return x.g===0;}).length;
-  let head;
-  if(over&&tod) head="⏰ 지난 마감 "+over+"건 · 오늘 마감 "+tod+"건";
-  else if(over) head="⏰ 마감이 지난 게 "+over+"건 있어요";
-  else if(tod)  head="⏰ 오늘 마감 "+tod+"건";
-  else          head="📅 "+DUESOON+"일 안에 마감 "+l.length+"건";
-  const top=l.slice(0,8);
-  box.className="duebar on"+(over?" hot":"");
-  box.innerHTML='<div class="dbh"><span>'+head+'</span>'+
-    '<button class="x" type="button" title="오늘은 접어두기" aria-label="알림 접어두기" onclick="dueHide()">✕</button></div>'+
-    '<div class="dbl">'+top.map(function(x){
-      return '<button type="button" class="dbi '+(x.g<0?"over":x.g===0?"today":"soon")+'" '+
+  const over=l.filter(function(x){return x.g<0;});
+  const soon=l.filter(function(x){return x.g>=0;});
+  const w=weekDone();
+  if((!l.length&&!w.total)||dueHidden()){ box.className="duebar"; box.innerHTML=""; return; }
+
+  let head, sub="";
+  if(w.total){ head="이번 주에 <b>"+w.total+"개</b> 해냈어요"; sub=weekDoneTxt(w); }
+  else { head="이번 주는 이제 시작이에요"; sub="한 개만 끝내도 여기에 쌓여요."; }
+
+  let act="";
+  if(over.length){
+    act='<div class="dbact"><button type="button" class="btn sm primary" onclick="openOverdue()">'+
+        '밀린 '+over.length+'개 정리하기</button>'+
+        '<span class="dbnote">지운 게 아니라, 언제 할지만 다시 정하는 거예요</span></div>';
+  }else if(soon.length){
+    act='<div class="dbl">'+soon.slice(0,6).map(function(x){
+      return '<button type="button" class="dbi '+(x.g===0?"today":"soon")+'" '+
         'onclick="dueGo(\''+x.k+'\',\''+x.id+'\')">'+
         '<span class="dbe">'+esc(SHORT[x.k]||"")+'</span>'+
         '<span class="dbt">'+esc(x.title)+'</span>'+
         '<span class="dbd">'+dueTxt(x.g)+'</span></button>';
-    }).join("")+
-    (l.length>top.length?'<span class="dbmore">+'+(l.length-top.length)+'건 더</span>':"")+
-    '</div>';
+    }).join("")+(soon.length>6?'<span class="dbmore">+'+(soon.length-6)+'건 더</span>':"")+'</div>';
+  }
+  box.className="duebar on";
+  box.innerHTML='<div class="dbh"><span>✅ '+head+'</span>'+
+    '<button class="x" type="button" title="오늘은 접어두기" aria-label="배너 접어두기" onclick="dueHide()">✕</button></div>'+
+    (sub?'<div class="dbsub">'+esc(sub)+'</div>':"")+act;
+}
+
+/* ===== 밀린 것 정리 : '못 한 일'이 아니라 '아직 정하지 않은 일'로 =====
+   지우는 게 아니라 언제 할지를 다시 고르는 화면입니다. */
+function openOverdue(){
+  const over=dueList().filter(function(x){return x.g<0;});
+  document.getElementById("mTitle").textContent="밀린 것 정리하기";
+  document.getElementById("mIc").innerHTML="🗓";
+  document.getElementById("mSave").style.display="none";
+  document.getElementById("mForm").innerHTML = over.length
+    ? '<div class="dbnote" style="margin-bottom:4px">밀렸다고 없어지는 게 아니에요. 언제 할지만 다시 정하면 됩니다.</div>'+
+      over.map(function(x){
+        return '<div class="odrow"><div class="odt"><span class="odw">'+esc(SHORT[x.k]||"")+'</span>'+
+          '<span class="odn">'+esc(x.title)+'</span>'+
+          '<span class="odw" style="margin-left:auto">'+dueTxt(x.g)+'</span></div>'+
+          '<div class="odb">'+
+          '<button class="btn sm" onclick="odSet(\''+x.k+'\',\''+x.id+'\',\'today\')">오늘로</button>'+
+          '<button class="btn sm" onclick="odSet(\''+x.k+'\',\''+x.id+'\',\'week\')">다음 주로</button>'+
+          '<button class="btn sm" onclick="odSet(\''+x.k+'\',\''+x.id+'\',\'none\')">날짜 없이</button>'+
+          '<button class="btn sm primary" onclick="odSet(\''+x.k+'\',\''+x.id+'\',\'done\')">다 했어요</button>'+
+          '</div></div>';
+      }).join("")
+    : '<div class="oddone">밀린 게 하나도 없어요 ✨<br><span style="font-weight:600;color:var(--muted)">오늘은 여기까지도 충분해요.</span></div>';
+  document.getElementById("overlay").classList.add("on");
+}
+function odSet(k,id,mode){
+  const i=find(id,k); if(!i)return;
+  let msg="";
+  if(mode==="today"){ i.due=todayStr(); msg="오늘로 옮겼어요"; }
+  else if(mode==="week"){ i.due=addDays(todayStr(),7); msg="다음 주로 미뤘어요 · 괜찮아요"; }
+  else if(mode==="none"){ i.due=""; msg="날짜를 비웠어요 · 생각나면 그때 하면 돼요"; }
+  else if(mode==="done"){ i.progress=100; i.status="완료"; i.doneAt=todayStr(); autoTag(i,k); msg="잘했어요 ✨"; }
+  save(); render(); openOverdue();
+  try{ toast(msg); }catch(e){}
+  if(!dueList().filter(function(x){return x.g<0;}).length){
+    setTimeout(function(){ try{closeEdit();}catch(e){} try{toast("정리 끝! 이제 앞만 보면 돼요");}catch(e){} },420);
+  }
 }
 function dueGo(k,id){
   if(noClick)return;
@@ -4785,7 +4871,18 @@ function pjView(list){
 }
 function pjAll(v){const l=visible();l.forEach(i=>{pjOpen[i.id]=!!v;});render();}
 
+function sweepDone(){
+  tabKeys().forEach(function(k){
+    const st=DATA[k]; if(!st||st.secret||!Array.isArray(st.items))return;
+    st.items.forEach(function(i){
+      const d=!!isDoneCard(i);
+      if(d&&!i.doneAt) i.doneAt=todayStr();
+      else if(!d&&i.doneAt) i.doneAt="";
+    });
+  });
+}
 function render(){
+  try{sweepDone();}catch(e){}
   renderTabs();renderHero();renderToday();renderStats();renderFilters();
   try{renderDue();}catch(e){}
   const s=DATA[cur],list=visible();
