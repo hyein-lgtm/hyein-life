@@ -1153,6 +1153,9 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
 /* 메모 체크리스트 — 손가락으로 누르기 좋게 */
 .mckr{padding:8px 0;font-size:14px}
 .mckr input[type=checkbox]{width:21px;height:21px}
+.mckr .mckx{opacity:1;width:26px;height:26px;font-size:14px}
+.mckadd input{height:34px;font-size:13px}
+.mckadd .ckclr{height:34px;font-size:12px}
 /* 이번 주 배너 */
 .duebar{margin:0 0 12px;padding:12px;border-radius:14px}
 .odb .btn{flex:1 1 44%}
@@ -1739,6 +1742,9 @@ html[data-theme=dark] .statmore:hover{background:#1e2a3e}
   border-radius:11px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--muted);font-family:inherit;cursor:pointer}
 .pinbtn.on{border-color:#ffd9a6;background:#fff8ec;color:#a35b00}
 html[data-theme=dark] .mcard.pinned{border-color:#5a441d;background:linear-gradient(180deg,#2c2416,var(--card) 42%)}
+html[data-theme=dark] .mckr .mckx{color:#8794a8}
+html[data-theme=dark] .mckadd input{color:#e8eefb}
+html[data-theme=dark] .mckadd .ckclr{background:#182541;color:#b9c3d4}
 html[data-theme=dark] .pinbtn.on{border-color:#5a441d;background:#332a17;color:#ffd08a}
 
 /* --- 메모 체크리스트 --- */
@@ -1748,6 +1754,24 @@ html[data-theme=dark] .pinbtn.on{border-color:#5a441d;background:#332a17;color:#
 .mckr span{flex:1 1 auto;min-width:0;word-break:break-word}
 .mckr.done span{text-decoration:line-through;color:#7a879b}
 .mckmore{font-size:11px;font-weight:700;color:var(--muted);padding-left:25px}
+/* 목록 화면에서 바로 지우고 더할 수 있게 */
+.mckr .mckx{flex:0 0 auto;width:22px;height:22px;margin:-1px -3px 0 0;border:0;background:transparent;
+  color:#9aa6b8;font-size:13px;line-height:1;border-radius:7px;cursor:pointer;opacity:0;transition:.12s;font-family:inherit}
+.mckr:hover .mckx,.mckr:focus-within .mckx{opacity:1}
+.mckr .mckx:hover{background:var(--pink-xl);color:var(--pink)}
+.mckr .ckt{flex:1 1 auto;min-width:0;word-break:break-word;cursor:pointer}
+.mckadd{display:flex;align-items:center;gap:6px;margin-top:2px}
+.mckadd input{flex:1 1 auto;min-width:0;height:30px;padding:0 9px;border:1px dashed var(--line);
+  border-radius:9px;background:transparent;color:var(--ink);font-size:12px;font-family:inherit}
+.mckadd input:focus{outline:0;border-style:solid;border-color:var(--blue-s);background:var(--card)}
+.mckadd input::placeholder{color:#9aa6b8}
+.mckadd .ckclr{flex:0 0 auto;height:30px;padding:0 9px;border:1px solid var(--line);border-radius:9px;
+  background:var(--card);color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;
+  white-space:nowrap;font-family:inherit}
+.mckadd .ckclr:hover{border-color:var(--pink-l);color:var(--pink)}
+.mcknew{align-self:flex-start;padding:4px 9px;border:1px dashed var(--line);border-radius:9px;
+  background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.mcknew:hover{border-style:solid;border-color:var(--blue-s);color:var(--blue)}
 .mckbar{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;color:var(--blue)}
 .mckbar .mckp{flex:1 1 auto;height:6px;border-radius:99px;background:var(--blue-xl);overflow:hidden}
 .mckbar .mckp i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#60a5fa,#2563eb);transition:width .25s}
@@ -4587,15 +4611,25 @@ function memoPreview(t){
 function memoCard(i){
   const pic=(i.pics||[])[0];
   const ts=i.todos||[], dn=ckDone(i);
-  const shown=ckSort(ts).slice(0,5);
+  /* 아이폰 메모장처럼 — 목록 화면에서 전부 보이고, 여기서 바로 체크·삭제·추가합니다 */
+  const rows=ckSort(ts).map(function(t){
+    return `<div class="mckr ${t.done?"done":""}">
+      <input type="checkbox" ${t.done?"checked":""} aria-label="${esc(t.text)}" onclick="event.stopPropagation()" onchange="memoTog('${i.id}','${t.id}')">
+      <span class="ckt" onclick="event.stopPropagation();memoTog('${i.id}','${t.id}')">${esc(t.text)}</span>
+      <button type="button" class="mckx" title="이 줄 지우기" aria-label="이 줄 지우기" onclick="event.stopPropagation();memoDelCk('${i.id}','${t.id}')">✕</button>
+    </div>`;
+  }).join("");
+  const addRow=`<div class="mckadd">
+    <input id="mca_${i.id}" placeholder="＋ 할 일 한 줄 적고 엔터" aria-label="할 일 추가"
+      onclick="event.stopPropagation()" onkeydown="memoAddKey(event,'${i.id}')">
+    ${dn?`<button type="button" class="ckclr" onclick="event.stopPropagation();memoClearDone('${i.id}')">체크한 ${dn}개 지우기</button>`:""}
+  </div>`;
   const ck=ts.length?`<div class="mckbar ${dn===ts.length?"allx":""}">
       <span>${dn===ts.length?"다 했어요 ✨":"☑ "+dn+"/"+ts.length}</span>
       <span class="mckp"><i style="width:${Math.round(dn/ts.length*100)}%"></i></span></div>
-    <div class="mckwrap">${shown.map(function(t){
-      return `<label class="mckr ${t.done?"done":""}">
-        <input type="checkbox" ${t.done?"checked":""} aria-label="${esc(t.text)}" onclick="event.stopPropagation()" onchange="memoTog('${i.id}','${t.id}')">
-        <span>${esc(t.text)}</span></label>`;
-    }).join("")}${ts.length>shown.length?`<div class="mckmore">+${ts.length-shown.length}개 더</div>`:""}</div>`:"";
+    <div class="mckwrap">${rows}</div>${addRow}`
+    :(CKNEW[i.id]?addRow
+      :`<button type="button" class="mcknew" onclick="event.stopPropagation();memoCkNew('${i.id}')">＋ 할 일 만들기</button>`);
   return `<div class="mcard${i.pin?" pinned":""}" data-id="${i.id}">
     <div class="mcth">
       <span class="mctt" onclick="openDetail('${i.id}')">${i.pin?'<span class="mcpin">📌</span> ':""}${esc(i.title||"제목 없는 메모")}</span>
@@ -4667,6 +4701,29 @@ function memoClearDone(mid){
     j.todos=(j.todos||[]).concat(gone); save();
     if(detailId===mid)renderDetail(); render();
   });
+}
+/* 목록 화면에서 「＋ 할 일 만들기」를 누른 메모들 (저장하지 않고 화면에만 기억) */
+var CKNEW={};
+function memoCkNew(mid){
+  CKNEW[mid]=true; render();
+  setTimeout(function(){ const e=document.getElementById("mca_"+mid); if(e)e.focus(); },50);
+}
+/* 엔터로 추가 · 빈 칸에서 지우기를 누르면 추가 줄이 닫힙니다 */
+function memoAddKey(ev,mid){
+  if(ev.key==="Enter"){ ev.preventDefault(); memoAddCard(mid); return; }
+  if(ev.key==="Escape"){ ev.target.value=""; ev.target.blur(); return; }
+  if(ev.key==="Backspace"&&!ev.target.value&&CKNEW[mid]){ delete CKNEW[mid]; render(); }
+}
+function memoAddCard(mid){
+  const el=document.getElementById("mca_"+mid); if(!el)return;
+  const v=(el.value||"").replace(/^\s*[-*·•]\s*/,"").trim();
+  if(!v){ el.value=""; return; }
+  const i=find(mid,"memo"); if(!i)return;
+  i.todos=i.todos||[];
+  i.todos.push({id:uid(),text:v,done:false});
+  el.value=""; CKNEW[mid]=true;
+  save(); if(detailId===mid)renderDetail(); render();
+  const n=document.getElementById("mca_"+mid); if(n)n.focus();
 }
 function ckOpenSet(){ const u=ui(); return u.memoCk||(u.memoCk={}); }
 function memoCkOn(mid){ ckOpenSet()[mid]=true; save(); renderDetail();
