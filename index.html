@@ -667,6 +667,9 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .etnew .grow{flex:1 1 auto;min-width:0}
 .etnew input[type=color]{width:48px;padding:2px}
 .etnew .etadd{flex:0 0 auto;padding:10px 14px;white-space:nowrap}
+.etrow{display:flex;align-items:center;gap:7px}
+.etrow select{flex:1 1 auto;min-width:0}
+.emb.del:hover{border-color:var(--danger);color:var(--danger);background:#fff5f4}
 .erow .ememo{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;
   white-space:nowrap;max-width:120px}
 .erow .x.cp{color:var(--muted)}
@@ -1387,6 +1390,7 @@ html[data-theme=dark] .erow .x{color:#b7c3d7}
 html[data-theme=dark] .emb{background:#1e2124;color:#e7edf8}
 html[data-theme=dark] .emchips button{background:#1e2124;color:#bac4d4}
 html[data-theme=dark] .emchips button.on{color:#0d1420}
+html[data-theme=dark] .emb.del:hover{background:#2a1a1c}
 html[data-theme=dark] textarea.mono{color:#a6b2c5}
 html[data-theme=dark] .qrow .x{color:#b7c3d7}
 html[data-theme=dark] .empty{color:#b7c3d7}
@@ -3691,7 +3695,7 @@ function dupEntry(id){
 }
 
 function openDay(k){
-  dayCur=k;
+  dayCur=k; ETMODE="";   /* 창을 다시 그리면 고치던 상태는 닫힙니다 */
   const s=hs(),es=s.entries[k]||[];
   document.getElementById("mTitle").textContent="🏃 "+k;
   const rows=es.length?es.map(e=>{const ty=typeOf(e.type);
@@ -3710,12 +3714,16 @@ function openDay(k){
   </div>`;
   document.getElementById("mForm").innerHTML=`<div class="elist">${rows}</div>${ops}
     <div class="field"><label>종류</label>
-      <select id="f_etype" onchange="etPick(this)">${opts}<option value="__new">＋ 새 종류 만들기…</option></select></div>
+      <div class="etrow">
+        <select id="f_etype" onchange="etPick(this)">${opts}<option value="__new">＋ 새 종류 만들기…</option></select>
+        <button type="button" class="emb" onclick="etEdit()" title="고른 종류 이름·색 바꾸기" aria-label="종류 이름·색 바꾸기">✎</button>
+        <button type="button" class="emb del" onclick="etDel()" title="고른 종류 지우기" aria-label="종류 지우기">🗑</button>
+      </div></div>
     <div class="etnew" id="etnew" style="display:none">
-      <div class="field grow"><label>새 종류 이름</label>
-        <input id="f_ntname" placeholder="예: 필라테스" onkeydown="if(event.key==='Enter'){event.preventDefault();addTypeQuick()}"></div>
+      <div class="field grow"><label id="etnlab">새 종류 이름</label>
+        <input id="f_ntname" placeholder="예: 필라테스" onkeydown="if(event.key==='Enter'){event.preventDefault();etSubmit()}"></div>
       <div class="field"><label>색</label><input id="f_ntcolor" type="color" value="#2563eb"></div>
-      <button type="button" class="btn primary etadd" onclick="addTypeQuick()">추가</button>
+      <button type="button" class="btn primary etadd" id="etok" onclick="etSubmit()">추가</button>
     </div>
     <div class="field"><label>운동 시간 (10분 단위)</label>
       <div class="emrow">
@@ -3744,13 +3752,68 @@ function emAdd(d){
   const el=document.getElementById("f_emin"); if(!el)return;
   el.value=Math.max(0,Math.round((+el.value||0)/10)*10+d); emChips();
 }
+/* "" = 닫힘 · "new" = 만드는 중 · 그 밖에는 고치고 있는 종류의 id */
+let ETMODE="";
+function etBox(mode,lab,name,color,btn){
+  const box=document.getElementById("etnew"); if(!box)return;
+  ETMODE=mode;
+  if(!mode){ box.style.display="none"; return; }
+  const l=document.getElementById("etnlab"); if(l)l.textContent=lab;
+  const n=document.getElementById("f_ntname"); if(n){ n.value=name; }
+  const c=document.getElementById("f_ntcolor"); if(c)c.value=color;
+  const b=document.getElementById("etok"); if(b)b.textContent=btn;
+  box.style.display="flex";
+  if(n)n.focus();
+}
 /* 종류 목록에서 「＋ 새 종류 만들기」를 고르면 그 자리에서 만들 수 있어요 */
 function etPick(sel){
-  const box=document.getElementById("etnew"); if(!box)return;
-  if(sel&&sel.value==="__new"){
-    box.style.display="flex";
-    const n=document.getElementById("f_ntname"); if(n)n.focus();
-  } else box.style.display="none";
+  if(sel&&sel.value==="__new") etBox("new","새 종류 이름","","#2563eb","추가");
+  else etBox("","","","","");
+}
+/* ✎ 를 누르면 고른 종류의 이름과 색을 그 자리에서 고칩니다 */
+function etEdit(){
+  const sel=document.getElementById("f_etype"); if(!sel)return;
+  if(sel.value==="__new"){ etBox("new","새 종류 이름","","#2563eb","추가"); return; }
+  const ty=typeOf(sel.value); if(!ty)return;
+  etBox(ty.id,"종류 이름 고치기",ty.name||"",ty.color||"#2563eb","저장");
+}
+/* 만들기와 고치기가 같은 버튼을 씁니다 */
+function etSubmit(){
+  if(!ETMODE||ETMODE==="new"){ addTypeQuick(); return; }
+  const el=document.getElementById("f_ntname"), n=((el&&el.value)||"").trim();
+  if(!n){ alert("종류 이름을 적어주세요."); if(el)el.focus(); return; }
+  const cl=document.getElementById("f_ntcolor"), c=(cl&&cl.value)||"#2563eb";
+  const ty=typeOf(ETMODE); if(!ty)return;
+  const keep=ETMODE;
+  ty.name=n; ty.color=c;
+  const mn=(document.getElementById("f_emin")||{}).value||"30";
+  const mo=(document.getElementById("f_ememo")||{}).value||"";
+  save(); openDay(dayCur); render();
+  const s2=document.getElementById("f_etype"); if(s2)s2.value=keep;
+  const m2=document.getElementById("f_emin"); if(m2)m2.value=mn;
+  const o2=document.getElementById("f_ememo"); if(o2)o2.value=mo;
+  emChips();
+  try{ toast("✏ 「"+n+"」으로 바꿨어요"); }catch(e){}
+}
+/* 🗑 는 그 종류로 남긴 기록까지 함께 지우니 개수를 먼저 알려줍니다 */
+function etDel(){
+  const sel=document.getElementById("f_etype"); if(!sel)return;
+  const id=sel.value;
+  if(id==="__new"){ alert("지울 종류를 먼저 골라주세요."); return; }
+  const s=hs();
+  if((s.types||[]).length<=1){ alert("최소 1개의 종류는 남아 있어야 해요."); return; }
+  const ty=typeOf(id), nm=(ty&&ty.name)||"";
+  let cnt=0;
+  Object.keys(s.entries||{}).forEach(function(k){
+    cnt+=(s.entries[k]||[]).filter(function(e){return e.type===id;}).length; });
+  if(!confirm("「"+nm+"」 종류를 지울까요?"+(cnt?" · 이 종류로 남긴 기록 "+cnt+"개도 함께 사라져요.":"")))return;
+  s.types=s.types.filter(function(t){return t.id!==id;});
+  Object.keys(s.entries).forEach(function(k){
+    s.entries[k]=(s.entries[k]||[]).filter(function(e){return e.type!==id;});
+    if(!s.entries[k].length) delete s.entries[k]; });
+  if(filter===id) filter="ALL";
+  save(); openDay(dayCur); render();
+  try{ toast("🗑 「"+nm+"」 종류를 지웠어요"); }catch(e){}
 }
 function addTypeQuick(){
   const el=document.getElementById("f_ntname"), n=((el&&el.value)||"").trim();
