@@ -651,6 +651,22 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
   border-color:var(--blue) !important;box-shadow:0 10px 26px rgba(37,99,235,.22) !important}
 /* --- 운동 기록 복붙 --- */
 .dayops{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+/* 운동: 종류 바로 추가 · 시간 10분 단위 */
+.emrow{display:flex;align-items:center;gap:7px}
+.emrow input{flex:1 1 auto;min-width:0}
+.emb{flex:0 0 auto;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:10px;
+  background:var(--card);color:var(--ink);font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.emb:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-xl)}
+.emu{flex:0 0 auto;font-size:12px;color:var(--muted);font-weight:700}
+.emchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.emchips button{padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);
+  color:var(--muted);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+.emchips button:hover{border-color:var(--blue);color:var(--blue)}
+.emchips button.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.etnew{display:flex;gap:8px;align-items:flex-end;margin:-4px 0 12px}
+.etnew .grow{flex:1 1 auto;min-width:0}
+.etnew input[type=color]{width:48px;padding:2px}
+.etnew .etadd{flex:0 0 auto;padding:10px 14px;white-space:nowrap}
 .erow .ememo{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;
   white-space:nowrap;max-width:120px}
 .erow .x.cp{color:var(--muted)}
@@ -1368,6 +1384,9 @@ html[data-theme=dark] .dnum{color:#b7c3d7}
 html[data-theme=dark] .dmore{color:#b7c3d7}
 html[data-theme=dark] .tsum{color:#8096b5}
 html[data-theme=dark] .erow .x{color:#b7c3d7}
+html[data-theme=dark] .emb{background:#1e2124;color:#e7edf8}
+html[data-theme=dark] .emchips button{background:#1e2124;color:#bac4d4}
+html[data-theme=dark] .emchips button.on{color:#0d1420}
 html[data-theme=dark] textarea.mono{color:#a6b2c5}
 html[data-theme=dark] .qrow .x{color:#b7c3d7}
 html[data-theme=dark] .empty{color:#b7c3d7}
@@ -3690,9 +3709,22 @@ function openDay(k){
     ${prev?`<button class="btn sm ghost" onclick="pasteFrom('${prev}')">↩ ${prev.slice(5)} 기록 가져오기</button>`:""}
   </div>`;
   document.getElementById("mForm").innerHTML=`<div class="elist">${rows}</div>${ops}
-    <div class="two">
-      <div class="field"><label>종류</label><select id="f_etype">${opts}</select></div>
-      <div class="field"><label>운동 시간 (분)</label><input id="f_emin" type="number" min="0" step="5" value="30"></div>
+    <div class="field"><label>종류</label>
+      <select id="f_etype" onchange="etPick(this)">${opts}<option value="__new">＋ 새 종류 만들기…</option></select></div>
+    <div class="etnew" id="etnew" style="display:none">
+      <div class="field grow"><label>새 종류 이름</label>
+        <input id="f_ntname" placeholder="예: 필라테스" onkeydown="if(event.key==='Enter'){event.preventDefault();addTypeQuick()}"></div>
+      <div class="field"><label>색</label><input id="f_ntcolor" type="color" value="#2563eb"></div>
+      <button type="button" class="btn primary etadd" onclick="addTypeQuick()">추가</button>
+    </div>
+    <div class="field"><label>운동 시간 (10분 단위)</label>
+      <div class="emrow">
+        <button type="button" class="emb" onclick="emAdd(-10)" aria-label="10분 줄이기">−10</button>
+        <input id="f_emin" type="number" min="0" step="10" value="30" oninput="emChips()">
+        <span class="emu">분</span>
+        <button type="button" class="emb" onclick="emAdd(10)" aria-label="10분 늘리기">＋10</button>
+      </div>
+      <div class="emchips">${EMQ.map(function(q){return `<button type="button" id="emq_${q}" class="${q===30?"on":""}" onclick="emSet(${q})">${q}분</button>`;}).join("")}</div>
     </div>
     <div class="field"><label>메모</label><input id="f_ememo" placeholder="예: 하체 위주 / 러닝 5km" onkeydown="if(event.key==='Enter'){event.preventDefault();addEntry()}"></div>
     <button class="btn primary wide" onclick="addEntry()">＋ 기록 추가</button>`;
@@ -3700,11 +3732,48 @@ function openDay(k){
   document.getElementById("mSave").style.display="none";
   document.getElementById("overlay").classList.add("on");
 }
+/* 자주 쓰는 운동 시간 (10분 단위) */
+const EMQ=[10,20,30,60];
+function emChips(){
+  const el=document.getElementById("f_emin"); if(!el)return;
+  const v=+el.value||0;
+  EMQ.forEach(function(q){ const b=document.getElementById("emq_"+q); if(b)b.classList.toggle("on",v===q); });
+}
+function emSet(v){ const el=document.getElementById("f_emin"); if(!el)return; el.value=v; emChips(); }
+function emAdd(d){
+  const el=document.getElementById("f_emin"); if(!el)return;
+  el.value=Math.max(0,Math.round((+el.value||0)/10)*10+d); emChips();
+}
+/* 종류 목록에서 「＋ 새 종류 만들기」를 고르면 그 자리에서 만들 수 있어요 */
+function etPick(sel){
+  const box=document.getElementById("etnew"); if(!box)return;
+  if(sel&&sel.value==="__new"){
+    box.style.display="flex";
+    const n=document.getElementById("f_ntname"); if(n)n.focus();
+  } else box.style.display="none";
+}
+function addTypeQuick(){
+  const el=document.getElementById("f_ntname"), n=((el&&el.value)||"").trim();
+  if(!n){ alert("종류 이름을 적어주세요."); if(el)el.focus(); return; }
+  const cl=document.getElementById("f_ntcolor"), c=(cl&&cl.value)||"#2563eb";
+  const mn=(document.getElementById("f_emin")||{}).value||"30";
+  const mo=(document.getElementById("f_ememo")||{}).value||"";
+  const id=uid();
+  hs().types.push({id:id,name:n,color:c});
+  save(); openDay(dayCur); render();
+  const s2=document.getElementById("f_etype"); if(s2)s2.value=id;
+  const m2=document.getElementById("f_emin"); if(m2)m2.value=mn;
+  const o2=document.getElementById("f_ememo"); if(o2)o2.value=mo;
+  emChips();
+  try{ toast("✨ 「"+n+"」 종류를 만들었어요"); }catch(e){}
+}
 function addEntry(){
   const s=hs(),k=dayCur;if(!k)return;
   s.entries[k]=s.entries[k]||[];
   const mm=document.getElementById("f_ememo");
-  s.entries[k].push({id:uid(),type:document.getElementById("f_etype").value,min:Math.max(0,+document.getElementById("f_emin").value||0),memo:((mm&&mm.value)||"").trim()});
+  const ty=document.getElementById("f_etype").value;
+  if(ty==="__new"){ addTypeQuick(); return; }   /* 종류를 안 고른 채로는 저장하지 않습니다 */
+  s.entries[k].push({id:uid(),type:ty,min:Math.max(0,+document.getElementById("f_emin").value||0),memo:((mm&&mm.value)||"").trim()});
   save();openDay(k);render();
 }
 function delEntry(id){
