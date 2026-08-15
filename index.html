@@ -517,7 +517,8 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .titem{display:flex;align-items:center;gap:10px;padding:8px 2px;cursor:pointer;border-radius:9px}
 .titem:hover{background:var(--blue-xl)}
 .titem input[type=checkbox]{width:17px;height:17px;flex:none;cursor:pointer}
-.titem .ttx{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--ink);word-break:break-all}
+.titem .ttx{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--ink);
+  word-break:break-word;overflow-wrap:anywhere}
 .titem.on .ttx{color:var(--muted);text-decoration:line-through}
 .titem .x{opacity:0;border:none;background:transparent;color:var(--muted);cursor:pointer;
   font-size:12px;padding:2px 4px;flex:none}
@@ -582,8 +583,17 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .dring{width:46px;height:46px}
 .dring b{width:35px;height:35px;font-size:12px}
 .tgroup{padding:11px 12px}
-.titem{padding:9px 2px}
+/* 할 일 한 줄 — 글자가 눌려서 세로로 쏟아지지 않게 최소 폭을 확보합니다 */
+.titem{padding:9px 2px;gap:7px;flex-wrap:wrap;row-gap:2px}
+.titem .ttx{flex:1 1 auto;min-width:46%;word-break:break-word}
 .titem .x{opacity:1}
+/* 누르기 좋은 크기 — 옆 버튼과 겹치지 않도록 세로로 넉넉하게 */
+.titem .x{padding:9px 7px;font-size:14px;line-height:1;border-radius:8px}
+/* ✎ 는 글자를 눌러도 똑같이 고쳐지니 좁은 화면에선 숨겨서 글자 자리를 넓힙니다 */
+.titem .x.ed{display:none}
+.titem .x:active{background:var(--surface-3)}
+.titem .x.tm{padding:7px 9px;font-size:12px}
+.titem .x.mv,.titem .x.rt{font-size:15px}
 .titem .grip{opacity:.55;width:15px;font-size:14px;padding:2px 0}
 .addline.daily{flex-wrap:nowrap;gap:5px}
 .addline.daily select{width:78px;font-size:16px;padding:9px 4px}
@@ -1188,7 +1198,7 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
 .pgin{padding:0 10px}
 .star{width:46px;height:46px;font-size:24px}
 /* 손가락으로 누르기 좋은 최소 크기 */
-  .row .x,.qrow .x,.frow .x,.titem .x{min-width:38px;min-height:38px}
+  .row .x,.qrow .x,.frow .x{min-width:38px;min-height:38px}
 /* 캘린더 */
   .calbox{padding:11px}
 .cal-body.big{gap:4px}
@@ -1935,6 +1945,21 @@ html[data-theme=dark] .crev{border-left-color:#5a441d}
 </div>
 
 <div id="cmenu" role="menu"></div>
+
+<div class="overlay" id="askOv">
+  <div class="modal" style="max-width:400px">
+    <div class="mhead"><div class="ic" id="askIc">✎</div><b id="askT">입력</b>
+      <button class="close" onclick="askClose()">✕</button></div>
+    <div class="form">
+      <div class="field"><label id="askL"></label>
+        <input id="askI" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();askOk();}">
+        <div class="ehint" id="askH"></div></div>
+    </div>
+    <div class="foot"><div class="spacer"></div>
+      <button class="btn" onclick="askClose()">취소</button>
+      <button class="btn primary" onclick="askOk()">확인</button></div>
+  </div>
+</div>
 <div class="credit">© 2026 hyein · My Life OS</div>
 
 <div class="overlay" id="overlay">
@@ -3138,7 +3163,12 @@ function museGoals(){
   </div>`;
 }
 function snapFollow(){
-  const s=ms(),v=prompt("지금 팔로워 수를 입력하세요",s.followers.cur);
+  const s=ms();
+  askText({title:"팔로워 수 기록",label:"지금 팔로워 수",value:s.followers.cur,icon:"✨",
+    type:"number",mode:"numeric"},function(v){ snapFollowDo(v); });
+}
+function snapFollowDo(v){
+  const s=ms();
   if(v===null)return;
   setGoalV("fcur",v);
 }
@@ -5408,9 +5438,13 @@ function inboxToCard(x){
   if(!s||!s.items||["daily","habit","dream","muse"].indexOf(s.type)>=0){
     alert("업무·독서·부동산처럼 카드로 쓰는 탭에서 옮겨주세요.");return;
   }
-  const gone=l[x];
-  s.items.unshift({id:uid(),title:gone.t,tag:(s.tags||[])[0]||"",status:statusList()[0]||"",
-    progress:0,start:"",due:"",goal:"",note:"",desc:"",owner:"",
+  const gone=l[x], txt=String(gone.t||"");
+  const isMemo=(s.type==="memo");
+  /* 메모 탭은 긴 글이면 본문으로, 짧으면 제목으로 넣습니다 */
+  const long=isMemo&&txt.length>28;
+  s.items.unshift({id:uid(),title:long?"":txt,tag:(s.tags||[])[0]||"",status:statusList()[0]||"",
+    progress:0,start:"",due:"",goal:"",note:long?txt:"",desc:"",owner:"",
+    pin:false,at:isMemo?todayStr():"",
     todos:[],milestones:[],links:[],quotes:[],logs:[]});
   l.splice(x,1); save();render();
   toast("→ '"+String(s.label||"").replace(/^\S+\s/,"")+"'에 카드로 옮겼어요");
@@ -6537,10 +6571,19 @@ function vCopy(id,which){
 }
 async function vChangePin(){
   if(!VKEY)return;
-  const a=prompt("새 PIN (숫자 4~6자리)");if(a===null)return;
-  if(!/^[0-9]{4,6}$/.test(a.trim())){alert("숫자 4~6자리로 정해 주세요.");return;}
-  const b=prompt("한 번 더 넣어 주세요");if(b===null)return;
-  if(b.trim()!==a.trim()){alert("두 번 넣은 PIN이 서로 달라요.");return;}
+  askText({title:"PIN 바꾸기",label:"새 PIN (숫자 4~6자리)",value:"",icon:"🔒",
+    type:"password",mode:"numeric"},function(a){
+    if(a===null)return;
+    if(!/^[0-9]{4,6}$/.test(String(a).trim())){alert("숫자 4~6자리로 정해 주세요.");return;}
+    askText({title:"PIN 확인",label:"한 번 더 넣어 주세요",value:"",icon:"🔒",
+      type:"password",mode:"numeric"},function(b){
+      if(b===null)return;
+      if(String(b).trim()!==String(a).trim()){alert("두 번 넣은 PIN이 서로 달라요.");return;}
+      vPinDo(String(a).trim());
+    });
+  });
+}
+async function vPinDo(a){
   VSALT=crypto.getRandomValues(new Uint8Array(16));
   VKEY=await vDerive(a.trim(),VSALT);
   await vPersist();vTouch();
@@ -6645,6 +6688,34 @@ function resetAll(){
 }
 
 /* ---- 📌 옆에 붙는 중요 메모판 (월별 묶음 + 체크리스트) ------------------- */
+/* ================= 앱 안 입력창 =================
+   iOS 에서 홈 화면에 추가한 앱은 브라우저 prompt() 가 아예 뜨지 않습니다.
+   그래서 글자를 받아야 하는 곳은 전부 이 창을 씁니다. */
+let ASKCB=null;
+function askText(opt,cb){
+  opt=opt||{};
+  ASKCB=cb||null;
+  document.getElementById("askT").textContent=opt.title||"입력";
+  document.getElementById("askL").textContent=opt.label||"";
+  document.getElementById("askIc").textContent=opt.icon||"✎";
+  const h=document.getElementById("askH");
+  h.textContent=opt.hint||""; h.style.display=opt.hint?"":"none";
+  const el=document.getElementById("askI");
+  el.value=(opt.value==null?"":String(opt.value));
+  el.setAttribute("type",opt.type||"text");
+  el.setAttribute("placeholder",opt.placeholder||"");
+  if(opt.mode) el.setAttribute("inputmode",opt.mode); else el.removeAttribute("inputmode");
+  document.getElementById("askOv").classList.add("on");
+  setTimeout(function(){ el.focus(); try{el.setSelectionRange(el.value.length,el.value.length);}catch(e){} },60);
+}
+function askClose(){ ASKCB=null; document.getElementById("askOv").classList.remove("on"); }
+function askOk(){
+  const v=document.getElementById("askI").value;
+  const cb=ASKCB; ASKCB=null;
+  document.getElementById("askOv").classList.remove("on");
+  if(cb) cb(v);
+}
+
 function padD(){
   if(!DATA.__pad||typeof DATA.__pad!=="object")DATA.__pad={};
   var p=DATA.__pad;
@@ -6734,10 +6805,14 @@ function padToggle(f){
   if(p.open)padRender();
 }
 function padAddGroup(){
-  var t=prompt("묶음 이름을 적어주세요 (예: 10월, 이번 주, 꼭 기억할 것)",padMonth());
-  if(t===null)return;
-  t=String(t).trim();
-  if(!t)return;
+  askText({title:"새 묶음 만들기",label:"묶음 이름",value:padMonth(),icon:"📌",
+    placeholder:"예: 10월, 이번 주, 꼭 기억할 것"},function(v){
+    v=String(v==null?"":v).trim();
+    if(!v)return;
+    padAddGroupDo(v);
+  });
+}
+function padAddGroupDo(t){
   var p=padD();
   p.groups.push({id:uid(),title:t,open:true,items:[]});
   padSave();padRender();
@@ -6748,11 +6823,11 @@ function padAddGroup(){
 }
 function padRenameGroup(id){
   var g=padG(id);if(!g)return;
-  var t=prompt("묶음 이름 바꾸기",g.title);
-  if(t===null)return;
-  t=String(t).trim();
-  if(!t)return;
-  g.title=t;padSave();padRender();
+  askText({title:"묶음 이름 바꾸기",label:"이름",value:g.title,icon:"📌"},function(v){
+    v=String(v==null?"":v).trim();
+    if(!v)return;
+    g.title=v;padSave();padRender();
+  });
 }
 function padDelGroup(id){
   var g=padG(id);if(!g)return;
@@ -6792,11 +6867,12 @@ function padEdit(gid,tid){
   var it=null;
   for(var i=0;i<g.items.length;i++)if(g.items[i].id===tid)it=g.items[i];
   if(!it)return;
-  var t=prompt("메모 고치기 (비우면 지워져요)",it.t);
-  if(t===null)return;
-  t=String(t).trim();
-  if(!t){padDel(gid,tid);return;}
-  it.t=t;padSave();padRender();
+  askText({title:"메모 고치기",label:"내용",value:it.t,icon:"📌",
+    hint:"비우고 확인을 누르면 지워져요"},function(v){
+    v=String(v==null?"":v).trim();
+    if(!v){padDel(gid,tid);return;}
+    it.t=v;padSave();padRender();
+  });
 }
 /* ---- 할 일 드래그로 옮기기 (같은 묶음 순서 + 다른 묶음 이동) ------------- */
 var PADDRAG=null;
@@ -6977,8 +7053,14 @@ document.addEventListener("visibilitychange",function(){
 });
 window.addEventListener("focus",function(){try{dayRoll(true);}catch(e){}});
 document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeEdit();});
+document.getElementById("askOv").addEventListener("click",e=>{if(e.target.id==="askOv")askClose();});
 document.getElementById("detail").addEventListener("click",e=>{if(e.target.id==="detail")closeDetail();});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeEdit();if(detailId)closeDetail();}});
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  const ao=document.getElementById("askOv");
+  if(ao&&ao.classList.contains("on")){askClose();return;}   /* 입력창이 열려 있으면 그것만 닫기 */
+  closeEdit(); if(detailId)closeDetail();
+});
 setInterval(()=>{
   const d=new Date();
   document.getElementById("clock").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
