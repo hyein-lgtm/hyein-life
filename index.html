@@ -555,14 +555,34 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .mcal .wk div.sat{color:#4f7ddb}
 .mcal .wk div.sun{color:#e0648a}
 .cal2{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.dcell2{height:42px;border:1px solid var(--line);border-radius:10px;background:#fbfcff;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:.13s}
+.dcell2{height:48px;border:1px solid var(--line);border-radius:10px;background:#fbfcff;position:relative;
+  overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  cursor:pointer;transition:.13s}
 .dcell2:hover{background:var(--blue-xl);border-color:var(--blue-l)}
 .dcell2.off{background:transparent;border-color:transparent;cursor:default}
 .dcell2 .dnum{font-size:12px;font-weight:700;color:var(--muted);line-height:1}
 .dcell2.today .dnum{color:var(--blue);font-weight:800}
 .dcell2.today{box-shadow:inset 0 0 0 2px var(--blue-l)}
 .dcell2.sel{border-color:var(--blue);background:var(--blue-xl);box-shadow:inset 0 0 0 2px var(--blue)}
+/* --- 날짜 칸의 카테고리 색 점 --- */
+.dots{display:flex;align-items:center;justify-content:center;gap:3px;min-height:8px;max-width:100%}
+.dots i{width:7px;height:7px;border-radius:50%;display:block;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.65) inset}
+.dots.one i{width:13px;height:13px}
+.dots .dmore2{font-size:11px;font-weight:800;color:var(--muted);line-height:1;margin-left:1px}
+/* 달성률은 칸 아래 얇은 띠로 --- 색 점과 겹치지 않게 */
+.drate{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--blue-xl)}
+.drate i{display:block;height:100%;background:linear-gradient(90deg,#93c5fd,#2563eb)}
+.drate.full i{background:var(--ok)}
+.dcell2.dim{opacity:.34}
+.dcell2.hit{border-color:var(--cchit,var(--blue));box-shadow:inset 0 0 0 2px var(--cchit,var(--blue))}
+.erow .spl.mk.on{background:#fff1f6;border-color:#f8c4d8;color:#c43a70}
+.mkchip{display:inline-block;margin-left:5px;font-size:11px;opacity:.85}
+.catleg{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;align-items:center;
+  margin-top:12px;font-size:11px;font-weight:700;color:var(--muted)}
+.catleg span{display:inline-flex;align-items:center;gap:5px}
+.catleg i{width:8px;height:8px;border-radius:50%;display:block}
+.catleg .rt2{display:inline-flex;align-items:center;gap:5px;margin-left:2px}
+.catleg .rt2 b{width:16px;height:4px;border-radius:99px;background:linear-gradient(90deg,#93c5fd,#2563eb);display:block}
 .ddot{width:8px;height:8px;border-radius:50%;display:block;flex:none}
 .ddot.none{background:#eaeff8}
 .ddot.l1{background:#c3d8fb}
@@ -601,7 +621,9 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .addline.daily .btn{flex:none;padding:6px 9px}
 .mcal{padding:12px 12px 10px}
 .msum{width:100%;order:9;margin:6px 0 0;text-align:center}
-.dcell2{height:38px}
+.dcell2{height:46px;gap:3px}
+.dots i{width:7px;height:7px}
+.dots.one i{width:12px;height:12px}
 }
 /* --- 데일리: 카테고리 카드 인라인 입력 --- */
 .tshort{display:none}
@@ -1457,6 +1479,8 @@ html[data-theme=dark] .mcal .wk div{color:#b7c3d7}
 html[data-theme=dark] .mcal .wk div.sat{color:#a2baec}
 html[data-theme=dark] .mcal .wk div.sun{color:#eca2b8}
 html[data-theme=dark] .dcell2{background:#222e53}
+html[data-theme=dark] .dots i{box-shadow:0 0 0 1px rgba(0,0,0,.3) inset}
+html[data-theme=dark] .drate{background:#1f304c}
 html[data-theme=dark] .dcell2 .dnum{color:#bbc4d2}
 html[data-theme=dark] .ddot.none{background:#213250}
 html[data-theme=dark] .ddot.l1{background:#1f304c}
@@ -2353,6 +2377,7 @@ function normalize(d){
     if(s.type==="daily"){
       s.cats=(s.cats&&s.cats.length)?s.cats:JSON.parse(JSON.stringify(SEED.daily.cats));
       if(!mig.split1){ s.cats.forEach(c=>{ if(/업무|일\s*·|워크/.test(c.name||"")) c.split=true; }); mig.split1=1; }
+      s.cats.forEach(function(c){ c.mark=!!c.mark; });     /* 기록용 여부 */
       s.days=s.days||{};
       s.skip=s.skip||{};
       s.routines=(s.routines||[]).filter(r=>r&&r.text).map(r=>({id:r.id||uid(),cat:r.cat,part:(r.part==="pm"?"pm":"am"),text:r.text||"",days:(Array.isArray(r.days)?r.days:[]).map(Number).filter(x=>x>=0&&x<=6),since:r.since||"",off:!!r.off})).filter(r=>r.days.length);
@@ -2551,10 +2576,16 @@ function endDrag(){
 
 /* ---- 데일리 투두 ---- */
 function ds(){return DATA.daily;}
+/* 「기록용」 카테고리 : 생리 시작처럼 '해내는 일'이 아니라 '그날 있었던 일' 표시.
+   → 다음 날로 넘어가지 않고, 달성률 계산에서도 빠집니다. */
+function isMarkCat(id){ const c=(ds().cats||[]).find(function(x){return x.id===id;}); return !!(c&&c.mark); }
+function markIds(){ return (ds().cats||[]).filter(function(c){return c.mark;}).map(function(c){return c.id;}); }
 function catOf(id){const s=ds();return (s.cats||[]).find(c=>c.id===id)||{id:id,name:"기타",color:"#94a3b8"};}
 function dayTodos(k){return (ds().days||{})[k]||[];}
 function dayRate(k){
-  const t=dayTodos(k);if(!t.length)return -1;
+  const mk=markIds();
+  const t=dayTodos(k).filter(function(x){return mk.indexOf(x.cat)<0;});   /* 기록용은 달성률에서 뺍니다 */
+  if(!t.length)return -1;
   return Math.round(t.filter(x=>x.done).length/t.length*100);
 }
 function addDays(k,n){const d=new Date(k+"T00:00:00");d.setDate(d.getDate()+n);return ymd(d);}
@@ -2591,7 +2622,7 @@ function dailyGroups(){
       <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
       <span class="ttx" title="눌러서 글자 수정" onclick="editDaily(event,'${t.id}')">${esc(t.text)}</span>${rollBadge(t)}
       ${sp?`<button class="x mv" title="${t.part==="pm"?"오전으로 옮기기":"오후로 옮기기"}" onclick="event.preventDefault();movePart('${t.id}')">${t.part==="pm"?"☀":"🌙"}</button>`:""}
-      ${t.done?"":`<button class="x tm" title="내일로 미루기" aria-label="내일로 미루기" onclick="event.preventDefault();pushDaily('${t.id}')">내일→</button>`}
+      ${(t.done||c.mark)?"":`<button class="x tm" title="내일로 미루기" aria-label="내일로 미루기" onclick="event.preventDefault();pushDaily('${t.id}')">내일→</button>`}
       <button class="x rt ${t.rt?"on":""}" title="${t.rt?"루틴 "+rtLabel(rtOf(t)||{days:[]}):"루틴으로 등록"}" aria-label="루틴으로 등록" onclick="event.preventDefault();openRoutine('${t.id}')">♺</button>
       <button class="x ed" title="글자 수정" aria-label="글자 수정" onclick="event.preventDefault();editDaily(event,'${t.id}')">${IC.pen}</button>
       <button class="x" title="삭제" aria-label="삭제" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`;
@@ -2615,8 +2646,8 @@ function dailyGroups(){
       body=g.map(t=>row(t,c)).join("")+(c.id==="__etc"?"":addrow(c,""));
     }
     return `<div class="tgroup ${c.split?"hassub":""}" data-cat="${c.id==="__etc"?"":c.id}" style="--cc:${c.color}">
-      <div class="ghd"><span class="cdot" style="background:${c.color}"></span>${esc(c.name)}
-        <span class="gcnt">${gd}/${g.length}</span></div>
+      <div class="ghd"><span class="cdot" style="background:${c.color}"></span>${esc(c.name)}${c.mark?`<span class="mkchip" title="기록용 — 다음 날로 안 넘어가요">🔖</span>`:""}
+        <span class="gcnt">${c.mark?g.length+"개":gd+"/"+g.length}</span></div>
       ${body}
     </div>`;
   }).join("");
@@ -2804,7 +2835,9 @@ function autoRoll(){
   let n=0;
   Object.keys(s.days).forEach(k=>{
     if(k>=t||k<lim) return;
-    const src=s.days[k]||[], stay=src.filter(x=>x.done||x.rt), go=src.filter(x=>!x.done&&!x.rt);
+    const mk=markIds();
+    const keep=function(x){ return x.done||x.rt||mk.indexOf(x.cat)>=0; };   /* 기록용은 그 날짜에 그대로 둡니다 */
+    const src=s.days[k]||[], stay=src.filter(keep), go=src.filter(function(x){return !keep(x);});
     if(!go.length) return;
     if(!s.days[t]) s.days[t]=[];
     const have=s.days[t].map(x=>x.text);
@@ -3051,6 +3084,7 @@ function openCats(){
     <input class="tcol" type="color" value="${c.color}" onchange="setCatColor('${c.id}',this.value)">
     <input class="tname" value="${esc(c.name)}" onchange="setCatName('${c.id}',this.value)">
     <button class="spl ${c.split?"on":""}" title="오전·오후로 나누기" onclick="toggleSplit('${c.id}')">☀/🌙</button>
+    <button class="spl mk ${c.mark?"on":""}" title="기록용으로 쓰기 — 다음 날로 안 넘어가고 달성률에서도 빠져요" onclick="toggleMark('${c.id}')">🔖</button>
     <button class="x" onclick="delCat('${c.id}')">✕</button></div>`).join("");
   document.getElementById("mForm").innerHTML=`<div class="elist">${rows}</div>
     <div class="two">
@@ -3058,7 +3092,9 @@ function openCats(){
       <div class="field"><label>색</label><input id="f_ccolor" type="color" value="#0891b2"></div>
     </div>
     <button class="btn primary wide" onclick="addCat()">＋ 카테고리 추가</button>
-    <div class="hint2">색은 투두 목록의 점·체크박스에 그대로 반영돼요. ☀/🌙 를 켜면 그 카테고리가 오전·오후로 나뉘어요.</div>`;
+    <div class="hint2">색은 투두 목록의 점·체크박스와 <b>달력</b>에 그대로 반영돼요.<br>
+      ☀/🌙 를 켜면 오전·오후로 나뉘고, <b>🔖 를 켜면 「기록용」</b>이 돼요 —
+      생리 시작·병원 같은 <b>표시</b>는 체크를 안 해도 다음 날로 안 넘어가고 달성률에서도 빠져요.</div>`;
   document.getElementById("mIc").innerHTML=chImg("daily");
   document.getElementById("mSave").style.display="none";
   document.getElementById("overlay").classList.add("on");
@@ -3074,6 +3110,11 @@ function toggleSplit(id){
   const c=ds().cats.find(x=>x.id===id); if(!c) return;
   c.split=!c.split; save(); openCats(); render();
 }
+function toggleMark(id){
+  const c=ds().cats.find(x=>x.id===id); if(!c) return;
+  c.mark=!c.mark; save(); openCats(); render();
+  try{ toast(c.mark?"🔖 「"+c.name+"」은 기록용이 됐어요 · 다음 날로 안 넘어가요":"「"+c.name+"」을 보통 할 일로 되돌렸어요"); }catch(e){}
+}
 function setCatName(id,v){const c=ds().cats.find(x=>x.id===id); if(c){c.name=v.trim()||c.name;} save(); renderFilters();}
 function setCatColor(id,v){const c=ds().cats.find(x=>x.id===id); if(c) c.color=v; save(); renderFilters();}
 function delCat(id){
@@ -3085,31 +3126,65 @@ function delCat(id){
   save(); openCats(); render();
 }
 
+/* 그날 어떤 카테고리가 있었는지 (카테고리 순서대로) */
+function dayCats(k){
+  const s=ds(), l=dayTodos(k);
+  if(!l.length) return [];
+  const cats=(s.cats||[]), ids=cats.map(function(c){return c.id;});
+  const out=cats.filter(function(c){ return l.some(function(t){return t.cat===c.id;}); });
+  if(l.some(function(t){return ids.indexOf(t.cat)<0;})) out.push({id:"__etc",name:"기타",color:"#94a3b8"});
+  return out;
+}
+function catById(id){
+  const c=(ds().cats||[]).find(function(x){return x.id===id;});
+  return c||{id:id,name:"기타",color:"#94a3b8"};
+}
 function dailyMonth(){
   const total=monthDays(calY,calM),start=firstIdx(calY,calM),t=todayStr();
-  let cells="",dn=0,ddone=0;
+  const one=(filter!=="ALL")?catById(filter):null;      /* 카테고리를 고르면 그것만 크게 */
+  let cells="",dn=0,ddone=0,hit=0,hitDays=[];
   for(let i=0;i<start;i++) cells+=`<div class="dcell2 off"></div>`;
   for(let d=1;d<=total;d++){
-    const k=dayKey(calY,calM,d),r=dayRate(k),n=dayTodos(k).length;
+    const k=dayKey(calY,calM,d),r=dayRate(k);
+    const cs=dayCats(k);
     if(r>=0){dn++;if(r===100)ddone++;}
-    const lv=r<0?"":r===100?"l4":r>=67?"l3":r>=34?"l2":"l1";
-    const dot=r<0?`<span class="ddot none"></span>`:`<span class="ddot ${lv}"></span>`;
-    cells+=`<div class="dcell2 ${k===daySel?"sel":""} ${k===t?"today":""}" onclick="setDay('${k}')">
-      <span class="dnum">${d}</span>${dot}</div>`;
+    let dots="",cls="";
+    if(one){
+      const on=cs.some(function(c){return c.id===one.id;});
+      if(on){ hit++; hitDays.push(d);
+        dots=`<span class="dots one"><i style="background:${one.color}"></i></span>`;
+        cls=" hit"; }
+      else { dots=`<span class="dots"></span>`; cls=cs.length?" dim":" dim"; }
+    }else{
+      const show=cs.slice(0,4);
+      dots=`<span class="dots">${show.map(function(c){
+        return `<i style="background:${c.color}"></i>`;}).join("")}${cs.length>4?'<b class="dmore2">+</b>':""}</span>`;
+    }
+    const bar=(r>=0)?`<span class="drate ${r===100?"full":""}"><i style="width:${Math.max(4,r)}%"></i></span>`:"";
+    const tip=cs.length?cs.map(function(c){return c.name;}).join(" · ")+(r>=0?" · "+r+"%":""):"";
+    cells+=`<div class="dcell2 ${k===daySel?"sel":""} ${k===t?"today":""}${cls}"
+      ${one?`style="--cchit:${one.color}"`:""} title="${esc(tip)}" onclick="setDay('${k}')">
+      <span class="dnum">${d}</span>${dots}${bar}</div>`;
   }
+  const cats=(ds().cats||[]);
+  const leg = one
+    ? `<div class="catleg"><span><i style="background:${one.color}"></i>${esc(one.name)}</span>
+        <span>이번 달 <b style="color:${one.color}">${hit}일</b>${hit?" · "+hitDays.join(", ")+"일":""}</span>
+        <span><button class="btn sm" onclick="setF('ALL')">전체 보기</button></span></div>`
+    : `<div class="catleg">${cats.map(function(c){
+        return `<span><i style="background:${c.color}"></i>${esc(c.name)}</span>`;}).join("")}
+        <span class="rt2"><b></b>아래 띠 = 달성률</span></div>`;
   return `<div class="mcal">
     <div class="monthnav">
       <button class="btn sm" onclick="shiftMonth(-1)">‹</button>
       <div class="m">${calY}. ${String(calM+1).padStart(2,"0")}</div>
       <button class="btn sm" onclick="shiftMonth(1)">›</button>
-      <span class="msum">기록 ${dn}일 · 100% 달성 ${ddone}일</span>
+      <span class="msum">${one?`「${esc(one.name)}」 ${hit}일`:`기록 ${dn}일 · 100% 달성 ${ddone}일`}</span>
       <button class="btn sm" onclick="setDay(todayStr())">오늘</button>
     </div>
     <div class="wk">${WD.map((w,i)=>`<div class="${i===5?"sat":i===6?"sun":""}">${w}</div>`).join("")}</div>
     <div class="cal2">${cells}</div>
-    <div class="legend"><span>달성률</span>
-      <i class="ddot none"></i><i class="ddot l1"></i><i class="ddot l2"></i><i class="ddot l3"></i><i class="ddot l4"></i>
-      <span>0 → 100%</span></div>
+    ${leg}
   </div>`;
 }
 function dailyView(){ syncRoutines(daySel); autoRoll(); return weekStrip()+dailyList()+dailyMonth(); }
