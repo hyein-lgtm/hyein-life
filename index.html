@@ -574,6 +574,9 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .drate i{display:block;height:100%;background:linear-gradient(90deg,#93c5fd,#2563eb)}
 .drate.full i{background:var(--ok)}
 .dcell2.dim{opacity:.34}
+.dcell2 .daway{position:absolute;right:3px;top:2px;font-size:11px;line-height:1;color:var(--muted);opacity:.7}
+.rollbar.back{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.rollbar.back .btn{margin-left:auto}
 /* 🔖 기록용이 있는 날 — 칸 전체를 그 색으로 */
 .dcell2.mk{border-color:var(--mkl)}
 .dcell2.mk .mkband{position:absolute;left:0;right:0;top:0;height:5px;background:var(--mkc)}
@@ -2389,7 +2392,7 @@ function normalize(d){
       s.days=s.days||{};
       s.skip=s.skip||{};
       s.routines=(s.routines||[]).filter(r=>r&&r.text).map(r=>({id:r.id||uid(),cat:r.cat,part:(r.part==="pm"?"pm":"am"),text:r.text||"",days:(Array.isArray(r.days)?r.days:[]).map(Number).filter(x=>x>=0&&x<=6),since:r.since||"",off:!!r.off})).filter(r=>r.days.length);
-      Object.keys(s.days).forEach(dk=>{ s.days[dk]=(s.days[dk]||[]).map(t=>({id:t.id||("d"+Math.random().toString(36).slice(2,8)),cat:t.cat,part:(t.part==="pm"?"pm":"am"),text:t.text||"",done:!!t.done,roll:+t.roll||0,from:t.from||"",rt:t.rt||""})); });
+      Object.keys(s.days).forEach(dk=>{ s.days[dk]=(s.days[dk]||[]).map(t=>({id:t.id||("d"+Math.random().toString(36).slice(2,8)),cat:t.cat,part:(t.part==="pm"?"pm":"am"),text:t.text||"",done:!!t.done,roll:+t.roll||0,from:t.from||"",rt:t.rt||"",fix:!!t.fix})); });
       s.items=[];
     }
     if(s.type==="habit"){
@@ -2663,6 +2666,21 @@ function dailyGroups(){
     +`<button class="tgroup newcat rtbtn" onclick="openRoutineList()">♺ 반복 루틴 관리 ${(ds().routines||[]).length?"("+(ds().routines||[]).length+"개)":""}</button>`;
   return groups;
 }
+/* 이 날짜에서 오늘로 옮겨간 것들 (없어진 게 아니라 이사 간 거예요) */
+function rolledFrom(k){
+  if(!k||k>=todayStr()) return [];
+  return dayTodos(todayStr()).filter(function(t){return t.from===k;});
+}
+function unrollDay(k){
+  const s=ds(), t=todayStr();
+  const move=dayTodos(t).filter(function(x){return x.from===k;});
+  if(!move.length) return;
+  s.days[k]=s.days[k]||[];
+  s.days[t]=(s.days[t]||[]).filter(function(x){return x.from!==k;});
+  move.forEach(function(x){ x.from=""; x.roll=0; x.fix=true; s.days[k].push(x); });  /* fix=이 날짜에 그대로 둠 */
+  save(); render();
+  try{ toast("↩ "+move.length+"개를 "+k.slice(5).replace("-","/")+" 로 되돌렸어요 · 이제 안 옮겨가요"); }catch(e){}
+}
 function dailyList(){
   const all=dayTodos(daySel);
   const done=all.filter(t=>t.done).length;
@@ -2672,12 +2690,15 @@ function dailyList(){
   const rolled=all.filter(t=>(+t.roll||0)>0&&!t.done);
   const stuck=rolled.filter(t=>(+t.roll||0)>=3);
   const rbar=rolled.length?`<div class="rollbar">↻ 지난 날에서 넘어온 일 <b>${rolled.length}개</b> · 오늘 리스트에 같이 있어요</div>`:"";
+  const gone=rolledFrom(daySel);
+  const gbar=gone.length?`<div class="rollbar back">↻ 이 날 못 끝낸 <b>${gone.length}개</b>는 오늘 목록으로 옮겨졌어요 · 지워진 게 아니에요
+      <button type="button" class="btn sm" onclick="unrollDay('${daySel}')">이 날짜에 그대로 두기</button></div>`:"";
   return `<div class="dayhead">
       <div class="dhtx"><div class="dh1">${korDate(daySel)}${daySel===todayStr()?`<span class="tdbadge">오늘</span>`:""}</div>
       <div class="dh2">${done} / ${all.length} 완료</div></div>
       <div class="dring" style="--p:${pct}"><b>${pct}<i>%</i></b></div>
     </div>
-    ${rbar}${stuckBox(stuck)}
+    ${rbar}${gbar}${stuckBox(stuck)}
     <div class="tlist">${groups}</div>
     ${yst?`<button class="btn sm ghost wide2" onclick="copyYesterday()">↩ 어제 한 일 ${yst}개 그대로 가져오기</button>`:""}`;
 }
@@ -2844,13 +2865,15 @@ function autoRoll(){
   Object.keys(s.days).forEach(k=>{
     if(k>=t||k<lim) return;
     const mk=markIds();
-    const keep=function(x){ return x.done||x.rt||mk.indexOf(x.cat)>=0; };   /* 기록용은 그 날짜에 그대로 둡니다 */
+    const keep=function(x){ return x.done||x.rt||x.fix||mk.indexOf(x.cat)>=0; };  /* 기록용·고정은 그 날짜에 그대로 */
     const src=s.days[k]||[], stay=src.filter(keep), go=src.filter(function(x){return !keep(x);});
     if(!go.length) return;
     if(!s.days[t]) s.days[t]=[];
     const have=s.days[t].map(x=>x.text);
     go.forEach(x=>{
-      if(have.indexOf(x.text)>=0) return;
+      /* 오늘 같은 문구가 이미 있으면 옮기지 말고 원래 날짜에 그대로 둡니다.
+         (예전에는 여기서 그냥 사라져 버렸어요) */
+      if(have.indexOf(x.text)>=0){ stay.push(x); return; }
       x.roll=(+x.roll||0)+1; x.from=x.from||k;
       s.days[t].push(x); have.push(x.text); n++;
     });
@@ -3128,10 +3151,11 @@ function restoreMarks(catId){
       if(t.cat===catId && t.from && t.from!==k){
         const back=t.from;
         s.days[back]=s.days[back]||[];
+        const dup=s.days[back].some(function(o){return o.text===t.text&&o.cat===t.cat;});
+        if(dup){ keep.push(t); return; }        /* 이미 있으면 건드리지 않습니다 (지우지 않음) */
         const cp={}; Object.keys(t).forEach(function(p){cp[p]=t[p];});
         delete cp.from; delete cp.roll;
-        if(!s.days[back].some(function(o){return o.text===cp.text&&o.cat===cp.cat;})) s.days[back].push(cp);
-        n++;
+        s.days[back].push(cp); n++;
       }else keep.push(t);
     });
     s.days[k]=keep;
@@ -3189,6 +3213,7 @@ function dailyMonth(){
   for(let d=1;d<=total;d++){
     const k=dayKey(calY,calM,d),r=dayRate(k);
     const cs=dayCats(k);
+    const away=rolledFrom(k).length;                            /* 이 날에서 오늘로 옮겨간 개수 */
     const mks=cs.filter(function(c){return c.mark;});          /* 🔖 기록용은 눈에 띄게 */
     if(r>=0){dn++;if(r===100)ddone++;}
     let dots="",cls="",st="",band="";
@@ -3211,11 +3236,12 @@ function dailyMonth(){
         return `<i class="${c.mark?"mkdot":""}" style="background:${c.color}"></i>`;}).join("")}${ordered.length>4?'<b class="dmore2">+</b>':""}</span>`;
     }
     const bar=(r>=0)?`<span class="drate ${r===100?"full":""}"><i style="width:${Math.max(4,r)}%"></i></span>`:"";
-    const tip=cs.length?cs.map(function(c){return c.name;}).join(" · ")+(r>=0?" · "+r+"%":""):"";
+    let tip=cs.length?cs.map(function(c){return c.name;}).join(" · ")+(r>=0?" · "+r+"%":""):"";
+    if(away) tip=(tip?tip+" · ":"")+"미완료 "+away+"개는 오늘로 옮겨짐";
     const styleAttr=(st||one)?` style="${st}${one?"--cchit:"+one.color+";":""}"`:"";
     cells+=`<div class="dcell2 ${k===daySel?"sel":""} ${k===t?"today":""}${cls}"${styleAttr}
       title="${esc(tip)}" onclick="setDay('${k}')">
-      ${band}<span class="dnum">${d}</span>${dots}${bar}</div>`;
+      ${band}<span class="dnum">${d}</span>${dots}${away?`<span class="daway">↻</span>`:""}${bar}</div>`;
   }
   const cats=(ds().cats||[]);
   const leg = one
