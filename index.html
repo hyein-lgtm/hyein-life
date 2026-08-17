@@ -574,6 +574,14 @@ html[data-theme=dark] .field .bnl .cnt{background:#1e2a3e}
 .drate i{display:block;height:100%;background:linear-gradient(90deg,#93c5fd,#2563eb)}
 .drate.full i{background:var(--ok)}
 .dcell2.dim{opacity:.34}
+/* 🔖 기록용이 있는 날 — 칸 전체를 그 색으로 */
+.dcell2.mk{border-color:var(--mkl)}
+.dcell2.mk .mkband{position:absolute;left:0;right:0;top:0;height:5px;background:var(--mkc)}
+.dcell2.mk .dnum{color:var(--mkd);font-weight:800}
+.dcell2.mk.sel{box-shadow:inset 0 0 0 2px var(--mkc)}
+.dcell2.mk .dots i.mkdot{width:9px;height:9px}
+.catleg .mkleg{display:inline-flex;align-items:center;gap:5px}
+.catleg .mkleg b{width:14px;height:10px;border-radius:3px;display:block;border:1px solid rgba(0,0,0,.08)}
 .dcell2.hit{border-color:var(--cchit,var(--blue));box-shadow:inset 0 0 0 2px var(--cchit,var(--blue))}
 .erow .spl.mk.on{background:#fff1f6;border-color:#f8c4d8;color:#c43a70}
 .mkchip{display:inline-block;margin-left:5px;font-size:11px;opacity:.85}
@@ -3110,10 +3118,38 @@ function toggleSplit(id){
   const c=ds().cats.find(x=>x.id===id); if(!c) return;
   c.split=!c.split; save(); openCats(); render();
 }
+/* 예전에 자동 이월로 끌려온 기록을 원래 날짜로 돌려놓습니다.
+   (이월될 때 x.from 에 처음 날짜를 남겨둔 덕분에 되살릴 수 있어요) */
+function restoreMarks(catId){
+  const s=ds(); s.days=s.days||{}; let n=0;
+  Object.keys(s.days).forEach(function(k){
+    const list=s.days[k]||[], keep=[];
+    list.forEach(function(t){
+      if(t.cat===catId && t.from && t.from!==k){
+        const back=t.from;
+        s.days[back]=s.days[back]||[];
+        const cp={}; Object.keys(t).forEach(function(p){cp[p]=t[p];});
+        delete cp.from; delete cp.roll;
+        if(!s.days[back].some(function(o){return o.text===cp.text&&o.cat===cp.cat;})) s.days[back].push(cp);
+        n++;
+      }else keep.push(t);
+    });
+    s.days[k]=keep;
+  });
+  return n;
+}
 function toggleMark(id){
   const c=ds().cats.find(x=>x.id===id); if(!c) return;
-  c.mark=!c.mark; save(); openCats(); render();
-  try{ toast(c.mark?"🔖 「"+c.name+"」은 기록용이 됐어요 · 다음 날로 안 넘어가요":"「"+c.name+"」을 보통 할 일로 되돌렸어요"); }catch(e){}
+  c.mark=!c.mark;
+  let back=0;
+  if(c.mark) back=restoreMarks(id);
+  save(); openCats(); render();
+  try{
+    if(c.mark) toast(back
+      ? "🔖 기록용으로 바꾸고, 밀려와 있던 "+back+"개를 원래 날짜로 되돌렸어요"
+      : "🔖 「"+c.name+"」은 기록용이 됐어요 · 다음 날로 안 넘어가요");
+    else toast("「"+c.name+"」을 보통 할 일로 되돌렸어요");
+  }catch(e){}
 }
 function setCatName(id,v){const c=ds().cats.find(x=>x.id===id); if(c){c.name=v.trim()||c.name;} save(); renderFilters();}
 function setCatColor(id,v){const c=ds().cats.find(x=>x.id===id); if(c) c.color=v; save(); renderFilters();}
@@ -3139,6 +3175,12 @@ function catById(id){
   const c=(ds().cats||[]).find(function(x){return x.id===id;});
   return c||{id:id,name:"기타",color:"#94a3b8"};
 }
+function hexA(h,a){
+  h=String(h||"#94a3b8").replace("#","");
+  if(h.length===3) h=h.split("").map(function(c){return c+c;}).join("");
+  const r=parseInt(h.slice(0,2),16)||148,g=parseInt(h.slice(2,4),16)||163,b=parseInt(h.slice(4,6),16)||184;
+  return "rgba("+r+","+g+","+b+","+a+")";
+}
 function dailyMonth(){
   const total=monthDays(calY,calM),start=firstIdx(calY,calM),t=todayStr();
   const one=(filter!=="ALL")?catById(filter):null;      /* 카테고리를 고르면 그것만 크게 */
@@ -3147,24 +3189,33 @@ function dailyMonth(){
   for(let d=1;d<=total;d++){
     const k=dayKey(calY,calM,d),r=dayRate(k);
     const cs=dayCats(k);
+    const mks=cs.filter(function(c){return c.mark;});          /* 🔖 기록용은 눈에 띄게 */
     if(r>=0){dn++;if(r===100)ddone++;}
-    let dots="",cls="";
+    let dots="",cls="",st="",band="";
+    if(mks.length){
+      const mc=mks[0].color;
+      cls+=" mk";
+      st="background:"+hexA(mc,.20)+";--mkc:"+mc+";--mkl:"+hexA(mc,.55)+";--mkd:"+mc+";";
+      band='<span class="mkband"></span>';
+    }
     if(one){
       const on=cs.some(function(c){return c.id===one.id;});
       if(on){ hit++; hitDays.push(d);
         dots=`<span class="dots one"><i style="background:${one.color}"></i></span>`;
-        cls=" hit"; }
-      else { dots=`<span class="dots"></span>`; cls=cs.length?" dim":" dim"; }
+        cls+=" hit"; }
+      else { dots=`<span class="dots"></span>`; cls+=" dim"; }
     }else{
-      const show=cs.slice(0,4);
+      const ordered=mks.concat(cs.filter(function(c){return !c.mark;}));   /* 기록용을 앞에 */
+      const show=ordered.slice(0,4);
       dots=`<span class="dots">${show.map(function(c){
-        return `<i style="background:${c.color}"></i>`;}).join("")}${cs.length>4?'<b class="dmore2">+</b>':""}</span>`;
+        return `<i class="${c.mark?"mkdot":""}" style="background:${c.color}"></i>`;}).join("")}${ordered.length>4?'<b class="dmore2">+</b>':""}</span>`;
     }
     const bar=(r>=0)?`<span class="drate ${r===100?"full":""}"><i style="width:${Math.max(4,r)}%"></i></span>`:"";
     const tip=cs.length?cs.map(function(c){return c.name;}).join(" · ")+(r>=0?" · "+r+"%":""):"";
-    cells+=`<div class="dcell2 ${k===daySel?"sel":""} ${k===t?"today":""}${cls}"
-      ${one?`style="--cchit:${one.color}"`:""} title="${esc(tip)}" onclick="setDay('${k}')">
-      <span class="dnum">${d}</span>${dots}${bar}</div>`;
+    const styleAttr=(st||one)?` style="${st}${one?"--cchit:"+one.color+";":""}"`:"";
+    cells+=`<div class="dcell2 ${k===daySel?"sel":""} ${k===t?"today":""}${cls}"${styleAttr}
+      title="${esc(tip)}" onclick="setDay('${k}')">
+      ${band}<span class="dnum">${d}</span>${dots}${bar}</div>`;
   }
   const cats=(ds().cats||[]);
   const leg = one
@@ -3172,7 +3223,9 @@ function dailyMonth(){
         <span>이번 달 <b style="color:${one.color}">${hit}일</b>${hit?" · "+hitDays.join(", ")+"일":""}</span>
         <span><button class="btn sm" onclick="setF('ALL')">전체 보기</button></span></div>`
     : `<div class="catleg">${cats.map(function(c){
-        return `<span><i style="background:${c.color}"></i>${esc(c.name)}</span>`;}).join("")}
+        return c.mark
+          ? `<span class="mkleg"><b style="background:${hexA(c.color,.35)};border-color:${c.color}"></b>${esc(c.name)} 🔖</span>`
+          : `<span><i style="background:${c.color}"></i>${esc(c.name)}</span>`;}).join("")}
         <span class="rt2"><b></b>아래 띠 = 달성률</span></div>`;
   return `<div class="mcal">
     <div class="monthnav">
