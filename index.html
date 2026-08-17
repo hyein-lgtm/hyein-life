@@ -1218,6 +1218,12 @@ html[data-theme=dark] .fsz,html[data-theme=dark] .pjlk span.fchip{background:#1e
 .mckr .mckx{opacity:1;width:26px;height:26px;font-size:14px}
 .mckadd input{height:34px;font-size:13px}
 .mckadd .ckclr{height:34px;font-size:12px}
+/* 탭 관리 */
+.tabrow{gap:6px}
+.tname2{flex:1 1 100px}
+.tbtns{width:100%;margin-left:0;justify-content:flex-end}
+.ntrow{flex-wrap:wrap}
+.ntsel{flex:1 1 100%;font-size:16px}
 /* 이번 주 배너 */
 .duebar{margin:0 0 12px;padding:12px;border-radius:14px}
 .odb .btn{flex:1 1 44%}
@@ -1857,6 +1863,25 @@ html[data-theme=dark] .pinbtn.on{border-color:#5a441d;background:#332a17;color:#
   outline:none;resize:none;min-height:40px;max-height:160px;line-height:1.5;font-family:inherit}
 .addline textarea.ckin:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-l)}
 .askta{width:100%;min-height:130px;line-height:1.7;resize:vertical}
+/* --- 탭 관리 --- */
+.tablist{display:flex;flex-direction:column;gap:8px}
+.tabrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  border:1px solid var(--line);border-radius:12px;padding:9px 10px;background:var(--surface-3)}
+.tabrow.off{opacity:.55}
+.ticon{flex:0 0 auto;width:52px;text-align:center;font-size:16px;padding:8px 4px;
+  border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);outline:none}
+.tname2{flex:1 1 120px;min-width:0;font-size:14px;font-weight:700;padding:8px 10px;
+  border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);outline:none}
+.ticon:focus,.tname2:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-l)}
+.tcnt{flex:0 0 auto;font-size:11px;font-weight:700;color:var(--muted);min-width:30px;text-align:right}
+.tbtns{display:flex;gap:5px;flex:0 0 auto;margin-left:auto}
+.tbtns .btn{padding:7px 9px}
+.newtab{margin-top:16px;border:1px dashed var(--line);border-radius:14px;padding:12px;background:var(--blue-xl)}
+.newtab .seth{font-size:14px;font-weight:800;margin-bottom:9px;letter-spacing:-.02em}
+.ntrow{display:flex;gap:7px;align-items:center;margin-bottom:8px}
+.ntrow:last-child{margin-bottom:0}
+.ntsel{flex:1 1 auto;min-width:0;font-size:12px;padding:9px 10px;border:1px solid var(--line);
+  border-radius:10px;background:var(--surface-2);color:var(--ink);outline:none}
 .ckadd{border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:11px;
   padding:11px 14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;width:100%;text-align:center}
 .ckadd:hover{border-color:var(--line-hover);color:var(--blue);background:var(--blue-xl);border-style:solid}
@@ -2478,7 +2503,11 @@ function find(id,key){return (DATA[key||cur].items||[]).find(x=>x.id===id);}
 /* ---- 월 캘린더 계산 ---- */
 function monthDays(y,m){return new Date(y,m+1,0).getDate();}
 function firstIdx(y,m){return (new Date(y,m,1).getDay()+6)%7;} // 월=0
-function hs(){return tabKeys().map(k=>DATA[k]).find(x=>x.type==="habit");}
+function hs(){
+  const h=Object.keys(DATA).filter(function(k){return k.indexOf("__")!==0;})
+    .map(function(k){return DATA[k];}).find(function(x){return x&&x.type==="habit";});
+  return h||{types:[],entries:{},goalCount:20,goalMin:0,items:[]};
+}
 function typeOf(id){const s=hs();return (s.types||[]).find(t=>t.id===id)||{id:id,name:"기타",color:"#94a3b8"};}
 function dayKey(y,m,d){return y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");}
 function dEnt(k){const s=hs();return (s.entries[k]||[]).filter(e=>filter==="ALL"||e.type===filter);}
@@ -2506,34 +2535,117 @@ function streakDays(){
 function tabKeys(){
   const o=DATA.__order;
   const a=(o&&o.length)?o.filter(k=>DATA[k]):Object.keys(DATA).filter(k=>k.indexOf("__")!==0);
-  const b=a.filter(k=>!(DATA[k]&&DATA[k].secret));
+  const b=a.filter(k=>!(DATA[k]&&(DATA[k].secret||DATA[k].hide)));
   if(dreamOn&&DATA.dream&&b.indexOf("dream")<0)b.push("dream");
   return b;
 }
 function setOrder(a){DATA.__order=a;save();renderTabs();}
 function moveTab(k,dir){
-  const a=tabKeys(),i=a.indexOf(k),j=i+dir;
+  const a=(typeof allTabKeys==="function")?allTabKeys():tabKeys();
+  const i=a.indexOf(k),j=i+dir;
   if(i<0||j<0||j>=a.length)return;
   a.splice(j,0,a.splice(i,1)[0]);
-  setOrder(a);openOrder();
+  setOrder(a);
+  if(document.getElementById("overlay").classList.contains("on")) openTabs();
 }
-function openOrder(){
-  document.getElementById("mTitle").textContent="⇅ 탭 순서 바꾸기";
-  const a=tabKeys();
+/* ================= 탭 관리 =================
+   이름·아이콘 수정 / 새 탭 만들기 / 숨기기 / 삭제 */
+const CORETAB=["daily","habit","muse","project","dream"];   /* 다른 화면이 기대는 탭 — 삭제 대신 숨기기만 */
+function tabCore(k){ return CORETAB.indexOf(k)>=0 || CORETAB.indexOf((DATA[k]||{}).type)>=0; }
+function allTabKeys(){
+  const o=DATA.__order||[];
+  const all=Object.keys(DATA).filter(function(k){return k.indexOf("__")!==0&&!(DATA[k]||{}).secret;});
+  return o.filter(function(k){return all.indexOf(k)>=0;})
+    .concat(all.filter(function(k){return o.indexOf(k)<0;}));
+}
+function openOrder(){ openTabs(); }
+function openTabs(){
+  const a=allTabKeys();
+  document.getElementById("mTitle").textContent="탭 관리";
   document.getElementById("mForm").innerHTML=
-    `<div class="hint2" style="margin:0 0 10px">탭을 길게 눌러 끌어도 순서가 바뀌어요.</div>
-     <div class="ordlist">${a.map((k,i)=>`<div class="ordrow">
-       <span class="on">${chImg(k)}</span>
-       <b>${esc(DATA[k].label.replace(/^\S+\s/,""))}</b>
-       <button class="btn sm" ${i===0?"disabled":""} onclick="moveTab('${k}',-1)">↑</button>
-       <button class="btn sm" ${i===a.length-1?"disabled":""} onclick="moveTab('${k}',1)">↓</button>
-     </div>`).join("")}</div>
-     <button class="btn wide" onclick="setOrder(Object.keys(SEED));openOrder()">기본 순서로 되돌리기</button>`;
+    `<div class="hint2" style="margin:0 0 10px">이름과 아이콘을 바로 고칠 수 있어요. 탭을 길게 눌러 끌어도 순서가 바뀝니다.</div>
+     <div class="tablist">${a.map(function(k,i){
+       const hid=!!DATA[k].hide, n=((DATA[k].items||[]).length);
+       return `<div class="tabrow ${hid?"off":""}">
+         <input class="ticon" value="${esc(tabIcon(k))}" maxlength="3" aria-label="아이콘"
+           onchange="setTabIcon('${k}',this.value)">
+         <input class="tname2" value="${esc(tabName(k))}" aria-label="탭 이름"
+           onchange="setTabName('${k}',this.value)">
+         <span class="tcnt">${DATA[k].type==="daily"||DATA[k].type==="habit"?"":n+"개"}</span>
+         <div class="tbtns">
+           <button class="btn sm" ${i===0?"disabled":""} title="위로" onclick="moveTab('${k}',-1)">↑</button>
+           <button class="btn sm" ${i===a.length-1?"disabled":""} title="아래로" onclick="moveTab('${k}',1)">↓</button>
+           <button class="btn sm ${hid?"primary":""}" title="${hid?"다시 보이기":"탭에서 숨기기"}" onclick="hideTab('${k}')">${hid?"보이기":"숨기기"}</button>
+           ${tabCore(k)
+             ? `<button class="btn sm" disabled title="기본 탭이라 지울 수 없어요 · 숨기기를 써주세요">🗑</button>`
+             : `<button class="btn sm danger" title="탭 삭제" onclick="delTab('${k}')">🗑</button>`}
+         </div>
+       </div>`;}).join("")}</div>
+
+     <div class="newtab">
+       <div class="seth">＋ 새 탭 만들기</div>
+       <div class="ntrow">
+         <input class="ticon" id="nt_icon" value="🗂" maxlength="3" aria-label="아이콘">
+         <input class="tname2" id="nt_name" placeholder="탭 이름 (예: 여행, 살림)" aria-label="탭 이름"
+           onkeydown="if(event.key==='Enter'){event.preventDefault();addTab();}">
+       </div>
+       <div class="ntrow">
+         <select id="nt_type" class="ntsel" aria-label="탭 종류">
+           <option value="card">카드형 — 프로젝트·독서처럼 상태·마감·체크리스트</option>
+           <option value="memo">메모형 — 메모 탭처럼 제목·긴 글·체크리스트</option>
+         </select>
+         <button class="btn primary" onclick="addTab()">만들기</button>
+       </div>
+     </div>
+     <button class="btn wide" onclick="setOrder(Object.keys(SEED));openTabs()">기본 순서로 되돌리기</button>`;
   document.getElementById("mIc").innerHTML=chImg("base");
   document.getElementById("mSave").style.display="none";
   document.getElementById("overlay").classList.add("on");
 }
-/* 길게 눌러 끌기 */
+function setTabName(k,v){
+  v=String(v||"").trim(); if(!v||!DATA[k])return;
+  DATA[k].label=tabIcon(k)+" "+v;
+  save(); render(); openTabs();
+}
+function setTabIcon(k,v){
+  v=String(v||"").trim(); if(!v||!DATA[k])return;
+  DATA[k].icon=v; DATA[k].label=v+" "+tabName(k);
+  save(); render(); openTabs();
+}
+function hideTab(k){
+  if(!DATA[k])return;
+  DATA[k].hide=!DATA[k].hide;
+  if(DATA[k].hide&&cur===k){ const l=tabKeys(); cur=l[0]||cur; filter="ALL"; }
+  save(); render(); openTabs();
+  try{ toast(DATA[k].hide?"「"+tabName(k)+"」을 탭에서 숨겼어요 · 내용은 그대로 있어요":"「"+tabName(k)+"」을 다시 보이게 했어요"); }catch(e){}
+}
+function addTab(){
+  const nm=(document.getElementById("nt_name").value||"").trim();
+  const ic=(document.getElementById("nt_icon").value||"🗂").trim()||"🗂";
+  const ty=document.getElementById("nt_type").value;
+  if(!nm){ alert("탭 이름을 적어주세요."); document.getElementById("nt_name").focus(); return; }
+  const key="t"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  DATA[key]= (ty==="memo")
+    ? {label:ic+" "+nm, icon:ic, type:"memo", tags:["아이디어","할 일","기록","기타"], items:[]}
+    : {label:ic+" "+nm, icon:ic, tags:["새로","진행","완료"], items:[]};
+  CHALIAS[key]="base";
+  DATA.__order=allTabKeys();
+  save(); cur=key; filter="ALL"; render(); openTabs();
+  try{ toast("「"+nm+"」 탭을 만들었어요"); }catch(e){}
+}
+function delTab(k){
+  if(!DATA[k]||tabCore(k))return;
+  const nm=tabName(k), n=(DATA[k].items||[]).length;
+  if(!confirm("「"+nm+"」 탭을 지울까요?"+(n?"\n안에 있는 카드 "+n+"개도 함께 사라져요.":"")))return;
+  const keep=DATA[k], order=(DATA.__order||allTabKeys()).slice();
+  delete DATA[k];
+  DATA.__order=order.filter(function(x){return x!==k;});
+  if(cur===k){ cur=tabKeys()[0]||cur; filter="ALL"; }
+  save(); render(); openTabs();
+  toastU("🗑 「"+nm+"」 탭을 지웠어요", function(){
+    DATA[k]=keep; DATA.__order=order; save(); render(); openTabs();
+  });
+}
 let DRAG=null;
 function tabDown(ev,k){
   if(DRAG)return;
@@ -2586,7 +2698,13 @@ function endDrag(){
 }
 
 /* ---- 데일리 투두 ---- */
-function ds(){return DATA.daily;}
+function ds(){
+  let d=DATA.daily;
+  if(!d||d.type!=="daily") d=Object.keys(DATA).map(function(k){return DATA[k];}).find(function(x){return x&&x.type==="daily";});
+  if(!d){ d=DATA.daily={label:"✅ 투두",icon:"✅",type:"daily",cats:[],days:{},routines:{},skip:{},items:[]}; }
+  d.cats=d.cats||[]; d.days=d.days||{}; d.skip=d.skip||{};
+  return d;
+}
 /* 「기록용」 카테고리 : 생리 시작처럼 '해내는 일'이 아니라 '그날 있었던 일' 표시.
    → 다음 날로 넘어가지 않고, 달성률 계산에서도 빠집니다. */
 function isMarkCat(id){ const c=(ds().cats||[]).find(function(x){return x.id===id;}); return !!(c&&c.mark); }
@@ -3270,7 +3388,11 @@ function dailyView(){ syncRoutines(daySel); autoRoll(); return weekStrip()+daily
 
 /* ---- 인플루언서(muse) 탭 ---- */
 function statusList(){return DATA[cur]&&DATA[cur].type==="muse"?MSTATUS:STATUSES;}
-function ms(){return DATA.muse;}
+function ms(){
+  let m=DATA.muse;
+  if(!m||m.type!=="muse") m=Object.keys(DATA).map(function(k){return DATA[k];}).find(function(x){return x&&x.type==="muse";});
+  return m||{items:[],followers:{cur:0,goal:1},monthGoal:{uploads:0},tags:[]};
+}
 function nfm(n){n=+n||0;return n>=10000?(n/10000).toFixed(n%10000?1:0).replace(/\.0$/,"")+"만":n.toLocaleString("ko-KR");}
 function inMonth(d){return d&&d.slice(0,7)===calY+"-"+String(calM+1).padStart(2,"0");}
 function museAgg(){
@@ -3651,8 +3773,8 @@ function setGoalV(k,v){
 
 /* ---- 캐릭터 헬퍼 ---- */
 const CHALIAS={memo:"base"};
-function chImg(k,cls){k=CHALIAS[k]||k;return `<img class="ch ${cls||""}" alt="" src="${CHAR[k]||CHAR.muse}">`;}
-function chFace(k){k=CHALIAS[k]||k;return `<span class="chf" aria-hidden="true"><img alt="" src="${CHAR[k]||CHAR.muse}"></span>`;}
+function chImg(k,cls){k=CHALIAS[k]||k;return `<img class="ch ${cls||""}" alt="" src="${CHAR[k]||CHAR.base}">`;}
+function chFace(k){k=CHALIAS[k]||k;return `<span class="chf" aria-hidden="true"><img alt="" src="${CHAR[k]||CHAR.base}"></span>`;}
 const HERO={
   project:["오늘도 차곡차곡 ✦","진행 중인 프로젝트를 한눈에. 카드 제목을 누르면 상세 화면이 열려요."],
   work:["오늘 할 일, 놓치지 않기 ✦","회의·보고·정산까지. 체크리스트를 채우면 진행률이 따라 올라가요."],
@@ -3684,6 +3806,9 @@ function cheerMsg(){
   return ["","이번 달 <b>"+st.cnt+"회</b> · "+hhmm(st.min)+" 기록했어요. 목표까지 "+left+"회!"];
 }
 const SHORT={project:"프로젝트",work:"업무",daily:"투두",memo:"메모",book:"독서",habit:"운동",muse:"브랜드",estate:"부동산",dream:"꿈"};
+function tabName(k){ return String((DATA[k]&&DATA[k].label)||k).replace(/^\S+\s/,""); }
+function tabIcon(k){ const l=String((DATA[k]&&DATA[k].label)||"").trim(); const m=l.match(/^(\S+)\s/); return m?m[1]:((DATA[k]&&DATA[k].icon)||"🗂"); }
+function shortName(k){ return SHORT[k]||tabName(k); }
 /* 검색·필터 때문에 비었는지, 진짜 아무것도 없는지 구분해서 알려줍니다 */
 function emptyBox(){
   const q=((document.getElementById("q")||{}).value||"").trim();
@@ -4686,7 +4811,7 @@ function renderDue(){
     act='<div class="dbl">'+soon.slice(0,6).map(function(x){
       return '<button type="button" class="dbi '+(x.g===0?"today":"soon")+'" '+
         'onclick="dueGo(\''+x.k+'\',\''+x.id+'\')">'+
-        '<span class="dbe">'+esc(SHORT[x.k]||"")+'</span>'+
+        '<span class="dbe">'+esc(shortName(x.k))+'</span>'+
         '<span class="dbt">'+esc(x.title)+'</span>'+
         '<span class="dbd">'+dueTxt(x.g)+'</span></button>';
     }).join("")+(soon.length>6?'<span class="dbmore">+'+(soon.length-6)+'건 더</span>':"")+'</div>';
@@ -4707,7 +4832,7 @@ function openOverdue(){
   document.getElementById("mForm").innerHTML = over.length
     ? '<div class="dbnote" style="margin-bottom:4px">밀렸다고 없어지는 게 아니에요. 언제 할지만 다시 정하면 됩니다.</div>'+
       over.map(function(x){
-        return '<div class="odrow"><div class="odt"><span class="odw">'+esc(SHORT[x.k]||"")+'</span>'+
+        return '<div class="odrow"><div class="odt"><span class="odw">'+esc(shortName(x.k))+'</span>'+
           '<span class="odn">'+esc(x.title)+'</span>'+
           '<span class="odw" style="margin-left:auto">'+dueTxt(x.g)+'</span></div>'+
           '<div class="odb">'+
@@ -4983,7 +5108,7 @@ function ckSort(list){
 }
 function ckDone(i){ return (i.todos||[]).filter(function(t){return t.done;}).length; }
 function memoTog(mid,tid){
-  const i=find(mid,"memo"); if(!i)return;
+  const i=find(mid); if(!i)return;
   const t=(i.todos||[]).find(function(x){return x.id===tid;}); if(!t)return;
   t.done=!t.done; save();
   if(detailId===mid) renderDetail();
@@ -4995,7 +5120,7 @@ function memoAddCk(mid){
   const raw=el.value||"";
   const lines=raw.split(/\r?\n/).map(function(x){return x.replace(/^\s*[-*·•]\s*/,"").trim();}).filter(Boolean);
   if(!lines.length){ el.value=""; return; }
-  const i=find(mid,"memo"); if(!i)return;
+  const i=find(mid); if(!i)return;
   i.todos=i.todos||[];
   lines.forEach(function(t){ i.todos.push({id:uid(),text:t,done:false}); });
   el.value=""; save(); renderDetail(); render();
@@ -5004,23 +5129,23 @@ function memoAddCk(mid){
 }
 function ckGrow(el){ if(!el)return; el.style.height="auto"; el.style.height=Math.min(160,Math.max(40,el.scrollHeight))+"px"; }
 function memoDelCk(mid,tid){
-  const i=find(mid,"memo"); if(!i)return;
+  const i=find(mid); if(!i)return;
   const x=(i.todos||[]).findIndex(function(t){return t.id===tid;}); if(x<0)return;
   const gone=i.todos[x]; i.todos.splice(x,1); save(); renderDetail(); render();
   toastU("지웠어요 · "+(gone.text.length>12?gone.text.slice(0,12)+"…":gone.text), function(){
-    const j=find(mid,"memo"); if(!j)return;
+    const j=find(mid); if(!j)return;
     j.todos.splice(Math.min(x,j.todos.length),0,gone); save();
     if(detailId===mid)renderDetail(); render();
   });
 }
 function memoClearDone(mid){
-  const i=find(mid,"memo"); if(!i)return;
+  const i=find(mid); if(!i)return;
   const kept=(i.todos||[]).filter(function(t){return !t.done;});
   const gone=(i.todos||[]).filter(function(t){return t.done;});
   if(!gone.length)return;
   i.todos=kept; save(); renderDetail(); render();
   toastU("체크한 "+gone.length+"개를 지웠어요", function(){
-    const j=find(mid,"memo"); if(!j)return;
+    const j=find(mid); if(!j)return;
     j.todos=(j.todos||[]).concat(gone); save();
     if(detailId===mid)renderDetail(); render();
   });
@@ -5041,7 +5166,7 @@ function memoAddCard(mid){
   const el=document.getElementById("mca_"+mid); if(!el)return;
   const v=(el.value||"").replace(/^\s*[-*·•]\s*/,"").trim();
   if(!v){ el.value=""; return; }
-  const i=find(mid,"memo"); if(!i)return;
+  const i=find(mid); if(!i)return;
   i.todos=i.todos||[];
   i.todos.push({id:uid(),text:v,done:false});
   el.value=""; CKNEW[mid]=true;
@@ -5058,11 +5183,12 @@ function memoPin(id){
   try{ toast(i.pin?"📌 위에 고정했어요":"고정을 풀었어요"); }catch(e){}
 }
 function newMemo(){
-  const o={id:uid(),title:"",tag:(DATA.memo.tags||[])[0]||"",pin:false,at:todayStr(),
+  const s=DATA[cur]||{};
+  const o={id:uid(),title:"",tag:(s.tags||[])[0]||"",pin:false,at:todayStr(),
     status:"할일",progress:0,due:"",start:"",owner:"",goal:"",desc:"",note:"",
     todos:[],milestones:[],links:[],logs:[],quotes:[],pics:[],doneAt:""};
-  DATA.memo.items.unshift(o); save(); render();
-  cur="memo"; openDetail(o.id);
+  s.items=s.items||[]; s.items.unshift(o); save(); render();
+  openDetail(o.id);
   setTimeout(function(){ const t=document.querySelector("#dForm .detail-title"); if(t)t.focus(); },80);
 }
 
@@ -5089,7 +5215,8 @@ const NSAUTO={
   daily_done:"완료한 할 일 수"
 };
 function ns(){
-  const p=DATA.project;
+  let p=DATA.project;
+  if(!p) p=DATA.project={label:"🗂 프로젝트",icon:"🗂",tags:["신규"],items:[],north:null};
   if(!p.north)p.north={year:2026,statement:"",why:"",goals:[],q:{}};
   const n=p.north;
   n.year=+n.year||2026;
@@ -6533,9 +6660,9 @@ function openSettings(){
       <div class="setb"><button class="btn" onclick="closeEdit();openSync()">설정하기</button></div>
     </div>
     <div class="setg">
-      <div class="seth">⇅ 탭 순서</div>
-      <div class="setd">탭을 길게 눌러 끌어도 순서가 바뀌어요.</div>
-      <div class="setb"><button class="btn" onclick="closeEdit();openOrder()">순서 바꾸기</button></div>
+      <div class="seth">🗂 탭 관리</div>
+      <div class="setd">이름·아이콘 바꾸기, 새 탭 만들기, 숨기기·삭제를 할 수 있어요.</div>
+      <div class="setb"><button class="btn" onclick="closeEdit();openTabs()">탭 관리하기</button></div>
     </div>
     <div class="setg danger">
       <div class="seth">⚠ 초기화</div>
