@@ -1974,9 +1974,27 @@ html[data-theme=dark] .crev{border-left-color:#5a441d}
 .tpdd.now{background:var(--pink-l);color:var(--pink);border-color:var(--pink-l)}
 .tpht .spacer{flex:1}
 .tphp{font-size:12.5px;color:var(--muted);margin-top:5px}
-.tpnote{font-size:12.5px;color:var(--ink-2);margin-top:8px;padding:8px 11px;
-  background:var(--surface-3);border-radius:10px;cursor:pointer}
-.tpnote:hover{color:var(--blue)}
+/* 그날의 코디 · 세 끼 · 메모 */
+.tpday{display:grid;gap:7px;margin-bottom:14px}
+.tpdrow{display:flex;align-items:flex-start;gap:9px;width:100%;text-align:left;
+  padding:10px 12px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface-3);font-size:12.5px;color:var(--ink)}
+.tpdrow:hover{border-color:var(--line-hover);background:var(--blue-xl)}
+.tpdrow>.k{flex:0 0 auto;font-weight:800;color:var(--ink-2);white-space:nowrap}
+.tpdrow>.v{flex:1;min-width:0;white-space:pre-wrap;word-break:break-all;line-height:1.5}
+.tpdrow>.e{flex:0 0 auto;color:var(--muted);font-size:11px}
+.tpdrow.ph>.v{color:var(--muted)}
+.tpdrow.fit{background:var(--pink-xl);border-color:var(--pink-l)}
+.tpdrow.fit:hover{background:var(--pink-l)}
+.tpdrow.fit>.k{color:var(--pink)}
+.tpmeals{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tpmeal{display:flex;flex-direction:column;gap:3px;text-align:left;padding:9px 11px;
+  border-radius:11px;border:1px solid var(--line);background:var(--surface-2);
+  font-size:12.5px;color:var(--ink);min-width:0}
+.tpmeal:hover{border-color:var(--line-hover);background:var(--blue-xl)}
+.tpmeal>.k{font-size:11px;font-weight:800;color:var(--ink-2)}
+.tpmeal>.v{white-space:pre-wrap;word-break:break-all;line-height:1.45}
+.tpmeal.ph>.v{color:var(--muted)}
 .tpbar{position:relative;height:24px;border-radius:999px;background:var(--surface-3);
   overflow:hidden;margin-top:12px;border:1px solid var(--line)}
 .tpbar>i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--blue),var(--blue-d));border-radius:999px;transition:width .3s}
@@ -2091,6 +2109,10 @@ html[data-theme=dark] .tpdot::after{background:var(--line)}
   border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700}
 .tcpick>button.on{color:#fff;border-color:transparent}
 @media(max-width:520px){
+  .tpmeals{grid-template-columns:1fr}
+  .tpmeal{flex-direction:row;align-items:flex-start;gap:9px}
+  .tpmeal>.k{flex:0 0 auto;white-space:nowrap;font-size:12px}
+  .tpmeal>.v{flex:1;min-width:0}
   .tprow{grid-template-columns:46px 18px 1fr auto;gap:0 6px}
   .tmcrow{grid-template-columns:62px 1fr 80px}
   .tmsum{grid-template-columns:repeat(3,1fr)}
@@ -2522,7 +2544,9 @@ function tripNorm(s){
   if(!s.days.length)s.days=[{id:uid(),note:"",plans:[]}];
   s.days=s.days.map(function(d){
     d=d||{};
-    return {id:d.id||uid(),note:String(d.note||""),
+    const ml=(d.meal&&typeof d.meal==="object")?d.meal:{};
+    return {id:d.id||uid(),note:String(d.note||""),fit:String(d.fit||""),
+      meal:{b:String(ml.b||""),l:String(ml.l||""),d:String(ml.d||"")},
       plans:(Array.isArray(d.plans)?d.plans:[]).filter(Boolean).map(function(p){
         return {id:p.id||uid(),time:String(p.time||""),place:String(p.place||""),
           cat:tHas(TCAT,p.cat)?p.cat:"spot",move:String(p.move||""),
@@ -2609,14 +2633,51 @@ function tripPlanView(s){
       '</div></div>';
   }).join(""):'<div class="tpempty">'+(q?'검색어에 맞는 일정이 없어요.':'아직 이 날 일정이 비어 있어요.<br>아래 버튼으로 한 줄만 적어봐요 ✈️')+'</div>';
 
-  const note='<div class="tpnote" onclick="tripDayNote()">'+(d.note?"📝 "+esc(d.note):"📝 이 날의 한 줄 메모 남기기")+'</div>';
-
   return '<div class="tdays">'+chips+'</div>'+
-    '<div class="tpwrap">'+note+
+    '<div class="tpwrap">'+tripDayBox(s,d)+
       '<div class="tptl">'+rows+'</div>'+
       '<button class="tpadd" onclick="tripPlanEdit()">＋ '+(s.dsel+1)+'일차에 일정 추가</button>'+
       (s.days.length>1?'<div style="text-align:right"><button class="btn sm ghost" onclick="tripDelDay()">이 일차 지우기</button></div>':'')+
     '</div>';
+}
+/* 그날의 코디 · 세 끼 · 한 줄 메모 */
+const TMEAL=[["b","🌅","아침"],["l","☀️","점심"],["d","🌙","저녁"]];
+function tripDayBox(s,d){
+  const meals=TMEAL.map(function(m){
+    const v=(d.meal||{})[m[0]]||"";
+    return '<button type="button" class="tpmeal '+(v?"":"ph")+'" onclick="tripDayMeal(\''+m[0]+'\')">'+
+      '<span class="k">'+m[1]+' '+m[2]+'</span>'+
+      '<span class="v">'+(v?esc(v):"뭐 먹을까?")+'</span></button>';
+  }).join("");
+  return '<div class="tpday">'+
+    '<button type="button" class="tpdrow fit '+(d.fit?"":"ph")+'" onclick="tripDayFit()">'+
+      '<span class="k">👕 코디</span>'+
+      '<span class="v">'+(d.fit?esc(d.fit):"이 날 뭐 입지?")+'</span>'+
+      '<span class="e">✎</span></button>'+
+    '<div class="tpmeals">'+meals+'</div>'+
+    '<button type="button" class="tpdrow note '+(d.note?"":"ph")+'" onclick="tripDayNote()">'+
+      '<span class="k">📝 메모</span>'+
+      '<span class="v">'+(d.note?esc(d.note):"이 날 기억하고 싶은 한 줄")+'</span>'+
+      '<span class="e">✎</span></button>'+
+  '</div>';
+}
+function tripDayFit(){
+  const s=tS();if(!s)return;const d=s.days[s.dsel];
+  askText({title:(s.dsel+1)+"일차 코디",label:"이 날 입을 옷",icon:"👕",value:d.fit,multiline:true,
+    placeholder:"예: 린넨 셔츠 + 데님 / 모자 · 선글라스 / 슬리퍼\n저녁엔 얇은 가디건",
+    hint:"신발·액세서리까지 적어두면 짐 쌀 때 편해요 · 비우고 확인을 누르면 지워져요"},function(v){
+    d.fit=String(v==null?"":v).trim();save();render();
+  });
+}
+function tripDayMeal(k){
+  const s=tS();if(!s)return;const d=s.days[s.dsel];
+  const m=TMEAL.filter(function(x){return x[0]===k;})[0]||TMEAL[0];
+  d.meal=d.meal||{b:"",l:"",d:""};
+  askText({title:(s.dsel+1)+"일차 "+m[2],label:m[1]+" "+m[2]+"에 먹을 것",icon:m[1],value:d.meal[k],
+    placeholder:"예: 숙소 조식 / 흑돼지 김치찌개",
+    hint:"가게 이름이나 메뉴, 편한 대로 적어요 · 비우고 확인을 누르면 지워져요"},function(v){
+    d.meal[k]=String(v==null?"":v).trim();save();render();
+  });
 }
 function tripDay(i){const s=tS();if(!s)return;s.dsel=i;save();render();}
 function tripAddDay(){
@@ -2959,8 +3020,11 @@ function tripStats(s){
   let dd="—";
   if(s.start){const g=dueDiff(s.start);dd=g>0?("D-"+g):g===0?"D-DAY":("여행 "+(-g+1)+"일째");}
   const left=(s.budgetPlan||0)-tripSpent(s);
+  const mn=(s.days||[]).reduce(function(a,d){
+    return a+["b","l","d"].filter(function(k){return ((d.meal||{})[k]||"").trim();}).length;},0);
   return [["출발까지",dd],["짜둔 일정",all+"개"],["다녀온 곳",dn+"개"],
-          ["가고싶은 곳",s.wish.length+"곳"],[(left<0?"예산 초과":"남은 예산"),won(Math.abs(left))+"원"]];
+          ["가고싶은 곳",s.wish.length+"곳"],[(left<0?"예산 초과":"남은 예산"),won(Math.abs(left))+"원"],
+          ["정한 끼니",mn+" / "+((s.days||[]).length*3)]];
 }
 function tripNew(){
   const s=tS();if(!s)return;
