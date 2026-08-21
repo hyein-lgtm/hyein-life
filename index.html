@@ -2024,10 +2024,43 @@ html[data-theme=dark] .tpbar>span{color:#eaf0fb}
 .tpwrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
   padding:16px 16px 10px;box-shadow:var(--sh)}
 .tptl{position:relative;margin:2px 0 0}
-.tprow{display:grid;grid-template-columns:52px 20px 1fr auto;gap:0 8px;align-items:start;
-  padding:9px 0;position:relative}
+.tprow{display:grid;grid-template-columns:20px 50px 20px 1fr auto;gap:0 8px;align-items:start;
+  padding:9px 0;position:relative;border-radius:10px}
 .tptime{font-size:12px;font-weight:800;color:var(--blue-d);padding-top:4px;letter-spacing:-.03em}
 .tprow.done .tptime{color:var(--muted)}
+.tptime.no{color:var(--muted);font-weight:700;font-size:11.5px;opacity:.75}
+
+/* 끌어서 순서 바꾸기 */
+.tpgrip{position:relative;width:20px;align-self:stretch;min-height:26px;border:0;padding:0;
+  background:transparent;cursor:grab;touch-action:none;color:var(--muted);border-radius:7px;
+  transition:background-color .15s}
+.tpgrip::before{content:"";position:absolute;left:50%;top:7px;transform:translateX(-50%);
+  width:9px;height:14px;opacity:.55;transition:opacity .15s;
+  background-image:radial-gradient(currentColor 1.15px,transparent 1.25px);
+  background-size:5px 4.7px;background-position:0 0}
+.tpgrip:hover{background-color:var(--surface-3)}
+.tpgrip:hover::before{opacity:1}
+.tpgrip:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.tpgrip:focus-visible::before{opacity:1}
+.tpgrip.off{cursor:default}
+.tpgrip.off::before{opacity:.18}
+body.tpdragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
+body.tpdragging .tpgrip{cursor:grabbing}
+.tpph{height:44px;margin:5px 0;border-radius:11px;border:2px dashed var(--blue);
+  background:var(--blue-xl);animation:tpphIn .16s ease}
+@keyframes tpphIn{from{opacity:0;transform:scaleY(.7)}to{opacity:1;transform:none}}
+#tpGhost{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;
+  background:var(--card);color:var(--ink);border:1px solid var(--blue);border-radius:11px;
+  padding:7px 13px;font-size:12.5px;font-weight:800;max-width:230px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;box-shadow:0 10px 28px rgba(15,27,51,.22)}
+.tdchip.dropin{outline:2px dashed var(--blue);outline-offset:3px;
+  background:var(--blue-xl);border-color:var(--blue)}
+.tdchip.dropin>b,.tdchip.dropin>i{color:var(--blue-d)}
+.tphint{font-size:11.5px;color:var(--muted);padding:6px 2px 0;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.tphint .gz{display:inline-block;width:9px;height:13px;vertical-align:-2px;color:var(--ink-2);opacity:.7;
+  background-image:radial-gradient(currentColor 1.1px,transparent 1.2px);background-size:5px 4.5px;background-position:center}
+.tpfoot{display:flex;align-items:center;gap:8px;padding:4px 0 2px}
+.tpfoot>.spacer{flex:1}
 .tpdot{position:relative;display:flex;justify-content:center;align-self:stretch;padding-top:7px}
 .tpdot>i{width:11px;height:11px;border-radius:50%;background:var(--blue);
   box-shadow:0 0 0 3px var(--blue-l);z-index:1;flex:0 0 auto}
@@ -2113,7 +2146,9 @@ html[data-theme=dark] .tpdot::after{background:var(--line)}
   .tpmeal{flex-direction:row;align-items:flex-start;gap:9px}
   .tpmeal>.k{flex:0 0 auto;white-space:nowrap;font-size:12px}
   .tpmeal>.v{flex:1;min-width:0}
-  .tprow{grid-template-columns:46px 18px 1fr auto;gap:0 6px}
+  .tprow{grid-template-columns:18px 42px 18px 1fr auto;gap:0 5px}
+  .tpgrip{width:18px}
+  .tpgrip::before{opacity:.8}
   .tmcrow{grid-template-columns:62px 1fr 80px}
   .tmsum{grid-template-columns:repeat(3,1fr)}
   .tmsum b{font-size:14px}
@@ -2554,6 +2589,17 @@ function tripNorm(s){
       })};
   });
   s.dsel=Math.max(0,Math.min(s.days.length-1,Math.round(+s.dsel||0)));
+  /* 예전 버전은 시간순으로 보여줬어요 — 한 번만 그 순서대로 굳혀둡니다 (이후엔 드래그한 순서 그대로) */
+  if(!s.omig){
+    s.days.forEach(function(d){
+      d.plans=d.plans.map(function(p,i){return [p,i];})
+        .sort(function(a,b){
+          const x=a[0].time||"99:99",y=b[0].time||"99:99";
+          return x<y?-1:x>y?1:(a[1]-b[1]);})
+        .map(function(pr){return pr[0];});
+    });
+    s.omig=1;
+  }
   s.wish=(Array.isArray(s.wish)?s.wish:[]).filter(Boolean).map(function(w){
     return {id:w.id||uid(),name:String(w.name||""),cat:tHas(TCAT,w.cat)?w.cat:"spot",
       area:String(w.area||""),memo:String(w.memo||""),url:String(w.url||""),used:!!w.used};
@@ -2604,21 +2650,25 @@ function tripTimeKey(p){return p.time?p.time:"99:99";}
 function tripPlanView(s){
   const chips=s.days.map(function(d,i){
     const k=tripDate(s,i);
-    return '<button class="tdchip '+(i===s.dsel?"on":"")+'" onclick="tripDay('+i+')">'+
+    return '<button class="tdchip '+(i===s.dsel?"on":"")+'" data-di="'+i+'" onclick="tripDay('+i+')">'+
       '<b>'+(i+1)+'일차</b><i>'+(k?k.slice(5).replace("-",".")+" ("+tripWd(k)+")":"날짜 미정")+'</i>'+
       '<em>'+d.plans.length+'</em></button>';
   }).join("")+'<button class="tdchip add" onclick="tripAddDay()">＋ 일차</button>';
 
   const d=s.days[s.dsel]||s.days[0];
   const q=tripQ();
-  let ps=d.plans.slice().sort(function(a,b){
-    const x=tripTimeKey(a),y=tripTimeKey(b);return x<y?-1:x>y?1:0;});
+  const drag=!q;                                  /* 검색 중에는 순서가 흐트러질 수 있어 드래그를 잠급니다 */
+  let ps=d.plans.slice();
   if(q)ps=ps.filter(function(p){return (p.place+" "+p.memo+" "+p.move+" "+tcat(p.cat).name).toLowerCase().indexOf(q)>=0;});
+  const anyTime=d.plans.some(function(p){return !!p.time;});
 
-  const rows=ps.length?ps.map(function(p){
+  const rows=ps.length?ps.map(function(p,n){
     const c=tcat(p.cat);
-    return '<div class="tprow '+(p.done?"done":"")+'">'+
-      '<div class="tptime">'+esc(p.time||"--:--")+'</div>'+
+    return '<div class="tprow '+(p.done?"done":"")+'" data-id="'+p.id+'">'+
+      (drag?'<div class="tpgrip" title="끌어서 순서 바꾸기" aria-label="끌어서 순서 바꾸기" role="button" tabindex="0"'+
+        ' onpointerdown="tripGripDown(event,\''+p.id+'\')" onkeydown="tripGripKey(event,\''+p.id+'\')"></div>'
+        :'<div class="tpgrip off"></div>')+
+      '<div class="tptime'+(p.time?"":" no")+'">'+(p.time?esc(p.time):(n+1))+'</div>'+
       '<div class="tpdot"><i style="background:'+c.color+';box-shadow:0 0 0 3px '+c.color+'2e"></i></div>'+
       '<div class="tpbody" onclick="tripPlanEdit(\''+p.id+'\')">'+
         '<div class="tpb1"><span class="tpcat" style="background:'+c.color+'1f;color:'+c.color+'">'+c.emoji+' '+c.name+'</span>'+
@@ -2633,12 +2683,162 @@ function tripPlanView(s){
       '</div></div>';
   }).join(""):'<div class="tpempty">'+(q?'검색어에 맞는 일정이 없어요.':'아직 이 날 일정이 비어 있어요.<br>아래 버튼으로 한 줄만 적어봐요 ✈️')+'</div>';
 
-  return '<div class="tdays">'+chips+'</div>'+
+  const hint=ps.length?'<div class="tphint">'+(drag
+      ?'왼쪽 <span class="gz"></span> 을 잡고 끌면 순서가 바뀌어요 · 위 일차 칩 위에 놓으면 그 날로 옮겨가요'
+      :'검색 중에는 순서를 바꿀 수 없어요 · 검색어를 지우면 다시 끌 수 있어요')+'</div>':'';
+
+  return '<div class="tdays" id="tdays">'+chips+'</div>'+
     '<div class="tpwrap">'+tripDayBox(s,d)+
-      '<div class="tptl">'+rows+'</div>'+
+      '<div class="tptl" id="tptl">'+rows+'</div>'+hint+
       '<button class="tpadd" onclick="tripPlanEdit()">＋ '+(s.dsel+1)+'일차에 일정 추가</button>'+
-      (s.days.length>1?'<div style="text-align:right"><button class="btn sm ghost" onclick="tripDelDay()">이 일차 지우기</button></div>':'')+
+      '<div class="tpfoot">'+
+        (anyTime&&ps.length>1?'<button class="btn sm" onclick="tripSortTime()">🕘 시간순으로 정렬</button>':'')+
+        '<span class="spacer"></span>'+
+        (s.days.length>1?'<button class="btn sm" onclick="tripDelDay()">이 일차 지우기</button>':'')+
+      '</div>'+
     '</div>';
+}
+function tripSortTime(){
+  const s=tS();if(!s)return;
+  const d=s.days[s.dsel],before=d.plans.slice();
+  d.plans=d.plans.map(function(p,i){return [p,i];})
+    .sort(function(a,b){const x=a[0].time||"99:99",y=b[0].time||"99:99";
+      return x<y?-1:x>y?1:(a[1]-b[1]);})
+    .map(function(pr){return pr[0];});
+  save();render();
+  toastU("🕘 시간순으로 정렬했어요",function(){
+    const t=tS()||DATA.trip;if(!t)return;
+    t.days[s.dsel].plans=before;save();render();toast("↩ 되돌렸어요");
+  });
+}
+
+/* ---- 드래그로 순서 바꾸기 (마우스 · 터치 모두) ---- */
+var TPDRAG=null;
+function tripGripDown(e,id){
+  if(e.pointerType==="mouse"&&e.button!==0)return;
+  const row=(e.target&&e.target.closest)?e.target.closest(".tprow"):null;
+  if(!row)return;
+  try{e.preventDefault();e.stopPropagation();}catch(x){}
+  TPDRAG={id:id,row:row,x:e.clientX,y:e.clientY,on:false,ph:null,ghost:null,dropDay:-1};
+  document.addEventListener("pointermove",tripDragMove,{passive:false});
+  document.addEventListener("pointerup",tripDragUp,true);
+  document.addEventListener("pointercancel",tripDragUp,true);
+}
+function tripDragBegin(){
+  const d=TPDRAG;if(!d)return;
+  d.on=true;
+  document.body.classList.add("tpdragging");
+  const ph=document.createElement("div");
+  ph.className="tpph";ph.id="tpPh";
+  if(d.row.parentNode)d.row.parentNode.insertBefore(ph,d.row);
+  d.ph=ph;
+  d.row.style.display="none";
+  const g=document.createElement("div");
+  g.id="tpGhost";
+  const t=d.row.querySelector(".tpb1>b");
+  g.textContent=t?t.textContent:"일정";
+  document.body.appendChild(g);
+  d.ghost=g;
+}
+function tripDropClear(){
+  const a=document.querySelectorAll(".tdchip.dropin");
+  for(let i=0;i<a.length;i++)a[i].classList.remove("dropin");
+}
+function tripDragMove(e){
+  const d=TPDRAG;if(!d)return;
+  if(!d.on){
+    if(Math.abs(e.clientX-d.x)<5&&Math.abs(e.clientY-d.y)<5)return;
+    tripDragBegin();
+  }
+  try{e.preventDefault();}catch(x){}
+  if(d.ghost)d.ghost.style.transform="translate("+(e.clientX+14)+"px,"+(e.clientY-16)+"px)";
+  /* 화면 위·아래 끝에 닿으면 따라 스크롤 */
+  const vh=window.innerHeight||600;
+  if(e.clientY<70)window.scrollBy(0,-16);
+  else if(e.clientY>vh-70)window.scrollBy(0,16);
+
+  if(d.ghost)d.ghost.style.display="none";
+  const el=document.elementFromPoint?document.elementFromPoint(e.clientX,e.clientY):null;
+  if(d.ghost)d.ghost.style.display="";
+  tripDropClear();d.dropDay=-1;
+  if(!el||!el.closest||!d.ph)return;
+
+  /* 일차 칩 위 → 그 날로 옮기기 */
+  const chip=el.closest(".tdchip");
+  if(chip&&chip.getAttribute("data-di")!==null&&chip.getAttribute("data-di")!==undefined&&!chip.classList.contains("add")){
+    const di=+chip.getAttribute("data-di");
+    const s=tS();
+    if(s&&di!==s.dsel){chip.classList.add("dropin");d.dropDay=di;return;}
+  }
+  /* 목록 안 → 자리 바꾸기 */
+  const row=el.closest(".tprow");
+  if(row&&row!==d.row&&row.parentNode){
+    const rr=row.getBoundingClientRect();
+    const after=(e.clientY>rr.top+rr.height/2);
+    row.parentNode.insertBefore(d.ph,after?row.nextSibling:row);
+    return;
+  }
+  const tl=el.closest("#tptl");
+  if(tl&&d.ph.parentNode!==tl)tl.appendChild(d.ph);
+}
+function tripDragUp(){
+  const d=TPDRAG;
+  document.removeEventListener("pointermove",tripDragMove);
+  document.removeEventListener("pointerup",tripDragUp,true);
+  document.removeEventListener("pointercancel",tripDragUp,true);
+  TPDRAG=null;
+  if(!d)return;
+  document.body.classList.remove("tpdragging");
+  if(d.ghost&&d.ghost.parentNode)d.ghost.parentNode.removeChild(d.ghost);
+  if(!d.on){tripDropClear();return;}
+
+  const s=tS();
+  let to=-1;
+  if(d.ph&&d.ph.parentNode){
+    let n=0,el=d.ph.previousElementSibling;
+    while(el){if(el.classList&&el.classList.contains("tprow")&&el!==d.row)n++;el=el.previousElementSibling;}
+    to=n;
+  }
+  if(d.ph&&d.ph.parentNode)d.ph.parentNode.removeChild(d.ph);
+  d.row.style.display="";
+  tripDropClear();
+  if(!s){render();return;}
+
+  const day=s.days[s.dsel],from=day.plans.map(function(p){return p.id;}).indexOf(d.id);
+  if(from<0){render();return;}
+
+  if(d.dropDay>=0&&d.dropDay!==s.dsel&&s.days[d.dropDay]){
+    const item=day.plans.splice(from,1)[0];
+    s.days[d.dropDay].plans.push(item);
+    save();render();
+    toastU("✈️ "+(d.dropDay+1)+"일차로 옮겼어요",function(){
+      const t=tS()||DATA.trip;if(!t)return;
+      const x=t.days[d.dropDay].plans.map(function(p){return p.id;}).indexOf(d.id);
+      if(x>=0){const it=t.days[d.dropDay].plans.splice(x,1)[0];
+        t.days[s.dsel].plans.splice(Math.min(from,t.days[s.dsel].plans.length),0,it);}
+      save();render();toast("↩ 되돌렸어요");
+    });
+    return;
+  }
+  if(to<0||to===from){render();return;}
+  const item=day.plans.splice(from,1)[0];
+  day.plans.splice(Math.max(0,Math.min(day.plans.length,to)),0,item);
+  save();render();
+}
+/* 키보드로도 옮길 수 있게 (↑ ↓) */
+function tripGripKey(e,id){
+  if(e.key!=="ArrowUp"&&e.key!=="ArrowDown")return;
+  e.preventDefault();
+  const s=tS();if(!s)return;
+  const day=s.days[s.dsel],i=day.plans.map(function(p){return p.id;}).indexOf(id);
+  const j=i+(e.key==="ArrowUp"?-1:1);
+  if(i<0||j<0||j>=day.plans.length)return;
+  day.plans.splice(j,0,day.plans.splice(i,1)[0]);
+  save();render();
+  setTimeout(function(){
+    const el=document.querySelector('.tprow[data-id="'+id+'"] .tpgrip');
+    if(el)el.focus();
+  },30);
 }
 /* 그날의 코디 · 세 끼 · 한 줄 메모 */
 const TMEAL=[["b","🌅","아침"],["l","☀️","점심"],["d","🌙","저녁"]];
@@ -2747,7 +2947,7 @@ function tripPlanEdit(id){
   document.getElementById("mIc").innerHTML=chImg("trip");
   document.getElementById("mTitle").textContent=(p?"일정 고치기":"＋ 일정 추가")+" · "+(di+1)+"일차";
   document.getElementById("mForm").innerHTML=
-    '<div class="field"><label>몇 시에</label>'+
+    '<div class="field"><label>몇 시에 (안 적어도 돼요)</label>'+
       '<input id="t_time" type="time" value="'+esc(p?p.time:"")+'"></div>'+
     '<div class="field"><label>어디서 · 무엇을</label>'+
       '<input id="t_place" placeholder="예: 성산일출봉 산책" value="'+esc(p?p.place:"")+'" '+
@@ -2759,7 +2959,7 @@ function tripPlanEdit(id){
       '<textarea id="t_memo" rows="3" placeholder="예약 여부, 주차, 챙길 것…">'+esc(p?p.memo:"")+'</textarea></div>'+
     '<div class="field"><label>링크 (선택)</label>'+
       '<input id="t_url" placeholder="지도·블로그 주소를 붙여넣어도 돼요" value="'+esc(p?p.url:"")+'"></div>'+
-    '<div class="ehint">시간을 비워두면 그 날 제일 아래에 놓여요.</div>';
+    '<div class="ehint">시간은 안 적어도 괜찮아요. 순서는 목록에서 끌어서 바꾸면 돼요.</div>';
   const sv=document.getElementById("mSave");
   sv.style.display="";sv.setAttribute("data-ns","trip:plan:"+di+":"+(id||""));
   document.getElementById("overlay").classList.add("on");
