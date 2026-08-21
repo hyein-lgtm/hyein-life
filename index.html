@@ -2154,6 +2154,21 @@ html[data-theme=dark] .tpdot::after{background:var(--line)}
   .tmsum b{font-size:14px}
 }
 </style>
+<style id="mvdaycss">
+.titem .x.dt{color:var(--blue-d);border-color:#cfe0fb}
+html[data-theme=dark] .titem .x.dt{color:#9dbcff;border-color:#2a3b5c}
+.mdwho{font-size:14.5px;font-weight:800;letter-spacing:-.02em;color:var(--ink);
+  padding:2px 2px 6px;word-break:break-all}
+.mdqs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin:4px 0 12px}
+.mdq{display:flex;flex-direction:column;gap:1px;align-items:flex-start;text-align:left;
+  padding:9px 12px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2)}
+.mdq:hover{border-color:var(--blue);background:var(--blue-xl)}
+.mdq>b{font-size:13px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.mdq>i{font-size:11px;font-style:normal;color:var(--muted)}
+@media(max-width:720px){
+  .mdqs{grid-template-columns:1fr 1fr}
+}
+</style>
 </head>
 <body>
 
@@ -3669,7 +3684,8 @@ function dailyGroups(){
       <input type="checkbox" ${t.done?"checked":""} style="accent-color:${c.color}" onchange="togDaily('${t.id}')">
       <span class="ttx" title="눌러서 글자 수정" onclick="editDaily(event,'${t.id}')">${esc(t.text)}</span>${rollBadge(t)}
       ${sp?`<button class="x mv" title="${t.part==="pm"?"오전으로 옮기기":"오후로 옮기기"}" onclick="event.preventDefault();movePart('${t.id}')">${t.part==="pm"?"☀":"🌙"}</button>`:""}
-      ${(t.done||c.mark)?"":`<button class="x tm" title="내일로 미루기" aria-label="내일로 미루기" onclick="event.preventDefault();pushDaily('${t.id}')">내일→</button>`}
+      ${(t.done||c.mark)?"":`<button class="x tm" title="내일로 미루기" aria-label="내일로 미루기" onclick="event.preventDefault();pushDaily('${t.id}')">내일→</button>
+      <button class="x tm dt" title="다른 날짜로 옮기기" aria-label="다른 날짜로 옮기기" onclick="event.preventDefault();openMoveDay('${t.id}')">날짜→</button>`}
       <button class="x rt ${t.rt?"on":""}" title="${t.rt?"루틴 "+rtLabel(rtOf(t)||{days:[]}):"루틴으로 등록"}" aria-label="루틴으로 등록" onclick="event.preventDefault();openRoutine('${t.id}')">♺</button>
       <button class="x ed" title="글자 수정" aria-label="글자 수정" onclick="event.preventDefault();editDaily(event,'${t.id}')">${IC.pen}</button>
       <button class="x" title="삭제" aria-label="삭제" onclick="event.preventDefault();delDaily('${t.id}')">✕</button></label>`;
@@ -3917,8 +3933,11 @@ function autoRoll(){
   });
   return n;
 }
-function pushDaily(id){
-  const s=ds(), day=daySel, nxt=addDays(day,1);
+function moveDailyTo(id,to,verb,bump){
+  const s=ds(), day=daySel;
+  to=String(to||"");
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(to)){try{toast("날짜를 골라주세요");}catch(e){}return;}
+  if(to===day){try{toast("이미 그 날이에요 :)");}catch(e){}return;}
   const list=dayTodos(day), x=list.findIndex(v=>v.id===id);
   if(x<0)return;
   const t=list[x], name=t.text||"할 일";
@@ -3930,21 +3949,74 @@ function pushDaily(id){
   }
   if(!s.days)s.days={};
   s.days[day]=list.filter(v=>v.id!==id);
-  if(!s.days[nxt])s.days[nxt]=[];
+  if(!s.days[to])s.days[to]=[];
+  /* '내일→ 미루기'만 이월 횟수를 올려요. 날짜를 직접 고른 건 계획 변경이라 그대로 둡니다. */
+  const up=(bump!==false)&&(to>day);
   const moved={id:uid(),cat:t.cat,part:t.part==="pm"?"pm":"am",text:t.text,done:false,
-    roll:(+t.roll||0)+1, from:t.from||day, rt:t.rt||""};
-  s.days[nxt].push(moved);
+    roll:up?((+t.roll||0)+1):(+t.roll||0), from:t.from||(up?day:""), rt:t.rt||"", fix:!!t.fix};
+  s.days[to].push(moved);
   save();render();
   const short=name.length>12?name.slice(0,12)+"…":name;
-  toastU("→ '"+short+"' "+korDate(nxt)+"로 미뤘어요",function(){
+  toastU("→ '"+short+"' "+korDate(to)+"로 "+(verb||"옮겼어요"),function(){
     const b=ds();
-    b.days[nxt]=(b.days[nxt]||[]).filter(v=>v.id!==moved.id);
+    b.days[to]=(b.days[to]||[]).filter(v=>v.id!==moved.id);
     if(skipped&&b.skip&&b.skip[day])b.skip[day]=b.skip[day].filter(r=>r!==t.rt);
     if(!b.days[day])b.days[day]=[];
     b.days[day].splice(Math.min(x,b.days[day].length),0,t);
     daySel=day;save();render();toast("↩ 되돌렸어요");
   });
 }
+function pushDaily(id){ return moveDailyTo(id,addDays(daySel,1),"미뤘어요",true); }
+
+/* 📅 아무 날짜로나 옮기기 */
+function openMoveDay(id){
+  const t=dayTodos(daySel).filter(function(v){return v.id===id;})[0];
+  if(!t)return;
+  const wd=new Date(daySel+"T00:00:00").getDay();          /* 일=0 */
+  const nx=function(target){const n=((target-wd)+7)%7;return addDays(daySel,n||7);};
+  const opts=[
+    ["내일",addDays(daySel,1)],
+    ["모레",addDays(daySel,2)],
+    ["이번 주말",nx(6)],
+    ["다음 주 월요일",nx(1)],
+    ["일주일 뒤",addDays(daySel,7)],
+    ["2주 뒤",addDays(daySel,14)]
+  ];
+  const seen={};
+  const chips=opts.filter(function(o){
+    if(o[1]===daySel||seen[o[1]])return false; seen[o[1]]=1; return true;
+  }).map(function(o){
+    return '<button type="button" class="mdq" onclick="mdPick(\''+o[1]+'\')">'+
+      '<b>'+o[0]+'</b><i>'+korDate(o[1])+'</i></button>';
+  }).join("");
+  const nm=t.text||"할 일";
+  document.getElementById("mIc").innerHTML=chImg("daily");
+  document.getElementById("mTitle").textContent="📅 언제로 옮길까요?";
+  document.getElementById("mForm").innerHTML=
+    '<div class="mdwho">「'+esc(nm.length>28?nm.slice(0,28)+"…":nm)+'」</div>'+
+    '<div class="ehint">지금은 '+esc(korDate(daySel))+'에 있어요.</div>'+
+    '<div class="mdqs">'+chips+'</div>'+
+    '<div class="field"><label>직접 고르기</label>'+
+      '<input id="md_date" type="date" value="'+esc(addDays(daySel,1))+'" '+
+      'onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveEdit()}"></div>'+
+    '<div class="ehint">루틴으로 등록된 할 일은 이 날 하루만 건너뛰고 옮겨져요.<br>'+
+      '지난 날짜로 보내면, 아직 못 한 일은 자동 이월 규칙에 따라 오늘로 다시 올라와요.</div>';
+  const sv=document.getElementById("mSave");
+  sv.style.display="";sv.textContent="옮기기";sv.setAttribute("data-ns","mvday:"+id);
+  document.getElementById("overlay").classList.add("on");
+}
+function mdPick(k){
+  const el=document.getElementById("md_date"); if(el)el.value=k;
+  saveEdit();
+}
+function saveMoveDay(id){
+  const el=document.getElementById("md_date");
+  const to=el?el.value:"";
+  if(!to){alert("날짜를 골라주세요.");return;}
+  closeEdit();
+  moveDailyTo(id,to,"옮겼어요",false);
+}
+
 function rollFind(id){return dayTodos(daySel).find(x=>x.id===id);}
 function rollDrop(id){
   const s=ds(); s.days[daySel]=dayTodos(daySel).filter(x=>x.id!==id);
@@ -6768,7 +6840,8 @@ function openEdit(id){
 }
 function closeEdit(){try{vLock();}catch(e){}
   const _mf=document.getElementById("mForm");if(_mf)_mf.removeAttribute("data-vault");
-  document.getElementById("overlay").classList.remove("on");editing=null;dayCur=null;document.getElementById("mSave").removeAttribute("data-ns");}
+  document.getElementById("overlay").classList.remove("on");editing=null;dayCur=null;
+  const _ms=document.getElementById("mSave");_ms.removeAttribute("data-ns");_ms.textContent="저장";}
 function saveEdit(){
   const tag=document.getElementById("mSave").getAttribute("data-ns");
   if(tag){
@@ -6778,6 +6851,7 @@ function saveEdit(){
     if(tag.indexOf("goal:")===0)return saveGoal(tag.slice(5));
     if(tag.indexOf("dream:")===0)return saveDream(tag.slice(6));
     if(tag.indexOf("trip:")===0)return tripSaveDispatch(tag.slice(5));
+    if(tag.indexOf("mvday:")===0)return saveMoveDay(tag.slice(6));
   }
   const s=DATA[cur],g=id=>document.getElementById(id);
   const title=(g("f_title").value||"").trim();
