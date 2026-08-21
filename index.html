@@ -2169,6 +2169,54 @@ html[data-theme=dark] .titem .x.dt{color:#9dbcff;border-color:#2a3b5c}
   .mdqs{grid-template-columns:1fr 1fr}
 }
 </style>
+<style id="wishcss">
+/* ===================== 🎁 위시리스트 ===================== */
+.wsec{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:6px 16px 10px;box-shadow:var(--sh);margin-bottom:12px}
+.wsh{display:flex;align-items:center;gap:8px;padding:12px 2px 8px;border-bottom:1px solid var(--line);
+  margin-bottom:2px;flex-wrap:wrap}
+.wsh>b{font-size:14px;letter-spacing:-.02em}
+.wsh>.spacer{flex:1}
+.wsh>em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--ink-2);white-space:nowrap}
+.wsn{font-size:11px;font-weight:800;color:var(--ink-2);background:var(--surface-3);
+  border-radius:999px;padding:2px 8px}
+.wnow{font-size:10.5px;font-weight:800;color:var(--blue-d);background:var(--blue-l);
+  border-radius:999px;padding:2px 8px}
+.wpast{font-size:10.5px;font-weight:800;color:var(--muted);background:var(--surface-3);
+  border-radius:999px;padding:2px 8px}
+
+.wrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:start;
+  padding:10px 2px;border-bottom:1px solid var(--line)}
+.wrow:last-child{border-bottom:0}
+.wck{flex:none;width:24px;height:24px;margin-top:2px;border-radius:8px;border:1.5px solid var(--line);
+  background:var(--surface-2);color:transparent;font-size:13px;font-weight:900;line-height:1;
+  display:flex;align-items:center;justify-content:center;transition:.15s}
+.wck:hover{border-color:var(--ok);color:var(--ok)}
+.wck.on{background:var(--st-done-bg);border-color:var(--st-done-bg);color:var(--st-done-fg)}
+.wbody{cursor:pointer;min-width:0}
+.w1{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.w1>b{font-size:14px;letter-spacing:-.02em;word-break:break-all}
+.wbody:hover .w1>b{color:var(--blue)}
+.wrow.done .w1>b{text-decoration:line-through;color:var(--muted)}
+.wrow.done .tpcat{opacity:.55}
+.wbody>p{margin:4px 0 0;font-size:12.5px;color:var(--ink-2);white-space:pre-wrap;word-break:break-all}
+.wdone{display:inline-block;margin-top:5px;font-size:11px;font-weight:800;
+  color:var(--st-done-fg);background:var(--st-done-bg);border-radius:999px;padding:2px 8px}
+.wright{padding-top:3px;white-space:nowrap}
+.wprice{font-size:13px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.wrow.done .wprice{color:var(--muted);text-decoration:line-through}
+
+.wmq{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 12px}
+.wmq>button{border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);
+  border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:700}
+.wmq>button:hover{border-color:var(--blue);color:var(--blue-d);background:var(--blue-xl)}
+@media(max-width:520px){
+  .wsec{padding:4px 12px 8px}
+  .wrow{grid-template-columns:auto 1fr auto;gap:8px}
+  .wright{grid-column:2/3;padding-top:2px}
+  .wrow .tpacts{grid-row:1;grid-column:3}
+}
+</style>
 </head>
 <body>
 
@@ -2552,6 +2600,21 @@ const SEED = {
       {id:"tw3",name:"바다 보이는 카페",cat:"cafe",area:"애월/한담",memo:"",url:"",used:false}
     ],
     spend:[],
+    items:[]
+  }
+  ,
+  wishlist: {
+    label:"🎁 위시리스트", icon:"🎁", type:"wish",
+    list:[
+      {id:"wl1",name:"제주 여행 원피스",cat:"buy",month:"",price:89000,
+       memo:"생일 저녁에 입을 것 · 사진 잘 나오는 색으로",url:"",done:false,doneAt:""},
+      {id:"wl2",name:"속눈썹 펌",cat:"care",month:"",price:60000,
+       memo:"여행 가기 전 주에 예약",url:"",done:false,doneAt:""},
+      {id:"wl3",name:"러닝화 새로 사기",cat:"buy",month:"",price:150000,
+       memo:"지금 신는 거 밑창 닳음",url:"",done:false,doneAt:""},
+      {id:"wl4",name:"필름 카메라 배우기",cat:"learn",month:"",price:0,
+       memo:"원데이 클래스라도",url:"",done:false,doneAt:""}
+    ],
     items:[]
   }
 };
@@ -3252,6 +3315,243 @@ function tripNewLabel(){
   return s.view==="wish"?"＋ 가고 싶은 곳":s.view==="money"?"＋ 지출 추가":"＋ 일정 추가";
 }
 
+
+/* ===========================================================
+   🎁 위시리스트 — 월별로 모아보고, 이루면 체크
+   =========================================================== */
+const WKAT=[
+  {id:"buy", name:"사고 싶은 것", emoji:"🛍", color:"#d81b60"},
+  {id:"care",name:"시술·뷰티",   emoji:"💄", color:"#e11d48"},
+  {id:"trip",name:"여행·나들이", emoji:"✈️", color:"#5b7cfa"},
+  {id:"exp", name:"경험·맛집",   emoji:"🍽", color:"#b4772e"},
+  {id:"learn",name:"배움",       emoji:"📚", color:"#0ea472"},
+  {id:"home",name:"집·살림",     emoji:"🏠", color:"#7c3aed"},
+  {id:"etc", name:"기타",        emoji:"✨", color:"#0891b2"}
+];
+function wkat(id){for(let i=0;i<WKAT.length;i++)if(WKAT[i].id===id)return WKAT[i];return WKAT[6];}
+function wsNorm(s){
+  s.label=s.label||"🎁 위시리스트"; s.icon=s.icon||"🎁";
+  s.list=(Array.isArray(s.list)?s.list:[]).filter(Boolean).map(function(w){
+    const m=String(w.month||"");
+    return {id:w.id||uid(),name:String(w.name||""),
+      cat:(WKAT.filter(function(c){return c.id===w.cat;}).length?w.cat:"buy"),
+      month:/^\d{4}-\d{2}$/.test(m)?m:"",
+      price:Math.max(0,Math.round(+w.price||0)),
+      memo:String(w.memo||""),url:String(w.url||""),
+      done:!!w.done,doneAt:String(w.doneAt||"")};
+  });
+  /* 처음 한 번만 — 예시 항목에 이번 달/다음 달을 채워 월별 묶음이 어떻게 보이는지 알려줘요 */
+  if(!s.mig){
+    const n=ymNow(),map={wl1:n,wl2:n,wl3:ymAdd(n,1),wl4:ymAdd(n,2)};
+    s.list.forEach(function(w){ if(map[w.id]&&!w.month) w.month=map[w.id]; });
+    s.mig=1;
+  }
+  s.items=[];
+  return s;
+}
+function wS(){const s=DATA[cur];return (s&&s.type==="wish")?s:null;}
+function ymNow(){return todayStr().slice(0,7);}
+function ymLabel(m){
+  if(!m)return "언젠가 · 날짜 미정";
+  const a=m.split("-");
+  return a[0]+"년 "+(+a[1])+"월";
+}
+function ymAdd(m,n){
+  const a=m.split("-");let y=+a[0],x=(+a[1])-1+n;
+  y+=Math.floor(x/12);x=((x%12)+12)%12;
+  return y+"-"+String(x+1).padStart(2,"0");
+}
+function wsQ(){const e=document.getElementById("q");return ((e&&e.value)||"").trim().toLowerCase();}
+function wsPick(s){
+  const q=wsQ();
+  return (s.list||[]).filter(function(w){
+    if(filter==="TODO"&&w.done)return false;
+    if(filter==="DONE"&&!w.done)return false;
+    if(filter!=="ALL"&&filter!=="TODO"&&filter!=="DONE"&&w.cat!==filter)return false;
+    if(q&&(w.name+" "+w.memo+" "+wkat(w.cat).name).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+}
+
+/* ---- 화면 ---- */
+function wsView(){
+  const s=DATA[cur];
+  const l=wsPick(s);
+  /* 월별로 묶기 — 날짜 미정은 맨 아래 */
+  const keys=[];const bag={};
+  l.forEach(function(w){
+    const k=w.month||"";
+    if(!bag[k]){bag[k]=[];keys.push(k);}
+    bag[k].push(w);
+  });
+  keys.sort(function(a,b){ if(!a)return 1; if(!b)return -1; return a<b?-1:a>b?1:0; });
+  const now=ymNow();
+  const secs=keys.map(function(k){
+    const g=bag[k].slice().sort(function(a,b){return (a.done?1:0)-(b.done?1:0);});
+    const dn=g.filter(function(w){return w.done;}).length;
+    const sum=g.reduce(function(a,w){return a+(w.done?0:w.price);},0);
+    const rows=g.map(wsRow).join("");
+    const tag=(!k)?"":(k===now?'<span class="wnow">이번 달</span>':(k<now?'<span class="wpast">지난달</span>':""));
+    return '<div class="wsec">'+
+      '<div class="wsh"><b>'+esc(ymLabel(k))+'</b>'+tag+
+        '<span class="wsn">'+dn+' / '+g.length+'</span>'+
+        '<span class="spacer"></span>'+
+        (sum?'<em>남은 예상 '+won(sum)+'원</em>':'')+
+      '</div>'+rows+'</div>';
+  }).join("");
+  const empty='<div class="tpempty">'+(wsQ()||filter!=="ALL"
+      ?'이 조건에 맞는 게 없어요.'
+      :'갖고 싶은 것, 받고 싶은 시술, 해보고 싶은 것<br>뭐든 한 줄만 적어두면 돼요 🎁')+'</div>';
+  return wsHead(s)+'<button class="tpadd" onclick="wsEdit()">＋ 위시 담기</button>'+
+    (secs||empty);
+}
+function wsHead(s){
+  const all=s.list||[];
+  const dn=all.filter(function(w){return w.done;}).length;
+  const pct=all.length?Math.round(dn/all.length*100):0;
+  const now=ymNow();
+  const mine=all.filter(function(w){return w.month===now&&!w.done;});
+  const msum=mine.reduce(function(a,w){return a+w.price;},0);
+  return '<div class="tphead">'+
+    '<div class="tpht"><b>🎁 이루고 싶은 것 '+all.length+'개</b>'+
+      (dn?'<span class="tpdd">'+dn+'개 이룸</span>':'')+'</div>'+
+    '<div class="tphp">'+(mine.length
+      ? '이번 달('+(+now.split("-")[1])+'월)에 '+mine.length+'개 · 예상 '+won(msum)+'원'
+      : '이번 달에 담아둔 건 아직 없어요')+'</div>'+
+    '<div class="tpbar"><i style="width:'+pct+'%"></i><span>'+dn+' / '+all.length+' 이룸 ('+pct+'%)</span></div>'+
+  '</div>';
+}
+function wsRow(w){
+  const c=wkat(w.cat);
+  return '<div class="wrow '+(w.done?"done":"")+'">'+
+    '<button class="wck '+(w.done?"on":"")+'" title="'+(w.done?"아직으로 되돌리기":"이뤘어요!")+'" '+
+      'aria-label="이룸 표시" onclick="wsTog(\''+w.id+'\')">✓</button>'+
+    '<div class="wbody" onclick="wsEdit(\''+w.id+'\')">'+
+      '<div class="w1"><span class="tpcat" style="background:'+c.color+'1f;color:'+c.color+'">'+c.emoji+' '+c.name+'</span>'+
+        '<b>'+esc(w.name||"(이름 없음)")+'</b></div>'+
+      (w.memo?'<p>'+esc(w.memo)+'</p>':'')+
+      (w.done&&w.doneAt?'<span class="wdone">✓ '+esc(w.doneAt.replace(/-/g,"."))+' 이룸</span>':'')+
+    '</div>'+
+    '<div class="wright">'+(w.price?'<span class="wprice">'+won(w.price)+'원</span>':'')+'</div>'+
+    '<div class="tpacts">'+
+      (w.url?'<button title="링크 열기" aria-label="링크 열기" onclick="window.open(\''+esc(w.url)+'\',\'_blank\')">🔗</button>':'')+
+      '<button class="dl" title="지우기" aria-label="지우기" onclick="wsDel(\''+w.id+'\')">✕</button>'+
+    '</div></div>';
+}
+function wsTog(id){
+  const s=wS();if(!s)return;
+  const w=s.list.filter(function(x){return x.id===id;})[0];if(!w)return;
+  w.done=!w.done;
+  w.doneAt=w.done?todayStr():"";
+  save();render();
+  if(w.done){try{toast("🎉 '"+(w.name||"").slice(0,14)+"' 이뤘어요!");}catch(e){}}
+}
+function wsDel(id){
+  const s=wS();if(!s)return;
+  const i=s.list.map(function(x){return x.id;}).indexOf(id);if(i<0)return;
+  const gone=s.list[i];s.list.splice(i,1);save();render();
+  toastU("🗑 '"+(gone.name||"").slice(0,14)+"' 지웠어요",function(){
+    const t=wS()||DATA.wishlist;if(!t)return;
+    t.list.splice(Math.min(i,t.list.length),0,gone);save();render();toast("↩ 되돌렸어요");
+  });
+}
+function wkPick(id,sel){
+  return '<div class="tcpick" id="'+id+'" data-v="'+sel+'">'+WKAT.map(function(c){
+    return '<button type="button" data-v="'+c.id+'" class="'+(c.id===sel?"on":"")+'"'+
+      (c.id===sel?' style="background:'+c.color+'"':'')+
+      ' onclick="wkSet(\''+id+'\',\''+c.id+'\')">'+c.emoji+' '+c.name+'</button>';
+  }).join("")+'</div>';
+}
+function wkSet(box,v){
+  const b=document.getElementById(box);if(!b)return;
+  b.setAttribute("data-v",v);
+  Array.prototype.forEach.call(b.children,function(el){
+    const on=el.getAttribute("data-v")===v;
+    el.classList.toggle("on",on);
+    el.style.background=on?wkat(v).color:"";
+  });
+}
+function wsEdit(id){
+  const s=wS();if(!s)return;
+  const w=id?s.list.filter(function(x){return x.id===id;})[0]:null;
+  const now=ymNow();
+  document.getElementById("mIc").innerHTML=chImg("wishlist");
+  document.getElementById("mTitle").textContent=w?"위시 고치기":"🎁 위시 담기";
+  document.getElementById("mForm").innerHTML=
+    '<div class="field"><label>무엇을</label>'+
+      '<input id="w_name" placeholder="예: 겨울 코트 / 보톡스 / 오사카 여행" value="'+esc(w?w.name:"")+'" '+
+      'onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveEdit()}"></div>'+
+    '<div class="field"><label>분류</label>'+wkPick("w_cat",w?w.cat:"buy")+'</div>'+
+    '<div class="field"><label>언제쯤</label>'+
+      '<input id="w_month" type="month" value="'+esc(w?w.month:now)+'"></div>'+
+    '<div class="wmq">'+
+      ['이번 달','다음 달','두 달 뒤'].map(function(t,i){
+        return '<button type="button" onclick="wmSet(\''+ymAdd(now,i)+'\')">'+t+'</button>';}).join("")+
+      '<button type="button" onclick="wmSet(\'\')">날짜 미정</button>'+
+    '</div>'+
+    '<div class="field"><label>예상 금액 (원 · 없으면 비워두세요)</label>'+
+      '<input id="w_price" type="number" inputmode="numeric" min="0" step="1000" placeholder="0" value="'+(w&&w.price?w.price:"")+'"></div>'+
+    '<div class="field"><label>메모</label>'+
+      '<textarea id="w_memo" rows="3" placeholder="왜 갖고 싶은지, 어디서 파는지, 주의할 점…">'+esc(w?w.memo:"")+'</textarea></div>'+
+    '<div class="field"><label>링크 (선택)</label>'+
+      '<input id="w_url" placeholder="구매 페이지·후기 주소" value="'+esc(w?w.url:"")+'"></div>'+
+    '<div class="ehint">이루면 왼쪽 ✓ 를 눌러 체크해요. 달마다 모아서 보여드릴게요.</div>';
+  const sv=document.getElementById("mSave");
+  sv.style.display="";sv.setAttribute("data-ns","wish:"+(id||""));
+  document.getElementById("overlay").classList.add("on");
+  setTimeout(function(){const e=document.getElementById("w_name");if(e)e.focus();},60);
+}
+function wmSet(m){
+  const e=document.getElementById("w_month");if(!e)return;
+  e.value=m;
+  const b=document.querySelectorAll(".wmq button");
+  for(let i=0;i<b.length;i++)b[i].classList.remove("on");
+}
+function wsSave(id){
+  const s=wS();if(!s)return;
+  const g=function(k){const e=document.getElementById(k);return e?e.value:"";};
+  const name=(g("w_name")||"").trim();
+  if(!name){alert("무엇을 담을지 한 줄만 적어주세요.");return;}
+  let w=id?s.list.filter(function(x){return x.id===id;})[0]:null;
+  const isNew=!w;
+  if(isNew){w={id:uid(),done:false,doneAt:""};s.list.unshift(w);}
+  w.name=name;
+  const cb=document.getElementById("w_cat");
+  w.cat=(cb&&cb.getAttribute("data-v"))||"buy";
+  const m=g("w_month");
+  w.month=/^\d{4}-\d{2}$/.test(m)?m:"";
+  w.price=Math.max(0,Math.round(+g("w_price")||0));
+  w.memo=g("w_memo")||"";
+  w.url=(g("w_url")||"").trim();
+  closeEdit();save();render();
+  if(isNew){try{toast("🎁 위시리스트에 담았어요");}catch(e){}}
+}
+function wsFiltersHtml(s){
+  const l=s.list||[];
+  const base=[["ALL","전체",l.length],
+              ["TODO","아직",l.filter(function(w){return !w.done;}).length],
+              ["DONE","이룸",l.filter(function(w){return w.done;}).length]];
+  const cats=WKAT.filter(function(c){return l.some(function(w){return w.cat===c.id;});})
+    .map(function(c){
+      const n=l.filter(function(w){return w.cat===c.id;}).length;
+      return '<button class="chip '+(filter===c.id?"on":"")+'" onclick="setF(\''+c.id+'\')">'+c.emoji+' '+c.name+' '+n+'</button>';
+    }).join("");
+  return base.map(function(b){
+    return '<button class="chip '+(filter===b[0]?"on":"")+'" onclick="setF(\''+b[0]+'\')">'+b[1]+' '+b[2]+'</button>';
+  }).join("")+cats;
+}
+function wsStats(s){
+  const l=s.list||[];
+  const dn=l.filter(function(w){return w.done;}).length;
+  const now=ymNow();
+  const mth=l.filter(function(w){return w.month===now&&!w.done;});
+  const left=l.filter(function(w){return !w.done;}).reduce(function(a,w){return a+w.price;},0);
+  const spent=l.filter(function(w){return w.done;}).reduce(function(a,w){return a+w.price;},0);
+  return [["담아둔 것",l.length+"개"],["이룬 것",dn+"개"],
+          ["이번 달 계획",mth.length+"개"],
+          ["남은 예상",won(left)+"원"],["이룬 것에 쓴 돈",won(spent)+"원"]];
+}
+
 const FEED=(function(){try{return JSON.parse(document.getElementById("feed").textContent)||{};}catch(e){return {};}})();
 let eStudyD=null;
 let LOSTMODE=false, LOSTFROM="", ALLOWSHRINK=false;
@@ -3322,6 +3622,7 @@ function normalize(d){
   Object.keys(d).forEach(k=>{
     const s=d[k];
     if(s.type==="trip"){ tripNorm(s); return; }
+    if(s.type==="wish"){ wsNorm(s); return; }
     if(s.type==="dream"){
       s.secret=true;s.label=s.label||"🌙 꿈";
       s.items=(s.items||[]).map(x=>{
@@ -3483,7 +3784,7 @@ function moveTab(k,dir){
 }
 /* ================= 탭 관리 =================
    이름·아이콘 수정 / 새 탭 만들기 / 숨기기 / 삭제 */
-const CORETAB=["daily","habit","muse","project","dream","trip"];   /* 다른 화면이 기대는 탭 — 삭제 대신 숨기기만 */
+const CORETAB=["daily","habit","muse","project","dream","trip","wishlist"];   /* 다른 화면이 기대는 탭 — 삭제 대신 숨기기만 */
 function tabCore(k){ return CORETAB.indexOf(k)>=0 || CORETAB.indexOf((DATA[k]||{}).type)>=0; }
 function allTabKeys(){
   const o=DATA.__order||[];
@@ -4762,7 +5063,7 @@ function setGoalV(k,v){
 }
 
 /* ---- 캐릭터 헬퍼 ---- */
-const CHALIAS={memo:"base",trip:"base"};
+const CHALIAS={memo:"base",trip:"base",wishlist:"base"};
 function chImg(k,cls){k=CHALIAS[k]||k;return `<img class="ch ${cls||""}" alt="" src="${CHAR[k]||CHAR.base}">`;}
 function chFace(k){k=CHALIAS[k]||k;return `<span class="chf" aria-hidden="true"><img alt="" src="${CHAR[k]||CHAR.base}"></span>`;}
 const HERO={
@@ -4774,6 +5075,7 @@ const HERO={
   habit:["오늘도 몸 챙기기 ✦","날짜를 눌러 운동 종류와 시간을 기록하면 한 달이 채워져요."],
   estate:["차근차근 임장 노트 ✦","기초부터 청약·세금까지. 배운 건 업무 일지에 남겨두세요."],
   muse:["나를 브랜드로 만들기 ✦","@hyen_roy · 혼캠 시리즈부터 다음 콘텐츠까지, 기획·일정·성과를 한 곳에서."],
+  wishlist:["갖고 싶은 건 적어두면 가까워져요 🎁","달마다 모아두고, 이루면 왼쪽 ✓ 를 눌러 체크하세요."],
   trip:["설레는 건 짐 싸기 전부터 ✈️","일차를 눌러 그날 동선을 짜고, 가고 싶은 곳은 위시리스트에 모아두세요."],
   dream:["여기는 나만 아는 곳 🌙","말하면 웃길까 봐 못 한 이야기들. 로고를 세 번 누르면 다시 숨겨져요."]
 };
@@ -4796,7 +5098,7 @@ function cheerMsg(){
   if(st.cnt===0) return ["","이번 달 첫 기록을 남겨봐요. 15분 스트레칭도 충분해요."];
   return ["","이번 달 <b>"+st.cnt+"회</b> · "+hhmm(st.min)+" 기록했어요. 목표까지 "+left+"회!"];
 }
-const SHORT={project:"프로젝트",work:"업무",daily:"투두",memo:"메모",book:"독서",habit:"운동",muse:"브랜드",estate:"부동산",dream:"꿈",trip:"여행"};
+const SHORT={project:"프로젝트",work:"업무",daily:"투두",memo:"메모",book:"독서",habit:"운동",muse:"브랜드",estate:"부동산",dream:"꿈",trip:"여행",wishlist:"위시"};
 function tabName(k){ return String((DATA[k]&&DATA[k].label)||k).replace(/^\S+\s/,""); }
 function tabIcon(k){ const l=String((DATA[k]&&DATA[k].label)||"").trim(); const m=l.match(/^(\S+)\s/); return m?m[1]:((DATA[k]&&DATA[k].icon)||"🗂"); }
 function shortName(k){ return SHORT[k]||tabName(k); }
@@ -4864,6 +5166,11 @@ function renderStats(){
       +statMoreBtn()+statsSayHtml();
     return;
   }
+  if(s.type==="wish"){
+    el0.classList.toggle("smore",ui().statOpen===true);
+    el0.innerHTML=wsStats(s).map(function(c){return '<div class="stat"><i class="sd"></i>'+c[0]+'<b>'+c[1]+'</b></div>';}).join("")+statMoreBtn()+statsSayHtml();
+    return;
+  }
   if(s.type==="trip"){
     el0.classList.toggle("smore",ui().statOpen===true);
     el0.innerHTML=tripStats(s).map(function(c){return '<div class="stat"><i class="sd"></i>'+c[0]+'<b>'+c[1]+'</b></div>';}).join("")+statMoreBtn()+statsSayHtml();
@@ -4928,6 +5235,7 @@ function renderFilters(){
     return;
   }
   if(s.type==="trip"){ el.innerHTML=tripFiltersHtml(s); return; }
+  if(s.type==="wish"){ el.innerHTML=wsFiltersHtml(s); return; }
   const tags=s.tags||[];
   el.innerHTML=[`<button class="chip ${filter==="ALL"?"on":""}" onclick="setF('ALL')">ALL ★</button>`]
     .concat(tags.map(t=>`<button class="chip ${filter===t?"on":""}${t===DONETAG()?" tdone":""}" onclick="setF('${esc(t)}')">${esc(t)}</button>`)).join("");
@@ -6585,7 +6893,8 @@ function render(){
   if(cur==="project") head=northPanel();
   else if(cur!=="book"&&cur!=="habit") head=nsStrip(cur)+head;
   if(cur==="estate") head=estatePanel()+`<div class="sechead">🏠 내 부동산 공부 카드 <span>${list.length}개</span></div>`+head;
-  const body=s.type==="trip" ? tripView()
+  const body=s.type==="wish" ? wsView()
+    : s.type==="trip" ? tripView()
     : s.type==="memo" ? memoView()
     : s.type==="dream" ? dreamView()
     : s.type==="muse" ? museView()
@@ -6598,8 +6907,8 @@ function render(){
   document.getElementById("panel").innerHTML=inboxBox()+head+body;
   document.getElementById("tbNow").textContent=s.label;
   const bn=document.getElementById("btnNew");
-  if(bn){bn.textContent=s.type==="trip"?tripNewLabel():s.type==="memo"?"＋ 새 메모":s.type==="daily"?"＋ 할 일 쓰기":s.type==="habit"?"＋ 오늘 기록":s.type==="dream"?"＋ 꿈 추가":"＋ 새 기록";
-    bn.setAttribute("onclick",s.type==="trip"?"tripNew()":s.type==="memo"?"newMemo()":s.type==="dream"?"openDream()":(s.type==="daily"||s.type==="habit"||s.type==="muse")?"openEdit()":"openQuick()");
+  if(bn){bn.textContent=s.type==="wish"?"＋ 위시 담기":s.type==="trip"?tripNewLabel():s.type==="memo"?"＋ 새 메모":s.type==="daily"?"＋ 할 일 쓰기":s.type==="habit"?"＋ 오늘 기록":s.type==="dream"?"＋ 꿈 추가":"＋ 새 기록";
+    bn.setAttribute("onclick",s.type==="wish"?"wsEdit()":s.type==="trip"?"tripNew()":s.type==="memo"?"newMemo()":s.type==="dream"?"openDream()":(s.type==="daily"||s.type==="habit"||s.type==="muse")?"openEdit()":"openQuick()");
     bn.style.display=(cur==="project")?"none":"";}
   const sq=document.getElementById("q"); if(sq)sq.style.display=(cur==="project")?"none":"";
   save();
@@ -6852,6 +7161,7 @@ function saveEdit(){
     if(tag.indexOf("dream:")===0)return saveDream(tag.slice(6));
     if(tag.indexOf("trip:")===0)return tripSaveDispatch(tag.slice(5));
     if(tag.indexOf("mvday:")===0)return saveMoveDay(tag.slice(6));
+    if(tag.indexOf("wish:")===0)return wsSave(tag.slice(5));
   }
   const s=DATA[cur],g=id=>document.getElementById(id);
   const title=(g("f_title").value||"").trim();
