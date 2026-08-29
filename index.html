@@ -2185,9 +2185,18 @@ html[data-theme=dark] .titem .x.dt{color:#9dbcff;border-color:#2a3b5c}
 .wpast{font-size:10.5px;font-weight:800;color:var(--muted);background:var(--surface-3);
   border-radius:999px;padding:2px 8px}
 
-.wrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:start;
+.wrow{display:grid;grid-template-columns:20px auto 1fr auto auto;gap:9px;align-items:start;
   padding:10px 2px;border-bottom:1px solid var(--line)}
 .wrow:last-child{border-bottom:0}
+.wgrip{margin-left:-4px}
+.wph{height:46px;margin:6px 0;border-radius:11px;border:2px dashed var(--blue);
+  background:var(--blue-xl);animation:tpphIn .16s ease}
+#wsGhost{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;
+  background:var(--card);color:var(--ink);border:1px solid var(--blue);border-radius:11px;
+  padding:7px 13px;font-size:12.5px;font-weight:800;max-width:230px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;box-shadow:0 10px 28px rgba(15,27,51,.22)}
+.wsec.dropin{outline:2px dashed var(--blue);outline-offset:2px}
+.wsec.dropin .wsh>b{color:var(--blue-d)}
 .wck{flex:none;width:24px;height:24px;margin-top:2px;border-radius:8px;border:1.5px solid var(--line);
   background:var(--surface-2);color:transparent;font-size:13px;font-weight:900;line-height:1;
   display:flex;align-items:center;justify-content:center;transition:.15s}
@@ -2212,9 +2221,9 @@ html[data-theme=dark] .titem .x.dt{color:#9dbcff;border-color:#2a3b5c}
 .wmq>button:hover{border-color:var(--blue);color:var(--blue-d);background:var(--blue-xl)}
 @media(max-width:520px){
   .wsec{padding:4px 12px 8px}
-  .wrow{grid-template-columns:auto 1fr auto;gap:8px}
-  .wright{grid-column:2/3;padding-top:2px}
-  .wrow .tpacts{grid-row:1;grid-column:3}
+  .wrow{grid-template-columns:18px auto 1fr auto;gap:7px}
+  .wright{grid-column:3/4;padding-top:2px}
+  .wrow .tpacts{grid-row:1;grid-column:4}
 }
 </style>
 </head>
@@ -3386,13 +3395,14 @@ function wsView(){
   });
   keys.sort(function(a,b){ if(!a)return 1; if(!b)return -1; return a<b?-1:a>b?1:0; });
   const now=ymNow();
+  const drag=!wsQ()&&filter==="ALL";        /* 검색·필터 중에는 순서가 꼬여서 잠급니다 */
   const secs=keys.map(function(k){
     const g=bag[k].slice().sort(function(a,b){return (a.done?1:0)-(b.done?1:0);});
     const dn=g.filter(function(w){return w.done;}).length;
     const sum=g.reduce(function(a,w){return a+(w.done?0:w.price);},0);
-    const rows=g.map(wsRow).join("");
+    const rows=g.map(function(w){return wsRow(w,drag);}).join("");
     const tag=(!k)?"":(k===now?'<span class="wnow">이번 달</span>':(k<now?'<span class="wpast">지난달</span>':""));
-    return '<div class="wsec">'+
+    return '<div class="wsec" data-m="'+k+'">'+
       '<div class="wsh"><b>'+esc(ymLabel(k))+'</b>'+tag+
         '<span class="wsn">'+dn+' / '+g.length+'</span>'+
         '<span class="spacer"></span>'+
@@ -3402,8 +3412,11 @@ function wsView(){
   const empty='<div class="tpempty">'+(wsQ()||filter!=="ALL"
       ?'이 조건에 맞는 게 없어요.'
       :'갖고 싶은 것, 받고 싶은 시술, 해보고 싶은 것<br>뭐든 한 줄만 적어두면 돼요 🎁')+'</div>';
+  const hint=(l.length>1)?'<div class="tphint">'+(drag
+      ?'왼쪽 <span class="gz"></span> 을 잡고 끌면 순서가 바뀌어요 · 다른 달 칸에 놓으면 그 달로 옮겨가요'
+      :'검색·필터 중에는 순서를 바꿀 수 없어요 · 「전체」로 돌아오면 다시 끌 수 있어요')+'</div>':'';
   return wsHead(s)+'<button class="tpadd" onclick="wsEdit()">＋ 위시 담기</button>'+
-    (secs||empty);
+    '<div id="wsroot">'+(secs||empty)+'</div>'+hint;
 }
 function wsHead(s){
   const all=s.list||[];
@@ -3421,9 +3434,12 @@ function wsHead(s){
     '<div class="tpbar"><i style="width:'+pct+'%"></i><span>'+dn+' / '+all.length+' 이룸 ('+pct+'%)</span></div>'+
   '</div>';
 }
-function wsRow(w){
+function wsRow(w,drag){
   const c=wkat(w.cat);
-  return '<div class="wrow '+(w.done?"done":"")+'">'+
+  return '<div class="wrow '+(w.done?"done":"")+'" data-id="'+w.id+'">'+
+    (drag?'<div class="tpgrip wgrip" title="끌어서 순서 바꾸기" aria-label="끌어서 순서 바꾸기" role="button" tabindex="0"'+
+      ' onpointerdown="wsGripDown(event,\''+w.id+'\')" onkeydown="wsGripKey(event,\''+w.id+'\')"></div>'
+      :'<div class="tpgrip wgrip off"></div>')+
     '<button class="wck '+(w.done?"on":"")+'" title="'+(w.done?"아직으로 되돌리기":"이뤘어요!")+'" '+
       'aria-label="이룸 표시" onclick="wsTog(\''+w.id+'\')">✓</button>'+
     '<div class="wbody" onclick="wsEdit(\''+w.id+'\')">'+
@@ -3437,6 +3453,132 @@ function wsRow(w){
       (w.url?'<button title="링크 열기" aria-label="링크 열기" onclick="window.open(\''+esc(w.url)+'\',\'_blank\')">🔗</button>':'')+
       '<button class="dl" title="지우기" aria-label="지우기" onclick="wsDel(\''+w.id+'\')">✕</button>'+
     '</div></div>';
+}
+/* ---- 끌어서 순서 바꾸기 · 다른 달로 옮기기 ---- */
+/* 화면에 보이는 차례대로 저장 목록을 다시 세웁니다 (그 줄이 속한 달도 함께) */
+function wsRebuild(){
+  const s=wS();if(!s)return false;
+  const root=document.getElementById("wsroot");if(!root)return false;
+  const map={};s.list.forEach(function(w){map[w.id]=w;});
+  const out=[],seen={};
+  const secs=root.querySelectorAll(".wsec");
+  for(let i=0;i<secs.length;i++){
+    const m=secs[i].getAttribute("data-m")||"";
+    const rows=secs[i].querySelectorAll(".wrow[data-id]");
+    for(let j=0;j<rows.length;j++){
+      const id=rows[j].getAttribute("data-id"),w=map[id];
+      if(!w||seen[id])continue;
+      seen[id]=1;w.month=m;out.push(w);
+    }
+  }
+  s.list.forEach(function(w){if(!seen[w.id])out.push(w);});
+  if(out.length!==s.list.length)return false;
+  s.list=out;return true;
+}
+var WSDRAG=null;
+function wsGripDown(e,id){
+  if(e.pointerType==="mouse"&&e.button!==0)return;
+  const row=(e.target&&e.target.closest)?e.target.closest(".wrow"):null;
+  if(!row)return;
+  try{e.preventDefault();e.stopPropagation();}catch(x){}
+  WSDRAG={id:id,row:row,x:e.clientX,y:e.clientY,on:false,ph:null,ghost:null,
+    from:(row.closest(".wsec")||{getAttribute:function(){return "";}}).getAttribute("data-m")||""};
+  document.addEventListener("pointermove",wsDragMove,{passive:false});
+  document.addEventListener("pointerup",wsDragUp,true);
+  document.addEventListener("pointercancel",wsDragUp,true);
+}
+function wsDragBegin(){
+  const d=WSDRAG;if(!d)return;
+  d.on=true;
+  document.body.classList.add("tpdragging");
+  const ph=document.createElement("div");
+  ph.className="wph";ph.id="wsPh";
+  if(d.row.parentNode)d.row.parentNode.insertBefore(ph,d.row);
+  d.ph=ph;
+  d.row.style.display="none";
+  const g=document.createElement("div");
+  g.id="wsGhost";
+  const t=d.row.querySelector(".w1>b");
+  g.textContent=t?t.textContent:"위시";
+  document.body.appendChild(g);
+  d.ghost=g;
+}
+function wsSecClear(){
+  const a=document.querySelectorAll(".wsec.dropin");
+  for(let i=0;i<a.length;i++)a[i].classList.remove("dropin");
+}
+function wsDragMove(e){
+  const d=WSDRAG;if(!d)return;
+  if(!d.on){
+    if(Math.abs(e.clientX-d.x)<5&&Math.abs(e.clientY-d.y)<5)return;
+    wsDragBegin();
+  }
+  try{e.preventDefault();}catch(x){}
+  if(d.ghost)d.ghost.style.transform="translate("+(e.clientX+14)+"px,"+(e.clientY-16)+"px)";
+  const vh=window.innerHeight||600;
+  if(e.clientY<70)window.scrollBy(0,-16);
+  else if(e.clientY>vh-70)window.scrollBy(0,16);
+
+  if(d.ghost)d.ghost.style.display="none";
+  const el=document.elementFromPoint?document.elementFromPoint(e.clientX,e.clientY):null;
+  if(d.ghost)d.ghost.style.display="";
+  wsSecClear();
+  if(!el||!el.closest||!d.ph)return;
+
+  const row=el.closest(".wrow");
+  if(row&&row!==d.row&&row.parentNode){
+    const rr=row.getBoundingClientRect();
+    const after=(e.clientY>rr.top+rr.height/2);
+    row.parentNode.insertBefore(d.ph,after?row.nextSibling:row);
+    const sc=row.closest(".wsec"); if(sc&&sc.getAttribute("data-m")!==d.from)sc.classList.add("dropin");
+    return;
+  }
+  const head=el.closest(".wsh");
+  const sec=el.closest(".wsec");
+  if(sec){
+    if(head)sec.insertBefore(d.ph,head.nextSibling);
+    else if(d.ph.parentNode!==sec)sec.appendChild(d.ph);
+    if(sec.getAttribute("data-m")!==d.from)sec.classList.add("dropin");
+  }
+}
+function wsDragUp(){
+  const d=WSDRAG;
+  document.removeEventListener("pointermove",wsDragMove);
+  document.removeEventListener("pointerup",wsDragUp,true);
+  document.removeEventListener("pointercancel",wsDragUp,true);
+  WSDRAG=null;
+  if(!d)return;
+  document.body.classList.remove("tpdragging");
+  if(d.ghost&&d.ghost.parentNode)d.ghost.parentNode.removeChild(d.ghost);
+  wsSecClear();
+  if(!d.on)return;
+  /* 자리표시자가 있던 그 자리에 진짜 줄을 넣고, 화면 차례대로 저장합니다 */
+  if(d.ph&&d.ph.parentNode)d.ph.parentNode.insertBefore(d.row,d.ph);
+  if(d.ph&&d.ph.parentNode)d.ph.parentNode.removeChild(d.ph);
+  d.row.style.display="";
+  const to=(d.row.closest(".wsec")||{getAttribute:function(){return d.from;}}).getAttribute("data-m")||"";
+  const ok=wsRebuild();
+  if(!ok){render();return;}
+  save();render();
+  if(to!==d.from){try{toast("📦 "+ymLabel(to)+"(으)로 옮겼어요");}catch(e){}}
+}
+/* 키보드로도 (↑ ↓) — 같은 달 안에서 자리 바꾸기 */
+function wsGripKey(e,id){
+  if(e.key!=="ArrowUp"&&e.key!=="ArrowDown")return;
+  e.preventDefault();
+  const row=document.querySelector('.wrow[data-id="'+id+'"]');if(!row)return;
+  const sec=row.closest(".wsec");if(!sec)return;
+  const rows=[].slice.call(sec.querySelectorAll(".wrow[data-id]"));
+  const i=rows.indexOf(row),j=i+(e.key==="ArrowUp"?-1:1);
+  if(i<0||j<0||j>=rows.length)return;
+  if(e.key==="ArrowUp")sec.insertBefore(row,rows[j]);
+  else sec.insertBefore(row,rows[j].nextSibling);
+  if(!wsRebuild()){render();return;}
+  save();render();
+  setTimeout(function(){
+    const el=document.querySelector('.wrow[data-id="'+id+'"] .wgrip');
+    if(el)el.focus();
+  },30);
 }
 function wsTog(id){
   const s=wS();if(!s)return;
