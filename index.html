@@ -2391,10 +2391,68 @@ function streakDays(){
 function tabKeys(){
   const o=DATA.__order;
   const a=(o&&o.length)?o.filter(k=>DATA[k]):Object.keys(DATA).filter(k=>k.indexOf("__")!==0);
-  const b=a.filter(k=>!(DATA[k]&&DATA[k].secret));
+  const off=Array.isArray(DATA.__off)?DATA.__off:[];
+  const b=a.filter(k=>!(DATA[k]&&DATA[k].secret)&&off.indexOf(k)<0);
   if(dreamOn&&DATA.dream&&b.indexOf("dream")<0)b.push("dream");
   return b;
 }
+/* ---- 사용할 탭 켜고 끄기 ---- */
+function tabOffList(){ if(!Array.isArray(DATA.__off))DATA.__off=[]; return DATA.__off; }
+function tabAll(){
+  const o=DATA.__order;
+  const a=(o&&o.length)?o.filter(k=>DATA[k]):Object.keys(DATA).filter(k=>k.indexOf("__")!==0);
+  Object.keys(DATA).forEach(k=>{ if(k.indexOf("__")!==0 && a.indexOf(k)<0) a.push(k); });
+  return a.filter(k=>!(DATA[k]&&DATA[k].secret));
+}
+function tabOn(k){ return tabOffList().indexOf(k)<0; }
+function tabOnCount(){ return tabAll().filter(tabOn).length; }
+function tabSet(k,on){
+  const off=tabOffList();
+  if(on){ const i=off.indexOf(k); if(i>=0)off.splice(i,1); }
+  else{
+    if(tabOnCount()<=1){ try{toast("탭은 하나 이상 켜져 있어야 해요");}catch(e){} return; }
+    if(off.indexOf(k)<0)off.push(k);
+  }
+  if(tabKeys().indexOf(cur)<0)cur=tabKeys()[0];
+  save();renderTabs();render();openTabs();
+  try{toast(on?"👀 탭을 다시 켰어요":"🙈 탭을 숨겼어요 · 기록은 그대로 있어요");}catch(e){}
+}
+function tabRename(k){
+  const st=DATA[k]; if(!st)return;
+  const cur0=String(st.label||k);
+  const ic=(cur0.match(/^\S+\s/)||[""])[0];
+  const v=prompt("탭 이름을 바꿔요", cur0.replace(/^\S+\s/,""));
+  if(v===null)return;
+  const nv=String(v).trim();
+  if(!nv){ try{toast("이름을 비울 수 없어요");}catch(e){} return; }
+  st.label=ic+nv;
+  save();renderTabs();render();openTabs();
+}
+function orderReset(){
+  const seed=Object.keys(SEED).filter(k=>DATA[k]);
+  const extra=Object.keys(DATA).filter(k=>k.indexOf("__")!==0&&seed.indexOf(k)<0);
+  setOrder(seed.concat(extra));
+  openOrder();
+}
+function openTabs(){
+  const all=tabAll();
+  document.getElementById("mTitle").textContent="🎛 사용할 탭 선택";
+  document.getElementById("mForm").innerHTML=
+    `<div class="hint2" style="margin:0 0 10px">끈 탭은 화면에서 숨겨져요. <b>기록은 그대로 보관</b>되고, 다시 켜면 그대로 돌아와요.</div>
+     <div class="ordlist">${all.map(k=>{
+       const on=tabOn(k);
+       return `<div class="ordrow" style="${on?"":"opacity:.48"}">
+         <span class="on">${chImg(k)}</span>
+         <b>${esc(String(DATA[k].label||k).replace(/^\S+\s/,""))}${on?"":' <span style="font-weight:600;font-size:11px;opacity:.75">· 숨김</span>'}</b>
+         <button class="btn sm" onclick="tabRename('${k}')">이름</button>
+         <button class="btn sm ${on?"":"primary"}" onclick="tabSet('${k}',${on?"false":"true"})">${on?"끄기":"켜기"}</button>
+       </div>`;}).join("")}</div>
+     <div class="hint2" style="margin:10px 0 0">켜진 탭 <b>${all.filter(tabOn).length}개</b> / 전체 ${all.length}개</div>`;
+  document.getElementById("mIc").innerHTML=chImg("base");
+  document.getElementById("mSave").style.display="none";
+  document.getElementById("overlay").classList.add("on");
+}
+
 function setOrder(a){DATA.__order=a;save();renderTabs();}
 function moveTab(k,dir){
   const a=tabKeys(),i=a.indexOf(k),j=i+dir;
@@ -2413,7 +2471,7 @@ function openOrder(){
        <button class="btn sm" ${i===0?"disabled":""} onclick="moveTab('${k}',-1)">↑</button>
        <button class="btn sm" ${i===a.length-1?"disabled":""} onclick="moveTab('${k}',1)">↓</button>
      </div>`).join("")}</div>
-     <button class="btn wide" onclick="setOrder(Object.keys(SEED));openOrder()">기본 순서로 되돌리기</button>`;
+     <button class="btn wide" onclick="orderReset()">기본 순서로 되돌리기</button>`;
   document.getElementById("mIc").innerHTML=chImg("base");
   document.getElementById("mSave").style.display="none";
   document.getElementById("overlay").classList.add("on");
@@ -6171,6 +6229,11 @@ function openSettings(){
         ?"지난 날짜의 못 한 할 일을 오늘로 <b>옮겨와요</b>. 그래서 지난 날짜는 비어 보일 수 있어요."
         :"지난 날짜의 기록이 <b>그 자리에 그대로 남아요</b>."}</div>
       <div class="setb"><button class="btn" onclick="rollSet(${rollOn()?"false":"true"});openSettings()">${rollOn()?"이월 끄기":"이월 켜기"}</button></div>
+    </div>
+    <div class="setg">
+      <div class="seth">🎛 사용할 탭 선택</div>
+      <div class="setd">안 쓰는 탭은 숨겨두고, 이름도 바꿀 수 있어요. 숨겨도 기록은 그대로 보관돼요.</div>
+      <div class="setb"><button class="btn" onclick="closeEdit();openTabs()">켜고 끄기 · 이름</button></div>
     </div>
     <div class="setg">
       <div class="seth">⇅ 탭 순서</div>
