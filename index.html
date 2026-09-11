@@ -2297,6 +2297,61 @@ body.tpdragging .mfgrip{cursor:grabbing}
   .mpcr>em{display:none}
   .mpmr{grid-template-columns:58px 1fr auto;gap:6px}
 }
+
+/* ===== 📅 일별 / 🗓 월별 전환 탭 ===== */
+.mnvt{display:flex;gap:6px;margin:10px 0 2px;padding:4px;border-radius:13px;
+  background:var(--surface-2);border:1px solid var(--line)}
+.mnvt>button{flex:1 1 0;border:0;background:transparent;color:var(--muted);
+  font-family:inherit;font-size:13px;font-weight:800;padding:9px 6px;border-radius:10px;
+  cursor:pointer;letter-spacing:-.02em;transition:background .15s,color .15s}
+.mnvt>button:hover{color:var(--ink-2)}
+.mnvt>button.on{background:var(--card);color:var(--blue);
+  box-shadow:0 1px 3px rgba(0,0,0,.09),inset 0 0 0 1px var(--line)}
+
+/* ===== 막대를 결제수단 색으로 쪼개기 ===== */
+.mnbc>i{display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.mnbc>i>u{display:block;width:100%;text-decoration:none;min-height:0;flex:none}
+.mnbc.big>i>u:last-child{filter:saturate(1.12)}
+.mnlgw{display:flex;flex-wrap:wrap;gap:5px 9px;margin-top:9px;padding-top:8px;
+  border-top:1px dashed var(--line)}
+.mnlg{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+  color:var(--muted);white-space:nowrap}
+.mnlg>i{width:9px;height:9px;border-radius:3px;flex:none}
+
+/* 날짜 묶음 머리에 찍히는 결제수단 점 */
+.mndots{display:inline-flex;align-items:center;gap:3px;margin-left:6px;vertical-align:middle}
+.mndots>i{width:7px;height:7px;border-radius:50%;display:block}
+
+/* ===== 🗓 월별 목록 ===== */
+.mnmw{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.mnmr{display:grid;grid-template-columns:1fr 74px minmax(78px,auto) minmax(64px,auto);gap:9px;align-items:center;
+  width:100%;border:1px solid transparent;background:transparent;color:inherit;
+  font-family:inherit;text-align:left;padding:10px 11px;border-radius:12px;cursor:pointer;
+  transition:background .14s,border-color .14s}
+.mnmr:hover{background:var(--surface-2);border-color:var(--line)}
+.mnmr.on{background:var(--blue-xl);border-color:var(--blue)}
+.mnmr.zero{opacity:.5}
+.mnmn{display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:800;
+  letter-spacing:-.02em;white-space:nowrap}
+.mnmn>span.wnow{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;
+  background:var(--blue);color:#fff;letter-spacing:0}
+.mnmn>small{font-size:10.5px;font-weight:700;color:var(--muted)}
+.mncb{height:9px;border-radius:999px;background:var(--surface-3);overflow:hidden}
+.mncb>i{display:block;height:100%;border-radius:999px;background:var(--blue);min-width:2px}
+.mnmr>b{font-size:13.5px;font-weight:800;text-align:right;white-space:nowrap;
+  letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.mnmr>em{font-style:normal;font-size:11px;font-weight:800;text-align:right;
+  white-space:nowrap;font-variant-numeric:tabular-nums}
+.mnmr>em.up{color:var(--danger)}
+.mnmr>em.down{color:var(--ok,#0ea472)}
+.mnmr>em.flat{color:var(--muted);opacity:.7}
+@media(max-width:640px){
+  .mnvt>button{font-size:12.5px;padding:8px 4px}
+  .mnmr{grid-template-columns:1fr minmax(70px,auto) minmax(58px,auto);gap:7px;padding:10px 9px}
+  .mncb{display:none}
+  .mnmr>b{font-size:13px}
+  .mnlg{font-size:10.5px}
+}
 </style>
 <style id="wishcss">
 /* ===================== 🎁 위시리스트 ===================== */
@@ -3801,6 +3856,21 @@ function mnWish(ym){
 }
 function mnWishSum(ym){return mnWish(ym).reduce(function(n,o){return n+(+o.w.price||0);},0);}
 
+/* ---- 일별 · 월별 화면 전환 ---- */
+function mnVw(){return (ui().mnview==="month")?"month":"day";}
+function mnSetVw(v){
+  ui().mnview=(v==="month")?"month":"day";
+  save();render();
+  try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){}
+}
+function mnViewTabs(){
+  const v=mnVw();
+  return '<div class="mnvt">'+
+    '<button type="button" class="'+(v==="day"?"on":"")+'" onclick="mnSetVw(\'day\')">📅 일별</button>'+
+    '<button type="button" class="'+(v==="month"?"on":"")+'" onclick="mnSetVw(\'month\')">🗓 월별</button>'+
+  '</div>';
+}
+
 /* ---- 화면 ---- */
 function mnView(){
   const s=DATA[cur],ym=mnYm(s);
@@ -3832,7 +3902,8 @@ function mnView(){
         '<em>'+(bud?(left-wsum<0?"다 사면 "+won(wsum-left)+"원 모자라요":"다 사도 "+won(left-wsum)+"원 남아요"):"예산을 정하면 비교해 드릴게요")+'</em></div>':'')+
   '</div>';
 
-  return head+mnQuick(s,ym)+mnFixedBox(s,ym)+mnDayChart(s,ym,list)+mnPayBox(s,ym,list)+mnSpendBox(s,ym,list);
+  if(mnVw()==="month") return head+mnViewTabs()+mnMonthBox(s);
+  return head+mnViewTabs()+mnQuick(s,ym)+mnFixedBox(s,ym)+mnDayChart(s,ym,list)+mnPayBox(s,ym,list)+mnSpendBox(s,ym,list);
 }
 
 /* ---- 빠른 입력 ---- */
@@ -4140,10 +4211,40 @@ function mnDragUp(){
 }
 
 /* ---- 일자별 쓴 돈 ---- */
+/* 하루치를 결제수단별로 나눈 조각 (카드 순서 고정 → 색이 날마다 안 바뀜) */
+function mnDaySegs(s,rows,total){
+  const by={};
+  rows.forEach(function(x){const k=x.p||"";by[k]=(by[k]||0)+x.amt;});
+  const order=mnPays(s).map(function(p){return p.id;}).concat([""]);
+  const segs=[];
+  order.forEach(function(k){ if(by[k]>0) segs.push({id:k,amt:by[k],c:mpay(s,k).color,n:mpay(s,k).name}); });
+  Object.keys(by).forEach(function(k){
+    if(by[k]>0&&order.indexOf(k)<0) segs.push({id:k,amt:by[k],c:MPNONE.color,n:MPNONE.name});
+  });
+  segs.sort(function(a,b){return a.amt-b.amt;});   /* 큰 조각이 아래로 */
+  let used=0;
+  segs.forEach(function(g,i){
+    g.pc=(i===segs.length-1)?(100-used):Math.round(g.amt/(total||1)*100);
+    if(g.pc<0)g.pc=0; used+=g.pc;
+  });
+  return segs;
+}
+function mnChartLegend(s,list){
+  const by={};
+  list.forEach(function(x){const k=x.p||"";by[k]=(by[k]||0)+x.amt;});
+  const order=mnPays(s).map(function(p){return p.id;}).concat([""]);
+  const out=[];
+  order.forEach(function(k){
+    if(!by[k])return;
+    const p=mpay(s,k);
+    out.push('<span class="mnlg"><i style="background:'+p.color+'"></i>'+p.emoji+' '+esc(p.name)+' '+won(by[k])+'</span>');
+  });
+  return out.length>1?'<div class="mnlgw">'+out.join("")+'</div>':'';
+}
 function mnDayChart(s,ym,list){
   if(!list.length) return "";
-  const per={};
-  list.forEach(function(x){per[x.d]=(per[x.d]||0)+x.amt;});
+  const per={},rowsOf={};
+  list.forEach(function(x){per[x.d]=(per[x.d]||0)+x.amt;(rowsOf[x.d]=rowsOf[x.d]||[]).push(x);});
   const isNow=(ym===ymNow());
   const last=isNow?(+todayStr().slice(8,10)):mnLastDay(ym);
   const t=todayStr();
@@ -4159,11 +4260,15 @@ function mnDayChart(s,ym,list){
     const v=per[k]||0;
     const h=max?Math.max(v?4:0,Math.round(v/max*100)):0;
     const big=(v>0&&v>=top);
+    const segs=v?mnDaySegs(s,rowsOf[k],v):[];
+    const tip=(+ym.split("-")[1])+'월 '+i+'일 · '+won(v)+'원'+
+      (segs.length?'\u000a'+segs.slice().reverse().map(function(g){return g.n+' '+won(g.amt);}).join('\u000a'):'');
     bars.push('<button type="button" class="mnbc'+(v?"":" zero")+(k===t?" today":"")+(big?" big":"")+'" '+
       (v?'onclick="mnGoDay(\''+k+'\')"':'disabled')+
-      ' title="'+(+ym.split("-")[1])+'월 '+i+'일 · '+won(v)+'원">'+
+      ' title="'+esc(tip)+'">'+
       '<span class="mnbv">'+(big?won(Math.round(v/1000))+"천":"")+'</span>'+
-      '<i style="height:'+h+'%"></i>'+
+      '<i style="height:'+h+'%">'+segs.map(function(g){
+        return '<u style="height:'+g.pc+'%;background:'+g.c+'"></u>';}).join("")+'</i>'+
       '<em>'+((i===1||i%5===0||i===last)?i:"")+'</em></button>');
   }
   return '<div class="wsec">'+
@@ -4171,7 +4276,8 @@ function mnDayChart(s,ym,list){
       '<span class="wsn">'+nd+'일 기록</span><span class="spacer"></span>'+
       '<em>하루 평균 '+won(Math.round(tot/last))+'원</em></div>'+
     '<div class="mnbw">'+bars.join("")+'</div>'+
-    '<div class="mfhint" style="border:0;padding-top:2px">막대를 누르면 그날 쓴 내역으로 내려가요</div>'+
+    mnChartLegend(s,list)+
+    '<div class="mfhint" style="border:0;padding-top:2px">막대 색은 결제수단이에요 · 누르면 그날 내역으로 내려가요</div>'+
   '</div>';
 }
 /* ---- \uD83D\uDCB3 \uce74\ub4dc\ubcc4 \uc774\ubc88 \ub2ec \ud569\uacc4 ---- */
@@ -4306,9 +4412,13 @@ function mnSpendBox(s,ym,listAll){
   const t=todayStr();
   const secs=keys.map(function(k){
     const g=bag[k],sum=mnSum(g);
+    const segs=mnDaySegs(s,g,sum);
     return '<div class="wsec" id="mnd_'+k+'">'+
       '<div class="wsh"><b>'+esc(mnDayLabel(k))+'</b>'+(k===t?'<span class="wnow">오늘</span>':'')+
-        '<span class="wsn">'+g.length+'건</span><span class="spacer"></span>'+
+        '<span class="wsn">'+g.length+'건</span>'+
+        (segs.length?'<span class="mndots">'+segs.slice().reverse().map(function(q){
+          return '<i style="background:'+q.c+'" title="'+esc(q.n+" "+won(q.amt)+"원")+'"></i>';}).join("")+'</span>':'')+
+        '<span class="spacer"></span>'+
         '<em>'+won(sum)+'원</em></div>'+
       g.map(mnRow).join("")+'</div>';
   }).join("");
@@ -4405,6 +4515,68 @@ function mnSaveDispatch(kind,id){
   return mnSave(id);
 }
 
+/* ---- 🗓 월별 목록 ---- */
+function mnMonthList(s){
+  const set={};
+  (s.spend||[]).forEach(function(x){const m=String(x.d||"").slice(0,7);if(/^\d{4}-\d{2}$/.test(m))set[m]=1;});
+  Object.keys(s.budget||{}).forEach(function(m){set[m]=1;});
+  set[ymNow()]=1; set[mnYm(s)]=1;
+  const ks=Object.keys(set).sort();
+  if(!ks.length) return [];
+  const all=[];let c=ks[0];const end=ks[ks.length-1];let guard=0;
+  while(c<=end&&guard++<400){all.push(c);c=ymAdd(c,1);}     /* 빈 달도 끼워서 흐름 유지 */
+  const cut=(all.length>18)?all.slice(all.length-18):all;
+  const sum={},cnt={};
+  (s.spend||[]).forEach(function(x){
+    const m=String(x.d||"").slice(0,7);
+    sum[m]=(sum[m]||0)+x.amt; cnt[m]=(cnt[m]||0)+1;
+  });
+  return cut.map(function(m){
+    const pv=ymAdd(m,-1);
+    return {ym:m,amt:sum[m]||0,n:cnt[m]||0,prev:(all.indexOf(pv)>=0)?(sum[pv]||0):null};
+  }).reverse();
+}
+function mnMonthBox(s){
+  const L=mnMonthList(s);
+  const has=L.filter(function(r){return r.amt>0;});
+  if(!has.length) return '<div class="wsec"><div class="tpempty">'+
+    '아직 기록이 없어요.<br>「📅 일별」에서 금액을 몇 번 적어보세요 💰</div></div>';
+  let max=0;L.forEach(function(r){if(r.amt>max)max=r.amt;});
+  const avg=Math.round(has.reduce(function(n,r){return n+r.amt;},0)/has.length);
+  let best=has[0];has.forEach(function(r){if(r.amt>best.amt)best=r;});
+  const now=ymNow(),sel=mnYm(s);
+  const rows=L.map(function(r){
+    const pc=max?Math.max(r.amt?2:0,Math.round(r.amt/max*100)):0;
+    let d;
+    if(r.prev===null||(!r.prev&&!r.amt)) d='<em class="flat">–</em>';
+    else if(!r.prev) d='<em class="up">처음 기록</em>';
+    else{
+      const g=r.amt-r.prev;
+      d=(g===0)?'<em class="flat">지난달과 같아요</em>'
+        :(g>0?'<em class="up">▲ '+won(g)+'</em>':'<em class="down">▼ '+won(-g)+'</em>');
+    }
+    return '<button type="button" class="mnmr'+(r.ym===sel?" on":"")+(r.amt?"":" zero")+'" '+
+      'title="'+esc(ymLabel(r.ym))+(r.n?' · '+r.n+'건':'')+'" onclick="mnGoMonth(\''+r.ym+'\')">'+
+      '<span class="mnmn">'+esc(ymLabel(r.ym))+(r.ym===now?'<span class="wnow">이번 달</span>':'')+'</span>'+
+      '<span class="mncb"><i style="width:'+pc+'%"></i></span>'+
+      '<b>'+won(r.amt)+'원</b>'+d+'</button>';
+  }).join("");
+  return '<div class="wsec">'+
+    '<div class="wsh"><b>🗓 달별로 쓴 돈</b>'+
+      '<span class="wsn">'+has.length+'개월</span><span class="spacer"></span>'+
+      '<em>한 달 평균 '+won(avg)+'원</em></div>'+
+    '<div class="mnmw">'+rows+'</div>'+
+    '<div class="mfhint">가장 많이 쓴 달은 <b>'+esc(ymLabel(best.ym))+' '+won(best.amt)+'원</b>'+
+      ' · 한 줄을 누르면 그 달로 가요</div>'+
+  '</div>';
+}
+function mnGoMonth(ym){
+  const s=mS();if(!s)return;
+  s.ym=ym; ui().mnview="day"; filter="ALL";
+  save();render();
+  try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){}
+}
+
 /* ---- 예산 ---- */
 function mnBudgetEdit(){
   const s=mS();if(!s)return;
@@ -4449,6 +4621,7 @@ function mnGoWish(){
 
 /* ---- 칩 · 통계 ---- */
 function mnFiltersHtml(s){
+  if(mnVw()==="month") return "";
   const ym=mnYm(s),l=mnSpendM(s,ym);
   const per={};l.forEach(function(x){per[x.cat]=(per[x.cat]||0)+1;});
   return '<button class="chip '+(filter==="ALL"?"on":"")+'" onclick="setF(\'ALL\')">전체 '+l.length+'</button>'+
