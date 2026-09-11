@@ -2336,8 +2336,8 @@ body.tpdragging .mfgrip{cursor:grabbing}
 .mnmn>span.wnow{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;
   background:var(--blue);color:#fff;letter-spacing:0}
 .mnmn>small{font-size:10.5px;font-weight:700;color:var(--muted)}
-.mncb{height:9px;border-radius:999px;background:var(--surface-3);overflow:hidden}
-.mncb>i{display:block;height:100%;border-radius:999px;background:var(--blue);min-width:2px}
+.mnmb{height:9px;border-radius:999px;background:var(--surface-3);overflow:hidden}
+.mnmb>i{display:block;height:100%;border-radius:999px;background:var(--blue);min-width:2px}
 .mnmr>b{font-size:13.5px;font-weight:800;text-align:right;white-space:nowrap;
   letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .mnmr>em{font-style:normal;font-size:11px;font-weight:800;text-align:right;
@@ -2348,9 +2348,33 @@ body.tpdragging .mfgrip{cursor:grabbing}
 @media(max-width:640px){
   .mnvt>button{font-size:12.5px;padding:8px 4px}
   .mnmr{grid-template-columns:1fr minmax(70px,auto) minmax(58px,auto);gap:7px;padding:10px 9px}
-  .mncb{display:none}
+  .mnmb{display:none}
   .mnmr>b{font-size:13px}
   .mnlg{font-size:10.5px}
+}
+
+/* ===== 📊 어디에 썼나 (카테고리 + 결제수단 합본) ===== */
+.mncb{display:flex;align-items:stretch;gap:1px}
+.mncb>i{flex:none;min-width:2px;border-radius:0}
+.mncb>i:first-child{border-radius:999px 0 0 999px}
+.mncb>i:last-child{border-radius:0 999px 999px 0}
+.mncb>i:only-child{border-radius:999px}
+.mncg{padding:5px 0 7px;border-radius:11px;transition:background .14s}
+.mncg+.mncg{border-top:1px dashed var(--line)}
+.mncg.on{background:var(--blue-xl);box-shadow:inset 0 0 0 1px var(--blue);padding:6px 8px 8px}
+.mncg .mncr{padding:2px 0}
+button.mncat{border:0;font-family:inherit;cursor:pointer;transition:filter .14s}
+button.mncat:hover{filter:brightness(.94)}
+.mncp{display:flex;flex-wrap:wrap;gap:4px 5px;margin:5px 0 0 2px}
+button.mncpb{border:1px solid transparent;font-family:inherit;cursor:pointer;
+  transition:border-color .14s,filter .14s}
+button.mncpb:hover{filter:brightness(.94)}
+button.mncpb.on{border-color:currentColor;font-weight:900}
+.mfhint button.lnk{border:0;background:transparent;padding:0;font-family:inherit;
+  font-size:inherit;font-weight:800;color:var(--blue);cursor:pointer;text-decoration:underline}
+@media(max-width:640px){
+  .mncp{margin-left:0}
+  button.mncpb{font-size:10px;padding:2px 6px}
 }
 </style>
 <style id="wishcss">
@@ -3903,7 +3927,7 @@ function mnView(){
   '</div>';
 
   if(mnVw()==="month") return head+mnViewTabs()+mnMonthBox(s);
-  return head+mnViewTabs()+mnQuick(s,ym)+mnFixedBox(s,ym)+mnDayChart(s,ym,list)+mnPayBox(s,ym,list)+mnSpendBox(s,ym,list);
+  return head+mnViewTabs()+mnQuick(s,ym)+mnDayChart(s,ym,list)+mnFixedBox(s,ym)+mnSpendBox(s,ym,list);
 }
 
 /* ---- 빠른 입력 ---- */
@@ -4281,34 +4305,6 @@ function mnDayChart(s,ym,list){
   '</div>';
 }
 /* ---- \uD83D\uDCB3 \uce74\ub4dc\ubcc4 \uc774\ubc88 \ub2ec \ud569\uacc4 ---- */
-function mnPayBox(s,ym,list){
-  if(!list.length) return "";
-  const per={},cnt={};
-  list.forEach(function(x){const k=x.p||"";per[k]=(per[k]||0)+x.amt;cnt[k]=(cnt[k]||0)+1;});
-  const ks=Object.keys(per).sort(function(a,b){
-    if(a===""&&b!=="")return 1; if(b===""&&a!=="")return -1; return per[b]-per[a];});
-  const tot=mnSum(list);
-  const fx={};
-  (s.fixed||[]).forEach(function(f){ if(!f.off&&!f.paid[ym]&&f.amt>0) fx[f.p||""]=(fx[f.p||""]||0)+f.amt; });
-  const rows=ks.map(function(k){
-    const p=mpay(s,k),v=per[k],pc=tot?Math.round(v/tot*100):0;
-    return '<button type="button" class="mncr mpcr'+(filter==="p:"+k?" on":"")+'" '+
-      'title="'+esc(p.name)+'\ub9cc \ubcf4\uae30" onclick="setF(\'p:'+k+'\')">'+
-      '<span class="tpcat" style="background:'+p.color+'1f;color:'+p.color+'">'+p.emoji+' '+esc(p.name)+'</span>'+
-      '<div class="mncb"><i style="width:'+pc+'%;background:'+p.color+'"></i></div>'+
-      '<b>'+won(v)+'\uc6d0</b><em>'+cnt[k]+'\uac74'+(fx[k]?' \u00b7 +'+won(fx[k]):'')+'</em></button>';
-  }).join("");
-  const fxtot=Object.keys(fx).reduce(function(n,k){return n+fx[k];},0);
-  return '<div class="wsec">'+
-    '<div class="wsh"><b>\uD83D\uDCB3 \uc5b4\ub5a4 \uac78\ub85c \uc37c\ub098</b>'+
-      '<span class="wsn">'+ks.length+'\uac1c</span><span class="spacer"></span>'+
-      (filter.indexOf("p:")===0?'<button type="button" class="btn sm" onclick="setF(\'ALL\')">\uc804\uccb4 \ubcf4\uae30</button>':'')+
-      '<button type="button" class="btn sm" onclick="mnPayMan()">\u2699 \uad00\ub9ac</button></div>'+
-    '<div class="mncw">'+rows+'</div>'+
-    (fxtot?'<div class="mfhint" style="border-top:1px dashed var(--line)">+ \ub294 \uc544\uc9c1 \uc548 \ub0b8 \uace0\uc815 \uc9c0\ucd9c\uc774\uc5d0\uc694 \u00b7 \ub2e4 \ub0b4\uba74 \ucd1d '+won(tot+fxtot)+'\uc6d0</div>':'')+
-    '<div class="mfhint" style="border:0;padding-top:2px">\uce74\ub4dc\ub97c \ub204\ub974\uba74 \uadf8\uac78\ub85c \uc4f4 \uac83\ub9cc \ubcf4\uc5ec\uc694</div>'+
-  '</div>';
-}
 function mnGoDay(k){
   const el=document.getElementById("mnd_"+k);
   if(!el){try{toast("그날 기록을 찾지 못했어요");}catch(e){}return;}
@@ -4404,6 +4400,66 @@ function mnPick(list){
     return true;
   });
 }
+/* 📊 어디에 썼나 — 카테고리 + 어떤 걸로 썼는지를 한 줄에 같이 */
+function mnCatBox(s,ym,listAll){
+  const per={},sub={};
+  listAll.forEach(function(x){
+    per[x.cat]=(per[x.cat]||0)+x.amt;
+    if(!sub[x.cat])sub[x.cat]={};
+    const k=x.p||"";
+    sub[x.cat][k]=(sub[x.cat][k]||0)+x.amt;
+  });
+  const tot=mnSum(listAll);
+  if(!tot) return "";
+  const order=mnPays(s).map(function(p){return p.id;}).concat([""]);
+  const used={};
+  const rows=MCAT.filter(function(c){return per[c.id]>0;})
+    .sort(function(a,b){return per[b.id]-per[a.id];})
+    .map(function(c){
+      const pc=tot?Math.round(per[c.id]/tot*100):0;
+      const by=sub[c.id]||{};
+      /* 결제수단 순서를 고정해서 색이 줄마다 안 바뀌게 */
+      const ks=order.filter(function(k){return by[k]>0;})
+        .concat(Object.keys(by).filter(function(k){return by[k]>0&&order.indexOf(k)<0;}));
+      ks.forEach(function(k){used[k]=1;});
+      const segs=ks.map(function(k){
+        const p=mpay(s,k);
+        return '<i style="width:'+(by[k]/tot*100)+'%;background:'+p.color+'" '+
+          'title="'+esc(p.name+' '+won(by[k])+'원')+'"></i>';
+      }).join("");
+      const pills=(ks.length?'<div class="mncp">'+ks.map(function(k){
+        const p=mpay(s,k);
+        return '<button type="button" class="mnpay mncpb'+(filter==="p:"+k?" on":"")+'" '+
+          'style="background:'+p.color+'1f;color:'+p.color+'" '+
+          'title="'+esc(p.name)+'만 보기" onclick="setF(\'p:'+k+'\')">'+
+          p.emoji+' '+esc(p.name)+' '+won(by[k])+'</button>';
+      }).join("")+'</div>':'');
+      return '<div class="mncg'+(filter===c.id?" on":"")+'">'+
+        '<div class="mncr"><button type="button" class="tpcat mncat" '+
+          'style="background:'+c.color+'1f;color:'+c.color+'" '+
+          'title="'+esc(c.name)+'만 보기" onclick="setF(\''+c.id+'\')">'+c.emoji+' '+c.name+'</button>'+
+        '<div class="mncb">'+segs+'</div>'+
+        '<b>'+won(per[c.id])+'원</b><em>'+pc+'%</em></div>'+pills+'</div>';
+    }).join("");
+  /* 아직 안 낸 고정 지출도 같이 알려주기 */
+  const fx={};let fxtot=0;
+  (s.fixed||[]).forEach(function(f){
+    if(!f.off&&!f.paid[ym]&&f.amt>0){fx[f.cat]=(fx[f.cat]||0)+f.amt;fxtot+=f.amt;}
+  });
+  const nUsed=Object.keys(used).length;
+  return '<div class="wsec">'+
+    '<div class="wsh"><b>\ud83d\udcca 어디에 썼나</b>'+
+      (nUsed>1?'<span class="wsn">결제수단 '+nUsed+'개</span>':'')+
+      '<span class="spacer"></span>'+
+      (filter!=="ALL"?'<button type="button" class="btn sm" onclick="setF(\'ALL\')">전체 보기</button>':'')+
+      '<em>'+won(tot)+'원</em></div>'+
+    '<div class="mncw">'+rows+'</div>'+
+    (fxtot?'<div class="mfhint">아직 안 낸 고정 지출 '+won(fxtot)+
+      '원까지 치면 총 <b>'+won(tot+fxtot)+'원</b></div>':'')+
+    '<div class="mfhint" style="border:0;padding-top:2px">막대 색은 결제수단이에요 · 카드나 카테고리를 누르면 그것만 보여요 · '+
+      '<button type="button" class="lnk" onclick="mnPayMan()">⚙ 결제수단 관리</button></div>'+
+  '</div>';
+}
 function mnSpendBox(s,ym,listAll){
   const l=mnPick(listAll).slice().sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:0;});
   /* 날짜별 묶기 */
@@ -4422,19 +4478,7 @@ function mnSpendBox(s,ym,listAll){
         '<em>'+won(sum)+'원</em></div>'+
       g.map(mnRow).join("")+'</div>';
   }).join("");
-  const per={};MCAT.forEach(function(c){per[c.id]=0;});
-  listAll.forEach(function(x){per[x.cat]=(per[x.cat]||0)+x.amt;});
-  const tot=mnSum(listAll);
-  const bars=MCAT.filter(function(c){return per[c.id]>0;})
-    .sort(function(a,b){return per[b.id]-per[a.id];})
-    .map(function(c){
-      const p=tot?Math.round(per[c.id]/tot*100):0;
-      return '<div class="mncr"><span class="tpcat" style="background:'+c.color+'1f;color:'+c.color+'">'+c.emoji+' '+c.name+'</span>'+
-        '<div class="mncb"><i style="width:'+p+'%;background:'+c.color+'"></i></div>'+
-        '<b>'+won(per[c.id])+'원</b><em>'+p+'%</em></div>';
-    }).join("");
-  const cats=bars?'<div class="wsec"><div class="wsh"><b>📊 어디에 썼나</b><span class="spacer"></span><em>'+won(tot)+'원</em></div>'+
-      '<div class="mncw">'+bars+'</div></div>':'';
+  const cats=mnCatBox(s,ym,listAll);
   const empty='<div class="wsec"><div class="tpempty">'+
     (mnQ()||filter!=="ALL"?'이 조건에 맞는 기록이 없어요.'
       :'이번 달 기록이 아직 없어요.<br>위에 금액만 적고 「넣기」를 눌러보세요 💸')+'</div></div>';
@@ -4558,7 +4602,7 @@ function mnMonthBox(s){
     return '<button type="button" class="mnmr'+(r.ym===sel?" on":"")+(r.amt?"":" zero")+'" '+
       'title="'+esc(ymLabel(r.ym))+(r.n?' · '+r.n+'건':'')+'" onclick="mnGoMonth(\''+r.ym+'\')">'+
       '<span class="mnmn">'+esc(ymLabel(r.ym))+(r.ym===now?'<span class="wnow">이번 달</span>':'')+'</span>'+
-      '<span class="mncb"><i style="width:'+pc+'%"></i></span>'+
+      '<span class="mnmb"><i style="width:'+pc+'%"></i></span>'+
       '<b>'+won(r.amt)+'원</b>'+d+'</button>';
   }).join("");
   return '<div class="wsec">'+
