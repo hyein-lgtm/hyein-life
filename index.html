@@ -2270,6 +2270,33 @@ body.tpdragging .mfgrip{cursor:grabbing}
   .mnbc{min-width:7px}
   .mnbv{font-size:9px}
 }
+
+/* ===== 💳 결제수단 ===== */
+.mppick{margin-top:7px;align-items:center}
+.mppick>button.mpman{border:1px dashed var(--line);background:transparent;color:var(--muted);
+  border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;margin-left:2px}
+.mppick>button.mpman:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-xl)}
+.mnq .mppick{margin-top:6px}
+.mnpay{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.mpcr{width:100%;border:0;background:transparent;text-align:left;cursor:pointer;
+  border-radius:10px;font-family:inherit;color:inherit}
+.mpcr:hover{background:var(--surface-2)}
+.mpcr.on{background:var(--blue-xl);box-shadow:inset 0 0 0 1px var(--blue)}
+.mpcr>em{white-space:nowrap}
+.mpmr{display:grid;grid-template-columns:66px 1fr auto;gap:7px;align-items:center;margin-bottom:7px}
+.mpmr>select.mpme{border:1px solid var(--line);background:var(--surface-2);color:inherit;
+  border-radius:10px;padding:9px 6px;font-size:16px;font-family:inherit;text-align:center}
+.mpmr>input.mpmn{border:1px solid var(--line);background:var(--surface-2);color:inherit;
+  border-radius:10px;padding:9px 11px;font-size:13.5px;min-width:0;font-family:inherit}
+.mpmr>input.mpmn:focus,.mpmr>select.mpme:focus{outline:none;border-color:var(--blue)}
+.mpmr>button.dl{border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+  width:32px;height:32px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;flex:none}
+.mpmr>button.dl:hover{background:var(--danger-xl);color:var(--danger);border-color:var(--danger)}
+@media(max-width:640px){
+  .mpcr{grid-template-columns:auto 1fr auto}
+  .mpcr>em{display:none}
+  .mpmr{grid-template-columns:58px 1fr auto;gap:6px}
+}
 </style>
 <style id="wishcss">
 /* ===================== 🎁 위시리스트 ===================== */
@@ -3684,12 +3711,41 @@ const MCAT=[
   {id:"etc",   name:"기타",    emoji:"✏️", color:"#64748b"}
 ];
 function mcat(id){for(let i=0;i<MCAT.length;i++)if(MCAT[i].id===id)return MCAT[i];return MCAT[MCAT.length-1];}
+
+/* ---- 결제수단 (직접 추가·수정할 수 있어요) ---- */
+const MPEMO=["\uD83D\uDCB3","\uD83D\uDCF1","\uD83D\uDCB5","\uD83C\uDFE6","\uD83C\uDFAB","\uD83E\uDE99","\uD83E\uDDFE","\uD83C\uDF81"];
+const MPCOL=["#1e5fd4","#0ea472","#c2410c","#7c3aed","#0891b2","#d81b60","#b4772e","#f59e0b","#64748b"];
+const MPDEF=[
+  {id:"pkb",name:"\uad6d\ubbfc\uce74\ub4dc",  emoji:"\uD83D\uDCB3"},
+  {id:"pss",name:"\uc0bc\uc131\uce74\ub4dc",  emoji:"\uD83D\uDCB3"},
+  {id:"psh",name:"\uc2e0\ud55c\uce74\ub4dc",  emoji:"\uD83D\uDCB3"},
+  {id:"pph",name:"\ud578\ub4dc\ud3f0\uacb0\uc81c",emoji:"\uD83D\uDCF1"},
+  {id:"pcs",name:"\ud604\uae08",          emoji:"\uD83D\uDCB5"},
+  {id:"pbk",name:"\uacc4\uc88c\uc774\uccb4",  emoji:"\uD83C\uDFE6"}
+];
+const MPNONE={id:"",name:"\ubbf8\uc9c0\uc815",emoji:"\uD83D\uDCA0",color:"#94a3b8"};
+function mnPays(s){return (s&&Array.isArray(s.pay))?s.pay:[];}
+function mpay(s,id){
+  const a=mnPays(s);
+  for(let i=0;i<a.length;i++) if(a[i].id===id) return a[i];
+  return MPNONE;
+}
+function mpHas(s,id){const a=mnPays(s);for(let i=0;i<a.length;i++)if(a[i].id===id)return true;return false;}
 function mHas(id){for(let i=0;i<MCAT.length;i++)if(MCAT[i].id===id)return true;return false;}
 
 /* ---- 저장된 값 다듬기 ---- */
 function mnNorm(s){
   s.label=s.label||"💰 재테크"; s.icon=s.icon||"💰";
   s.budget=(s.budget&&typeof s.budget==="object")?s.budget:{};
+  /* 결제수단: 처음 한 번만 기본 목록을 넣어준다 (다 지우면 빈 채로 둔다) */
+  if(!Array.isArray(s.pay)) s.pay=MPDEF.map(function(p,i){
+    return {id:p.id,name:p.name,emoji:p.emoji,color:MPCOL[i%MPCOL.length]};});
+  s.pay=s.pay.filter(Boolean).map(function(p,i){
+    return {id:String(p.id||"")||uid(),
+      name:String(p.name||"").trim()||"\uacb0\uc81c\uc218\ub2e8",
+      emoji:String(p.emoji||"\uD83D\uDCB3").slice(0,4),
+      color:/^#[0-9a-fA-F]{6}$/.test(String(p.color||""))?p.color:MPCOL[i%MPCOL.length]};
+  });
   Object.keys(s.budget).forEach(function(k){
     if(!/^\d{4}-\d{2}$/.test(k)) delete s.budget[k];
     else s.budget[k]=Math.max(0,Math.round(+s.budget[k]||0));
@@ -3700,6 +3756,7 @@ function mnNorm(s){
       cat:mHas(x.cat)?x.cat:"etc",
       amt:Math.max(0,Math.round(+x.amt||0)),
       memo:String(x.memo||""),
+      p:mpHas(s,x.p)?x.p:"",
       fx:String(x.fx||"")};
   });
   s.fixed=(Array.isArray(s.fixed)?s.fixed:[]).filter(Boolean).map(function(f){
@@ -3708,7 +3765,7 @@ function mnNorm(s){
       amt:Math.max(0,Math.round(+f.amt||0)),
       day:Math.max(0,Math.min(31,Math.round(+f.day||0))),
       cat:mHas(f.cat)?f.cat:"life",
-      memo:String(f.memo||""),off:!!f.off,paid:p};
+      memo:String(f.memo||""),p:mpHas(s,f.p)?f.p:"",off:!!f.off,paid:p};
   });
   s.ym=/^\d{4}-\d{2}$/.test(String(s.ym||""))?s.ym:ymNow();
   s.items=[];
@@ -3775,7 +3832,7 @@ function mnView(){
         '<em>'+(bud?(left-wsum<0?"다 사면 "+won(wsum-left)+"원 모자라요":"다 사도 "+won(left-wsum)+"원 남아요"):"예산을 정하면 비교해 드릴게요")+'</em></div>':'')+
   '</div>';
 
-  return head+mnQuick(s,ym)+mnFixedBox(s,ym)+mnDayChart(s,ym,list)+mnSpendBox(s,ym,list);
+  return head+mnQuick(s,ym)+mnFixedBox(s,ym)+mnDayChart(s,ym,list)+mnPayBox(s,ym,list)+mnSpendBox(s,ym,list);
 }
 
 /* ---- 빠른 입력 ---- */
@@ -3792,6 +3849,8 @@ function mnQuick(s,ym){
       '<button type="button" class="btn primary" onclick="mnQuickAdd()">넣기</button>'+
     '</div>'+
     mcPick("mq_cat",(ui().mqcat&&mHas(ui().mqcat))?ui().mqcat:"food")+
+    (mnPays(s).length?mpPick(s,"mq_pay",(ui().mqpay&&mpHas(s,ui().mqpay))?ui().mqpay:"",true)
+      :'<div class="tcpick mppick"><button type="button" class="mpman" onclick="mnPayMan()">\u2699 \uacb0\uc81c\uc218\ub2e8 \ub9cc\ub4e4\uae30</button></div>')+
   '</div>';
 }
 function mnQuickAdd(){
@@ -3802,11 +3861,12 @@ function mnQuickAdd(){
   const cb=document.getElementById("mq_cat");
   const cat=(cb&&cb.getAttribute("data-v"))||"food";
   const d=/^\d{4}-\d{2}-\d{2}$/.test(g("mq_date"))?g("mq_date"):todayStr();
-  ui().mqcat=cat;
-  s.spend.unshift({id:uid(),d:d,cat:cat,amt:amt,memo:(g("mq_memo")||"").trim(),fx:""});
+  const pv=mpHas(s,mpVal("mq_pay"))?mpVal("mq_pay"):"";
+  ui().mqcat=cat; ui().mqpay=pv;
+  s.spend.unshift({id:uid(),d:d,cat:cat,amt:amt,memo:(g("mq_memo")||"").trim(),p:pv,fx:""});
   if(d.slice(0,7)!==mnYm(s)) s.ym=d.slice(0,7);
   save();render();
-  try{toast("💸 "+won(amt)+"원 적었어요 · "+mcat(cat).name);}catch(x){}
+  try{toast("💸 "+won(amt)+"원 적었어요 · "+mcat(cat).name+(pv?" · "+mpay(s,pv).name:""));}catch(x){}
   setTimeout(function(){const e=document.getElementById("mq_amt");if(e)e.focus();},60);
 }
 function mcPick(id,sel){
@@ -3815,6 +3875,91 @@ function mcPick(id,sel){
       (c.id===sel?' style="background:'+c.color+'"':'')+
       ' onclick="mcSet(\''+id+'\',\''+c.id+'\')">'+c.emoji+' '+c.name+'</button>';
   }).join("")+'</div>';
+}
+/* 결제수단 고르개 */
+function mpPick(s,id,sel,man){
+  const a=mnPays(s);
+  return '<div class="tcpick mppick" id="'+id+'" data-v="'+esc(sel||"")+'">'+
+    '<button type="button" data-v="" class="'+(sel?"":"on")+'" onclick="mpSet(\''+id+'\',\'\')">'+MPNONE.emoji+' '+MPNONE.name+'</button>'+
+    a.map(function(p){
+      return '<button type="button" data-v="'+p.id+'" class="'+(p.id===sel?"on":"")+'"'+
+        (p.id===sel?' style="background:'+p.color+'"':'')+
+        ' onclick="mpSet(\''+id+'\',\''+p.id+'\')">'+p.emoji+' '+esc(p.name)+'</button>';
+    }).join("")+
+    (man?'<button type="button" class="mpman" title="\uacb0\uc81c\uc218\ub2e8 \uace0\uce58\uae30" aria-label="\uacb0\uc81c\uc218\ub2e8 \uad00\ub9ac" onclick="mnPayMan()">\u2699</button>':'')+
+  '</div>';
+}
+function mpSet(box,v){
+  const b=document.getElementById(box);if(!b)return;
+  const s=mS();
+  b.setAttribute("data-v",v);
+  Array.prototype.forEach.call(b.children,function(el){
+    if(el.classList.contains("mpman"))return;
+    const on=el.getAttribute("data-v")===v;
+    el.classList.toggle("on",on);
+    el.style.background=(on&&v)?mpay(s,v).color:"";
+  });
+}
+function mpVal(id){const e=document.getElementById(id);return (e&&e.getAttribute("data-v"))||"";}
+
+/* 결제수단 관리 (추가 · 이름 고치기 · 지우기) */
+function mnPayMan(){
+  const s=mS();if(!s)return;
+  document.getElementById("mIc").innerHTML=chImg("money");
+  document.getElementById("mTitle").textContent="\uD83D\uDCB3 \uacb0\uc81c\uc218\ub2e8 \uad00\ub9ac";
+  document.getElementById("mForm").innerHTML=
+    '<div id="mp_list">'+mnPays(s).map(mpManRow).join("")+'</div>'+
+    '<button type="button" class="tpadd" onclick="mpManAdd()">\uFF0B \uacb0\uc81c\uc218\ub2e8 \ucd94\uac00</button>'+
+    '<div class="ehint">\uce74\ub4dc \uc774\ub984\uc740 \uc5b8\uc81c\ub4e0 \uace0\uccd0\ub3c4 \ub3fc\uc694. \uc9c0\uc6b0\uba74 \uadf8 \uc218\ub2e8\uc73c\ub85c \uc801\uc5b4\ub454 \uae30\ub85d\uc740 \u300c\ubbf8\uc9c0\uc815\u300d\uc774 \ub3fc\uc694.<br>\uae08\uc561\uacfc \ub0b4\uc6a9\uc740 \uadf8\ub300\ub85c \ub0a8\uc544\uc694.</div>';
+  const sv=document.getElementById("mSave");
+  sv.style.display="";sv.setAttribute("data-ns","mnp:");
+  document.getElementById("overlay").classList.add("on");
+}
+function mpManRow(p){
+  return '<div class="mpmr" data-id="'+esc((p&&p.id)||"")+'">'+
+    '<select class="mpme" aria-label="\uc544\uc774\ucf58">'+MPEMO.map(function(e){
+      return '<option value="'+e+'"'+(e===((p&&p.emoji)||"")?' selected':'')+'>'+e+'</option>';}).join("")+'</select>'+
+    '<input class="mpmn" value="'+esc((p&&p.name)||"")+'" placeholder="\uc608: \uad6d\ubbfc\uce74\ub4dc" '+
+      'onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveEdit()}">'+
+    '<button type="button" class="dl" title="\uc9c0\uc6b0\uae30" aria-label="\uc9c0\uc6b0\uae30" onclick="mpManDel(this)">\u2715</button>'+
+  '</div>';
+}
+function mpManAdd(){
+  const l=document.getElementById("mp_list");if(!l)return;
+  const d=document.createElement("div");
+  d.innerHTML=mpManRow({id:"",emoji:"\uD83D\uDCB3",name:""});
+  l.appendChild(d.firstChild);
+  const ins=l.querySelectorAll(".mpmn");
+  if(ins.length&&ins[ins.length-1].focus)ins[ins.length-1].focus();
+}
+function mpManDel(b){
+  const r=(b&&b.closest)?b.closest(".mpmr"):null;
+  if(r&&r.parentNode)r.parentNode.removeChild(r);
+}
+function mnPaySave(){
+  const s=mS();if(!s)return;
+  const old=mnPays(s).slice();
+  const rows=[].slice.call(document.querySelectorAll("#mp_list .mpmr"));
+  const out=[],seen={};
+  rows.forEach(function(r,i){
+    const ne=r.querySelector(".mpmn"),ee=r.querySelector(".mpme");
+    const nm=((ne&&ne.value)||"").trim();
+    if(!nm)return;
+    let id=r.getAttribute("data-id")||"";
+    if(!id||seen[id])id=uid();
+    seen[id]=1;
+    const was=old.filter(function(p){return p.id===id;})[0];
+    out.push({id:id,name:nm,emoji:((ee&&ee.value)||"\uD83D\uDCB3"),
+      color:(was&&was.color)||MPCOL[i%MPCOL.length]});
+  });
+  s.pay=out;
+  const live={};out.forEach(function(p){live[p.id]=1;});
+  let lost=0;
+  (s.spend||[]).forEach(function(x){if(x.p&&!live[x.p]){x.p="";lost++;}});
+  (s.fixed||[]).forEach(function(f){if(f.p&&!live[f.p])f.p="";});
+  if(filter.indexOf("p:")===0&&!live[filter.slice(2)])filter="ALL";
+  closeEdit();save();render();
+  try{toast("\uD83D\uDCB3 \uacb0\uc81c\uc218\ub2e8 "+out.length+"\uac1c\ub85c \uc800\uc7a5\ud588\uc5b4\uc694"+(lost?" \u00b7 "+lost+"\uac74\uc740 \ubbf8\uc9c0\uc815\uc73c\ub85c":""));}catch(e){}
 }
 function mcSet(box,v){
   const b=document.getElementById(box);if(!b)return;
@@ -4029,6 +4174,35 @@ function mnDayChart(s,ym,list){
     '<div class="mfhint" style="border:0;padding-top:2px">막대를 누르면 그날 쓴 내역으로 내려가요</div>'+
   '</div>';
 }
+/* ---- \uD83D\uDCB3 \uce74\ub4dc\ubcc4 \uc774\ubc88 \ub2ec \ud569\uacc4 ---- */
+function mnPayBox(s,ym,list){
+  if(!list.length) return "";
+  const per={},cnt={};
+  list.forEach(function(x){const k=x.p||"";per[k]=(per[k]||0)+x.amt;cnt[k]=(cnt[k]||0)+1;});
+  const ks=Object.keys(per).sort(function(a,b){
+    if(a===""&&b!=="")return 1; if(b===""&&a!=="")return -1; return per[b]-per[a];});
+  const tot=mnSum(list);
+  const fx={};
+  (s.fixed||[]).forEach(function(f){ if(!f.off&&!f.paid[ym]&&f.amt>0) fx[f.p||""]=(fx[f.p||""]||0)+f.amt; });
+  const rows=ks.map(function(k){
+    const p=mpay(s,k),v=per[k],pc=tot?Math.round(v/tot*100):0;
+    return '<button type="button" class="mncr mpcr'+(filter==="p:"+k?" on":"")+'" '+
+      'title="'+esc(p.name)+'\ub9cc \ubcf4\uae30" onclick="setF(\'p:'+k+'\')">'+
+      '<span class="tpcat" style="background:'+p.color+'1f;color:'+p.color+'">'+p.emoji+' '+esc(p.name)+'</span>'+
+      '<div class="mncb"><i style="width:'+pc+'%;background:'+p.color+'"></i></div>'+
+      '<b>'+won(v)+'\uc6d0</b><em>'+cnt[k]+'\uac74'+(fx[k]?' \u00b7 +'+won(fx[k]):'')+'</em></button>';
+  }).join("");
+  const fxtot=Object.keys(fx).reduce(function(n,k){return n+fx[k];},0);
+  return '<div class="wsec">'+
+    '<div class="wsh"><b>\uD83D\uDCB3 \uc5b4\ub5a4 \uac78\ub85c \uc37c\ub098</b>'+
+      '<span class="wsn">'+ks.length+'\uac1c</span><span class="spacer"></span>'+
+      (filter.indexOf("p:")===0?'<button type="button" class="btn sm" onclick="setF(\'ALL\')">\uc804\uccb4 \ubcf4\uae30</button>':'')+
+      '<button type="button" class="btn sm" onclick="mnPayMan()">\u2699 \uad00\ub9ac</button></div>'+
+    '<div class="mncw">'+rows+'</div>'+
+    (fxtot?'<div class="mfhint" style="border-top:1px dashed var(--line)">+ \ub294 \uc544\uc9c1 \uc548 \ub0b8 \uace0\uc815 \uc9c0\ucd9c\uc774\uc5d0\uc694 \u00b7 \ub2e4 \ub0b4\uba74 \ucd1d '+won(tot+fxtot)+'\uc6d0</div>':'')+
+    '<div class="mfhint" style="border:0;padding-top:2px">\uce74\ub4dc\ub97c \ub204\ub974\uba74 \uadf8\uac78\ub85c \uc4f4 \uac83\ub9cc \ubcf4\uc5ec\uc694</div>'+
+  '</div>';
+}
 function mnGoDay(k){
   const el=document.getElementById("mnd_"+k);
   if(!el){try{toast("그날 기록을 찾지 못했어요");}catch(e){}return;}
@@ -4049,7 +4223,7 @@ function mnFixTog(id){
   }else{
     const day=String(Math.min(Math.max(f.day||1,1),mnLastDay(ym))).padStart(2,"0");
     const sid=uid();
-    s.spend.unshift({id:sid,d:ym+"-"+day,cat:f.cat,amt:f.amt,memo:f.name,fx:f.id});
+    s.spend.unshift({id:sid,d:ym+"-"+day,cat:f.cat,amt:f.amt,memo:f.name,p:(f.p||""),fx:f.id});
     f.paid[ym]=sid;
     save();render();try{toast("✓ "+won(f.amt)+"원 냈어요 · 지출에 넣었어요");}catch(e){}
   }
@@ -4083,10 +4257,12 @@ function mnFixEdit(id){
       '<input id="mf_amt" type="number" inputmode="numeric" min="0" step="1000" placeholder="0" value="'+(f&&f.amt?f.amt:"")+'"></div>'+
     '<div class="field"><label>매달 며칠에 (모르면 비워두세요)</label>'+
       '<input id="mf_day" type="number" inputmode="numeric" min="1" max="31" placeholder="예: 25" value="'+(f&&f.day?f.day:"")+'"></div>'+
-    '<div class="field"><label>분류</label>'+mcPick("mf_cat",f?f.cat:"life")+'</div>'+
+    '<div class="field"><label>\ubd84\ub958</label>'+mcPick("mf_cat",f?f.cat:"life")+'</div>'+
+    '<div class="field"><label>\uc5b4\ub5a4 \uac78\ub85c \ub098\uac00\ub294\uc9c0</label>'+
+      mpPick(s,"mf_pay",f?(f.p||""):"",false)+'</div>'+
     '<div class="field"><label>메모</label>'+
       '<textarea id="mf_memo" rows="2" placeholder="어디로 나가는지, 언제까지인지…">'+esc(f?f.memo:"")+'</textarea></div>'+
-    '<div class="ehint">달마다 왼쪽 ✓ 를 누르면 「쓴 돈」에 자동으로 들어가요.</div>';
+    '<div class="ehint">달마다 왼쪽 ✓ 를 누르면 「쓴 돈」에 자동으로 들어가요.<br>결제수단까지 같이 기록돼요.</div>';
   const sv=document.getElementById("mSave");
   sv.style.display="";sv.setAttribute("data-ns","mnf:"+(id||""));
   document.getElementById("overlay").classList.add("on");
@@ -4106,6 +4282,7 @@ function mnFixSave(id){
   const cb=document.getElementById("mf_cat");
   f.cat=(cb&&cb.getAttribute("data-v"))||"life";
   f.memo=g("mf_memo")||"";
+  f.p=mpHas(s,mpVal("mf_pay"))?mpVal("mf_pay"):"";
   closeEdit();save();render();
   if(isNew){try{toast("📌 고정 지출에 넣었어요");}catch(e){}}
 }
@@ -4115,7 +4292,8 @@ function mnQ(){const e=document.getElementById("q");return ((e&&e.value)||"").tr
 function mnPick(list){
   const q=mnQ();
   return list.filter(function(x){
-    if(filter!=="ALL"&&mHas(filter)&&x.cat!==filter)return false;
+    if(filter.indexOf("p:")===0){ if((x.p||"")!==filter.slice(2))return false; }
+    else if(filter!=="ALL"&&mHas(filter)&&x.cat!==filter)return false;
     if(q&&(x.memo+" "+mcat(x.cat).name).toLowerCase().indexOf(q)<0)return false;
     return true;
   });
@@ -4163,7 +4341,8 @@ function mnRow(x){
     '<span class="mnbul" style="background:'+c.color+'"></span>'+
     '<div class="wbody" onclick="mnEdit(\''+x.id+'\')">'+
       '<div class="w1"><span class="tpcat" style="background:'+c.color+'1f;color:'+c.color+'">'+c.emoji+' '+c.name+'</span>'+
-        '<b>'+esc(x.memo||c.name)+'</b>'+(x.fx?'<span class="mnfx">고정</span>':'')+'</div>'+
+        '<b>'+esc(x.memo||c.name)+'</b>'+(x.fx?'<span class="mnfx">고정</span>':'')+
+        (x.p?(function(){const p=mpay(mS(),x.p);return '<span class="mnpay" style="background:'+p.color+'1f;color:'+p.color+'">'+p.emoji+' '+esc(p.name)+'</span>';})():'')+'</div>'+
     '</div>'+
     '<div class="wright"><span class="wprice">'+won(x.amt)+'원</span></div>'+
     '<div class="tpacts"><button class="dl" title="지우기" aria-label="지우기" onclick="mnDel(\''+x.id+'\')">✕</button></div>'+
@@ -4191,7 +4370,9 @@ function mnEdit(id){
       'onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveEdit()}"></div>'+
     '<div class="field"><label>언제</label>'+
       '<input id="ms_date" type="date" value="'+esc(x?x.d:((mnYm(s)===ymNow())?todayStr():(mnYm(s)+"-01")))+'"></div>'+
-    '<div class="field"><label>분류</label>'+mcPick("ms_cat",x?x.cat:"food")+'</div>'+
+    '<div class="field"><label>\ubd84\ub958</label>'+mcPick("ms_cat",x?x.cat:"food")+'</div>'+
+    '<div class="field"><label>\uc5b4\ub5a4 \uac78\ub85c \uacb0\uc81c\ud588\ub294\uc9c0</label>'+
+      mpPick(s,"ms_pay",x?(x.p||""):((ui().mqpay&&mpHas(s,ui().mqpay))?ui().mqpay:""),false)+'</div>'+
     '<div class="field"><label>어디에 썼는지</label>'+
       '<input id="ms_memo" placeholder="예: 점심 / 택시 / 마트 장보기" value="'+esc(x?x.memo:"")+'"></div>'+
     (x&&x.fx?'<div class="ehint">고정 지출에서 자동으로 들어온 기록이에요.</div>':'');
@@ -4213,6 +4394,7 @@ function mnSave(id){
   const cb=document.getElementById("ms_cat");
   x.cat=(cb&&cb.getAttribute("data-v"))||"food";
   x.memo=(g("ms_memo")||"").trim();
+  x.p=mpHas(s,mpVal("ms_pay"))?mpVal("ms_pay"):"";
   if(x.d.slice(0,7)!==mnYm(s)) s.ym=x.d.slice(0,7);
   closeEdit();save();render();
   if(isNew){try{toast("💸 "+won(amt)+"원 적었어요");}catch(e){}}
@@ -7957,6 +8139,7 @@ function saveEdit(){
     if(tag.indexOf("mnf:")===0)return mnFixSave(tag.slice(4));
     if(tag.indexOf("mns:")===0)return mnSave(tag.slice(4));
     if(tag.indexOf("mnb:")===0)return mnBudgetSave();
+    if(tag.indexOf("mnp:")===0)return mnPaySave();
   }
   const s=DATA[cur],g=id=>document.getElementById(id);
   const title=(g("f_title").value||"").trim();
