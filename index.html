@@ -2435,6 +2435,43 @@ button.mfgb.fut{opacity:.4}
   button.mfgb{height:26px;font-size:11px}
   .mfgn{font-size:11.5px}
 }
+
+/* ===== 📆 앞으로 예정된 지출 ===== */
+.mfp{border-top:1px dashed var(--line)}
+.mfghd>em{margin-left:auto}
+.mfpn{margin-top:6px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:-.02em}
+.mfpn b{color:var(--ink-2);font-weight:900}
+.mfpn em.soon{font-style:normal;color:var(--blue);font-weight:900}
+.mfpn em.over{font-style:normal;color:var(--danger);font-weight:900}
+.mfpw{margin-top:9px;display:flex;flex-direction:column;gap:5px}
+.mfpr{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;
+  padding:6px 8px;border-radius:11px}
+.mfpr.now{background:var(--blue-xl);box-shadow:inset 0 0 0 1px var(--blue)}
+.mfpr.clr{opacity:.55}
+.mfpm{font-size:11.5px;font-weight:800;color:var(--muted);white-space:nowrap;letter-spacing:-.03em}
+.mfpr.now .mfpm{color:var(--blue)}
+.mfpi{display:flex;flex-wrap:wrap;gap:4px 5px;min-width:0}
+button.mfpc{display:inline-flex;align-items:center;gap:5px;border:1px solid transparent;
+  border-radius:999px;padding:3px 9px 3px 5px;font-family:inherit;font-size:11px;
+  font-weight:800;cursor:pointer;letter-spacing:-.02em;white-space:nowrap;
+  transition:filter .13s,border-color .13s}
+button.mfpc:hover{filter:brightness(.93)}
+button.mfpc>i{font-style:normal;font-size:9.5px;font-weight:900;opacity:.72;
+  background:rgba(255,255,255,.62);border-radius:999px;padding:1px 5px}
+button.mfpc.soon{border-color:currentColor}
+button.mfpc.over{border-color:var(--danger);color:var(--danger)!important;
+  background:var(--danger-xl)!important}
+.mfpz{font-size:11px;font-weight:700;color:var(--muted)}
+.mfpr>b{font-size:12.5px;font-weight:800;white-space:nowrap;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums}
+.mfghint2{margin-top:8px;font-size:11.5px;color:var(--muted)}
+button.mfgb:not(.on){color:var(--muted);opacity:.7}
+button.mfgb:not(.on):hover{opacity:1}
+@media(max-width:640px){
+  .mfpr{grid-template-columns:30px 1fr auto;gap:7px;padding:6px}
+  button.mfpc{font-size:10.5px;padding:3px 8px 3px 4px}
+  .mfpr>b{font-size:11.5px}
+}
 </style>
 <style id="wishcss">
 /* ===================== 🎁 위시리스트 ===================== */
@@ -4173,15 +4210,80 @@ function mnFixedBox(s,ym){
       '<div class="tpempty">월세·통신비·구독료처럼<br>매달 꼭 나가는 돈을 적어두세요 📌</div>')+
     (canSort?'<div class="mfhint">⠿ 를 끌어서 중요한 순서대로 놓을 수 있어요 · ✓ 하면 맨 아래로 내려가요'+
       '<button type="button" class="btn sm" onclick="mnFixSortDay()">📅 날짜순</button></div>':'')+
-    mnFixGrid(s,ym)+
+    mnFixPlan(s,ym)+mnFixGrid(s,ym)+
     '<button class="tpadd" onclick="mnFixEdit()">＋ 고정 지출 추가</button>'+
   '</div>';
+}
+/* 📆 앞으로 예정된 지출 — 이번 달부터 6개월, 아직 안 낸 것만 */
+function mnFixPlanOn(){return ui().mnfp!==false;}
+function mnFixPlanTog(){ui().mnfp=!mnFixPlanOn();save();render();}
+function mnDueDate(f,m){
+  const d=Math.min(Math.max(+f.day||1,1),mnLastDay(m));
+  return m+"-"+String(d).padStart(2,"0");
+}
+function mnDDay(a,b){
+  return Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000);
+}
+function mnFixPlan(s,ym){
+  const live=(s.fixed||[]).filter(function(f){return !f.off&&f.amt>0;});
+  if(!live.length) return "";
+  const open=mnFixPlanOn();
+  const now=ymNow(),t=todayStr();
+  const start=(ym>now)?ym:now;
+  const ms=[];for(let i=0;i<6;i++) ms.push(ymAdd(start,i));
+  let grand=0,late=0,lateSum=0;
+  const plan=ms.map(function(m){
+    const items=live.filter(function(f){return !(f.paid&&f.paid[m]);})
+      .map(function(f){
+        const due=mnDueDate(f,m);
+        return {f:f,due:due,dd:mnDDay(t,due)};
+      }).sort(function(a,b){return a.due<b.due?-1:a.due>b.due?1:0;});
+    const sum=items.reduce(function(n,x){return n+x.f.amt;},0);
+    grand+=sum;
+    items.forEach(function(x){ if(x.dd<0){late++;lateSum+=x.f.amt;} });
+    return {ym:m,items:items,sum:sum};
+  });
+  /* 가장 먼저 나갈 것 */
+  let nx=null;
+  plan.forEach(function(p){p.items.forEach(function(x){ if(!nx&&x.dd>=0) nx=x; });});
+  const headline=nx
+    ? '다음은 <b>'+(+nx.due.slice(5,7))+'/'+(+nx.due.slice(8,10))+' '+esc(nx.f.name||"고정 지출")+' '+won(nx.f.amt)+'원</b>'+
+      (nx.dd===0?' · <em class="soon">오늘이에요</em>':nx.dd<=3?' · <em class="soon">D-'+nx.dd+'</em>':' · D-'+nx.dd)
+    : '앞으로 나갈 게 없어요 ✓';
+  const hd='<div class="mfghd"><button type="button" class="mfgt" onclick="mnFixPlanTog()" '+
+    'aria-expanded="'+(open?"true":"false")+'">'+(open?"▾":"▸")+' 📆 앞으로 예정된 지출</button>'+
+    '<span class="spacer"></span><em>6개월 '+won(grand)+'원</em></div>';
+  const note='<div class="mfpn">'+headline+
+    (late?' · <em class="over">날짜 지난 '+late+'건 '+won(lateSum)+'원</em>':'')+'</div>';
+  if(!open) return '<div class="mfg mfp">'+hd+note+'</div>';
+  const rows=plan.map(function(p){
+    const mm=(+p.ym.split("-")[1])+"월";
+    const chips=p.items.map(function(x){
+      const c=mcat(x.f.cat);
+      const st=(x.dd<0)?"over":(x.dd<=3?"soon":"");
+      return '<button type="button" class="mfpc '+st+'" '+
+        'style="background:'+c.color+'14;color:'+c.color+'" '+
+        'title="'+esc((x.f.name||"")+" · "+won(x.f.amt)+"원 · "+ymLabel(p.ym)+" "+(+x.due.slice(8,10))+"일"+
+          (x.dd<0?" · "+(-x.dd)+"일 지났어요":x.dd===0?" · 오늘":" · D-"+x.dd))+
+          '\u000a눌러서 냈어요 표시" '+
+        'onclick="mnFixTog(\''+x.f.id+'\',\''+p.ym+'\')">'+
+        '<i>'+(+x.due.slice(8,10))+'일</i>'+esc(x.f.name||"고정 지출")+'</button>';
+    }).join("");
+    return '<div class="mfpr'+(p.ym===now?" now":"")+(p.items.length?"":" clr")+'">'+
+      '<span class="mfpm">'+mm+'</span>'+
+      '<div class="mfpi">'+(chips||'<span class="mfpz">다 냈어요 ✓</span>')+'</div>'+
+      '<b>'+(p.sum?won(p.sum)+'원':'–')+'</b></div>';
+  }).join("");
+  return '<div class="mfg mfp">'+hd+note+'<div class="mfpw">'+rows+'</div>'+
+    '<div class="mfghint2">칸을 누르면 그 달에 낸 걸로 바뀌어요 · 쉬는 중인 항목은 빠져 있어요</div></div>';
 }
 /* 🗓 항목 × 최근 6개월 체크표 — 어느 달에 냈는지 한눈에, 칸을 눌러 바로 체크 */
 function mnFixGridOn(){return ui().mnfg!==false;}
 function mnFixGridTog(){ui().mnfg=!mnFixGridOn();save();render();}
 function mnFixMonths(s,ym,n){
-  const a=[];for(let i=n-1;i>=0;i--)a.push(ymAdd(ym,-i));return a;
+  const now=ymNow();
+  const end=(ym<now)?ym:now;                 /* 낸 기록은 미래까지 볼 필요가 없어요 */
+  const a=[];for(let i=n-1;i>=0;i--)a.push(ymAdd(end,-i));return a;
 }
 function mnFixGrid(s,ym){
   const all=(s.fixed||[]).filter(function(f){return !!f;});
@@ -4189,9 +4291,9 @@ function mnFixGrid(s,ym){
   const open=mnFixGridOn();
   const ms=mnFixMonths(s,ym,6);
   const hd='<div class="mfghd"><button type="button" class="mfgt" onclick="mnFixGridTog()" '+
-    'aria-expanded="'+(open?"true":"false")+'">'+(open?"▾":"▸")+' 🗓 달별로 낸 것 체크</button>'+
+    'aria-expanded="'+(open?"true":"false")+'">'+(open?"▾":"▸")+' 🗓 달별로 낸 것 (지난 6개월)</button>'+
     '<span class="spacer"></span>'+
-    (open?'<em>칸을 누르면 그 달에 낸 걸로 표시돼요</em>':'')+'</div>';
+    (open?'<em>○ 를 누르면 그 달에 낸 걸로 바뀌어요</em>':'')+'</div>';
   if(!open) return '<div class="mfg">'+hd+'</div>';
   const now=ymNow();
   const head='<div class="mfgr mfgh"><span class="mfgn">항목</span>'+
@@ -4205,12 +4307,11 @@ function mnFixGrid(s,ym){
     const cells=ms.map(function(m){
       const paid=!!(f.paid&&f.paid[m]);
       if(paid)done++;
-      const fut=(m>now);
-      return '<button type="button" class="mfgb'+(paid?" on":"")+(fut?" fut":"")+(m===ym?" sel":"")+'" '+
+      return '<button type="button" class="mfgb'+(paid?" on":"")+(m===ym?" sel":"")+'" '+
         'style="'+(paid?"--mfgc:"+c.color+";":"")+'" '+
         'title="'+esc(ymLabel(m)+" · "+(f.name||"고정 지출")+" · "+(paid?"냈어요 (누르면 되돌리기)":"아직 안 냈어요 (누르면 냈어요)"))+'" '+
         'aria-label="'+esc(ymLabel(m)+" "+(f.name||""))+'" '+
-        'onclick="mnFixTog(\''+f.id+'\',\''+m+'\')">'+(paid?"✓":(fut?"·":""))+'</button>';
+        'onclick="mnFixTog(\''+f.id+'\',\''+m+'\')">'+(paid?"✓":"○")+'</button>';
     }).join("");
     return '<div class="mfgr'+(f.off?" moff":"")+'">'+
       '<span class="mfgn" title="'+esc((f.name||"")+(f.amt?" · "+won(f.amt)+"원":""))+'">'+
