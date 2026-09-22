@@ -2233,29 +2233,7 @@ html[data-theme=dark] .titem .x.dt{color:#9dbcff;border-color:#2a3b5c}
 }
 .wprice.ghost{color:var(--muted);font-weight:600;font-size:12px}
 
-/* ===== 고정지출: 순서 바꾸기 + 체크하면 아래로 ===== */
-.mflist{display:block}
-.mfrow{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:9px;align-items:start;
-  padding:10px 2px;border-bottom:1px solid var(--line);border-radius:10px;
-  transition:background-color .18s,opacity .18s}
-.mfrow:last-child{border-bottom:0}
-.mfrow.moff{opacity:.5}
-.mfrow.done{opacity:.62}
-.mfrow.done .w1>b{color:var(--muted)}
-.mfrow.done .tpcat{opacity:.55}
-.mfrow.done .wprice{color:var(--muted)}
-.mfgrip{position:relative;width:20px;align-self:stretch;min-height:26px;border:0;padding:0;
-  background:transparent;cursor:grab;touch-action:none;color:var(--muted);border-radius:7px;
-  display:flex;align-items:flex-start;justify-content:center;transition:background-color .15s}
-.mfgrip>svg{width:15px;height:15px;margin-top:5px;opacity:.55;transition:opacity .15s}
-.mfgrip:hover{background-color:var(--surface-3)}
-.mfgrip:hover>svg{opacity:1}
-.mfgrip:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
-.mfgrip.off{cursor:default}
-.mfgrip.off>svg{opacity:.16}
-body.tpdragging .mfgrip{cursor:grabbing}
-.mfph{height:46px;margin:5px 0;border-radius:11px;border:2px dashed var(--blue);
-  background:var(--blue-xl);animation:tpphIn .16s ease}
+/* ===== 📆 예정 지출 ===== */
 .mfhint{font-size:11.5px;color:var(--muted);padding:8px 2px 0;margin-top:4px;
   border-top:1px dashed var(--line);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .mfhint .btn.sm{margin-left:auto;font-size:11px;padding:4px 9px}
@@ -2285,9 +2263,6 @@ body.tpdragging .mfgrip{cursor:grabbing}
   70%{background:var(--blue-xl);border-color:var(--blue)}
   100%{background:var(--card);border-color:var(--line)}}
 @media(max-width:640px){
-  .mfrow{grid-template-columns:auto auto 1fr auto;gap:7px}
-  .mfrow .tpacts{grid-column:3/-1;justify-content:flex-end;padding-top:0}
-  .mfgrip{width:18px}
   .mnbw{height:92px;gap:1.5px}
   .mnbc{min-width:7px}
   .mnbv{font-size:9px}
@@ -2399,79 +2374,71 @@ button.mncpb.on{border-color:currentColor;font-weight:900}
   button.mncpb{font-size:10px;padding:2px 6px}
 }
 
-/* ===== 🗓 고정 지출 달별 체크표 ===== */
-.mfg{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
-.mfghd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.mfghd>em{font-style:normal;font-size:11.5px;color:var(--muted)}
-button.mfgt{border:0;background:transparent;color:var(--ink-2);font-family:inherit;
-  font-size:12.5px;font-weight:800;padding:3px 0;cursor:pointer;letter-spacing:-.02em}
-button.mfgt:hover{color:var(--blue)}
-.mfgw{margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.mfgr{display:grid;grid-template-columns:minmax(96px,1fr) repeat(6,30px) 38px;
-  gap:4px;align-items:center;min-width:330px}
-.mfgr+.mfgr{margin-top:4px}
-.mfgr.moff{opacity:.45}
-.mfgn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.02em}
-.mfgn>i{width:7px;height:7px;border-radius:50%;flex:none}
-.mfgh .mfgc,.mfgf .mfgc{font-size:10.5px;font-weight:800;color:var(--muted);text-align:center;
-  padding:3px 0;border-radius:7px;white-space:nowrap}
-.mfgh .mfgc.sel,.mfgf .mfgc.sel{background:var(--blue-xl);color:var(--blue)}
-.mfgh .mfgc.now{text-decoration:underline}
-.mfgf .mfgc.miss{color:var(--danger)}
-.mfgs{font-size:10.5px;font-weight:800;color:var(--muted);text-align:right;white-space:nowrap}
-.mfgs.full{color:var(--ok,#0ea472)}
-.mfgh .mfgn,.mfgf .mfgn{font-size:10.5px;color:var(--muted);font-weight:800}
-button.mfgb{height:28px;border:1px solid var(--line);background:var(--surface-2);
-  border-radius:8px;font-family:inherit;font-size:12px;font-weight:900;color:var(--muted);
-  cursor:pointer;padding:0;transition:background .13s,border-color .13s,color .13s}
-button.mfgb:hover{border-color:var(--blue);color:var(--blue)}
-button.mfgb.on{background:var(--mfgc,var(--blue));border-color:var(--mfgc,var(--blue));color:#fff}
-button.mfgb.sel{box-shadow:0 0 0 1.5px var(--blue-l)}
-button.mfgb.fut{opacity:.4}
-.mfghint{margin-top:8px;font-size:11.5px;color:var(--danger);font-weight:700}
+/* ===== 📆 앞으로 예정된 지출 ===== */
+.wsn.late{background:var(--danger-xl);color:var(--danger)}
+.mpn{margin:2px 0 9px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:-.02em}
+.mpn b{color:var(--ink-2);font-weight:900}
+.mpn em{font-style:normal;font-weight:900}
+.mpn em.soon{color:var(--blue)}
+.mpn em.over{color:var(--danger)}
+
+.mpg{margin-top:10px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface-2);padding:6px 8px 8px}
+.mpg.now{border-color:var(--blue-l);background:var(--blue-xl)}
+.mpg.late{border-color:var(--danger);background:var(--danger-xl)}
+.mpgh{display:flex;align-items:center;gap:7px;padding:3px 2px 6px;
+  border-bottom:1px dashed var(--line);margin-bottom:2px;flex-wrap:wrap}
+.mpgh>b{font-size:13px;font-weight:900;letter-spacing:-.03em}
+.mpgh>em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--muted);
+  white-space:nowrap;font-variant-numeric:tabular-nums}
+.mpgy{font-size:10.5px;font-weight:800;color:var(--muted)}
+.mpgn{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;
+  background:var(--surface-3);color:var(--muted);white-space:nowrap}
+.mpgn.ok{background:var(--st-done-bg);color:var(--st-done-fg)}
+.mpg.late .mpgn{background:var(--danger);color:#fff}
+
+.mpr{display:grid;grid-template-columns:auto 34px 1fr auto auto;gap:9px;align-items:center;
+  padding:8px 2px;border-bottom:1px solid var(--line);border-radius:10px;
+  transition:background-color .18s,opacity .18s}
+.mpr:last-child{border-bottom:0}
+.mpr.done{opacity:.55}
+.mpr.done .mprb>b{color:var(--muted);text-decoration:line-through}
+.mpr.done .tpcat{opacity:.55}
+.mpr.done .mprv{color:var(--muted)}
+.mprd{font-size:11.5px;font-weight:900;color:var(--muted);white-space:nowrap;
+  text-align:right;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.mpr.soon .mprd{color:var(--blue)}
+.mpr.over .mprd{color:var(--danger)}
+.mprb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;cursor:pointer}
+.mprb>b{font-size:13px;font-weight:800;letter-spacing:-.02em;
+  overflow:hidden;text-overflow:ellipsis}
+.mprb:hover>b{color:var(--blue)}
+.mprp{font-size:10px;font-weight:800;padding:2px 6px;border-radius:999px;
+  background:var(--surface-3);color:var(--muted);white-space:nowrap}
+.mprp.one{background:var(--blue-xl);color:var(--blue)}
+.mprl{font-size:10.5px;font-weight:900;color:var(--danger);white-space:nowrap}
+.mprl.soon{color:var(--blue)}
+.mprv{font-size:12.5px;font-weight:800;white-space:nowrap;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums}
+.mpr .tpacts{opacity:0;transition:opacity .15s}
+.mpr:hover .tpacts,.mpr:focus-within .tpacts{opacity:1}
+@media(hover:none){.mpr .tpacts{opacity:1}}
 @media(max-width:640px){
-  .mfgr{grid-template-columns:minmax(78px,1fr) repeat(6,27px) 32px;gap:3px;min-width:300px}
-  button.mfgb{height:26px;font-size:11px}
-  .mfgn{font-size:11.5px}
+  .mpg{padding:5px 6px 7px}
+  .mpr{grid-template-columns:auto 30px 1fr auto;gap:7px;padding:7px 1px}
+  .mpr .tpacts{grid-column:3/-1;justify-content:flex-end;padding-top:0}
+  .mprb>b{font-size:12.5px}
+  .mprv{font-size:12px}
 }
 
-/* ===== 📆 앞으로 예정된 지출 ===== */
-.mfp{border-top:1px dashed var(--line)}
-.mfghd>em{margin-left:auto}
-.mfpn{margin-top:6px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:-.02em}
-.mfpn b{color:var(--ink-2);font-weight:900}
-.mfpn em.soon{font-style:normal;color:var(--blue);font-weight:900}
-.mfpn em.over{font-style:normal;color:var(--danger);font-weight:900}
-.mfpw{margin-top:9px;display:flex;flex-direction:column;gap:5px}
-.mfpr{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;
-  padding:6px 8px;border-radius:11px}
-.mfpr.now{background:var(--blue-xl);box-shadow:inset 0 0 0 1px var(--blue)}
-.mfpr.clr{opacity:.55}
-.mfpm{font-size:11.5px;font-weight:800;color:var(--muted);white-space:nowrap;letter-spacing:-.03em}
-.mfpr.now .mfpm{color:var(--blue)}
-.mfpi{display:flex;flex-wrap:wrap;gap:4px 5px;min-width:0}
-button.mfpc{display:inline-flex;align-items:center;gap:5px;border:1px solid transparent;
-  border-radius:999px;padding:3px 9px 3px 5px;font-family:inherit;font-size:11px;
-  font-weight:800;cursor:pointer;letter-spacing:-.02em;white-space:nowrap;
-  transition:filter .13s,border-color .13s}
-button.mfpc:hover{filter:brightness(.93)}
-button.mfpc>i{font-style:normal;font-size:9.5px;font-weight:900;opacity:.72;
-  background:rgba(255,255,255,.62);border-radius:999px;padding:1px 5px}
-button.mfpc.soon{border-color:currentColor}
-button.mfpc.over{border-color:var(--danger);color:var(--danger)!important;
-  background:var(--danger-xl)!important}
-.mfpz{font-size:11px;font-weight:700;color:var(--muted)}
-.mfpr>b{font-size:12.5px;font-weight:800;white-space:nowrap;letter-spacing:-.03em;
-  font-variant-numeric:tabular-nums}
-.mfghint2{margin-top:8px;font-size:11.5px;color:var(--muted)}
-button.mfgb:not(.on){color:var(--muted);opacity:.7}
-button.mfgb:not(.on):hover{opacity:1}
-@media(max-width:640px){
-  .mfpr{grid-template-columns:30px 1fr auto;gap:7px;padding:6px}
-  button.mfpc{font-size:10.5px;padding:3px 8px 3px 4px}
-  .mfpr>b{font-size:11.5px}
-}
+/* 한 번만 / 매달 고르기 */
+.mfrep{display:flex;gap:6px;margin-bottom:7px}
+button.mfrb{flex:1;border:1px solid var(--line);background:var(--surface-2);
+  border-radius:10px;padding:8px 0;font-family:inherit;font-size:12.5px;font-weight:800;
+  color:var(--muted);cursor:pointer;transition:background .13s,border-color .13s,color .13s}
+button.mfrb:hover{border-color:var(--blue);color:var(--blue)}
+button.mfrb.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.ehint2{font-size:11px;color:var(--muted);margin-top:5px}
 </style>
 <style id="wishcss">
 /* ===================== 🎁 위시리스트 ===================== */
@@ -3940,7 +3907,9 @@ function mnNorm(s){
       amt:Math.max(0,Math.round(+f.amt||0)),
       day:Math.max(0,Math.min(31,Math.round(+f.day||0))),
       cat:mHas(f.cat)?f.cat:"life",
-      memo:String(f.memo||""),p:mpHas(s,f.p)?f.p:"",off:!!f.off,paid:p};
+      memo:String(f.memo||""),p:mpHas(s,f.p)?f.p:"",off:!!f.off,paid:p,
+      rep:(f.rep==="1")?"1":"m",
+      on:/^\d{4}-\d{2}-\d{2}$/.test(String(f.on||""))?f.on:""};
   });
   s.ym=/^\d{4}-\d{2}$/.test(String(s.ym||""))?s.ym:ymNow();
   s.items=[];
@@ -3958,7 +3927,22 @@ function mnYm(s){return (s&&s.ym)||ymNow();}
 function mnSpendM(s,ym){return (s.spend||[]).filter(function(x){return String(x.d||"").slice(0,7)===ym;});}
 function mnSum(a){return a.reduce(function(n,x){return n+(+x.amt||0);},0);}
 function mnFixedLeft(s,ym){
-  return (s.fixed||[]).filter(function(f){return !f.off&&!f.paid[ym]&&f.amt>0;});
+  return (s.fixed||[]).filter(function(f){
+    return !f.off&&!f.paid[ym]&&f.amt>0&&mnInM(f,ym);});
+}
+/* 이 항목이 그 달에 나가는가 — 매달이면 항상, 한 번만이면 그 달일 때만 */
+function mnInM(f,ym){
+  if(f.rep==="1") return String(f.on||"").slice(0,7)===ym;
+  return true;
+}
+/* 그 달 며칠에 나가는가 */
+function mnDueDate(f,m){
+  if(f.rep==="1") return f.on||(m+"-01");
+  const d=Math.min(Math.max(+f.day||1,1),mnLastDay(m));
+  return m+"-"+String(d).padStart(2,"0");
+}
+function mnDDay(a,b){
+  return Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000);
 }
 function mnBudget(s,ym){return Math.max(0,Math.round(+((s.budget||{})[ym])||0));}
 /* 위시리스트에서 이번 달에 쓰기로 한 돈 */
@@ -4023,7 +4007,7 @@ function mnView(){
   '</div>';
 
   if(mnVw()==="month") return head+mnViewTabs()+mnMonthBox(s);
-  return head+mnViewTabs()+mnQuick(s,ym)+mnDayChart(s,ym,list)+mnFixedBox(s,ym)+mnSpendBox(s,ym,list);
+  return head+mnViewTabs()+mnQuick(s,ym)+mnDayChart(s,ym,list)+mnPlanBox(s,ym)+mnSpendBox(s,ym,list);
 }
 
 /* ---- 빠른 입력 ---- */
@@ -4165,302 +4149,107 @@ function mcSet(box,v){
 /* ---- 곧 나갈 돈(고정지출) ----
    · ✓ 로 「냈어요」 표시하면 맨 아래로 내려갑니다
    · 손잡이(⠿)를 끌어서 중요한 순서대로 놓을 수 있어요 */
-function mnFixOrder(s,ym){
-  const a=s.fixed||[];
-  return a.filter(function(f){return !f.paid[ym];})
-    .concat(a.filter(function(f){return !!f.paid[ym];}));
+/* ===== 📆 앞으로 예정된 지출 — 날짜별 체크 목록 하나로 ===== */
+function mnPlanN(){const n=+(ui().mnpn||6);return (n>=3&&n<=12)?n:6;}
+function mnPlanMore(){ui().mnpn=Math.min(12,mnPlanN()+3);save();render();}
+function mnPlanLess(){ui().mnpn=Math.max(3,mnPlanN()-3);save();render();}
+/* 한 달치 줄 — 안 낸 것 먼저, 낸 것은 아래로 */
+function mnPlanRows(s,m,t){
+  const out=[];
+  (s.fixed||[]).forEach(function(f){
+    if(f.off||!mnInM(f,m)) return;
+    const due=mnDueDate(f,m);
+    out.push({f:f,ym:m,due:due,dd:mnDDay(t,due),paid:!!(f.paid&&f.paid[m])});
+  });
+  out.sort(function(a,b){
+    if(a.paid!==b.paid) return a.paid?1:-1;          /* ✓ 한 건 아래로 */
+    return a.due<b.due?-1:a.due>b.due?1:0;
+  });
+  return out;
 }
-function mnFixedBox(s,ym){
-  const all=mnFixOrder(s,ym);
-  const rows=all.map(function(f){
-    const paid=!!f.paid[ym],c=mcat(f.cat);
-    return '<div class="mfrow '+(paid?"done":"")+(f.off?" moff":"")+'" data-id="'+f.id+'">'+
-      (paid?'<span class="mfgrip off" aria-hidden="true">'+IC.grip+'</span>'
-        :'<button type="button" class="mfgrip" title="끌어서 순서 바꾸기 (↑↓ 키도 돼요)" aria-label="순서 이동" '+
-          'onclick="event.preventDefault()" onkeydown="mnGripKey(event,\''+f.id+'\')" '+
-          'onpointerdown="mnGripDown(event,\''+f.id+'\')">'+IC.grip+'</button>')+
-      '<button class="wck '+(paid?"on":"")+'" aria-label="냈어요 표시" '+
-        'title="'+(paid?"아직 안 낸 걸로 되돌리기":"냈어요 (지출에 자동으로 들어가요)")+'" '+
-        'onclick="mnFixTog(\''+f.id+'\')">✓</button>'+
-      '<div class="wbody" onclick="mnFixEdit(\''+f.id+'\')">'+
-        '<div class="w1"><span class="tpcat" style="background:'+c.color+'1f;color:'+c.color+'">'+c.emoji+' '+c.name+'</span>'+
-          '<b>'+esc(f.name||"(이름 없음)")+'</b>'+
-          (f.day?'<span class="mnday">매달 '+f.day+'일</span>':'')+
-          (f.off?'<span class="mnoff">쉬는 중</span>':'')+
-          (paid?'<span class="mnpaid">✓ 냈어요</span>':'')+'</div>'+
-        (f.memo?'<p>'+esc(f.memo)+'</p>':'')+
-      '</div>'+
-      '<div class="wright"><span class="wprice'+(f.amt?'':' ghost')+'">'+(f.amt?won(f.amt)+'원':'금액 적기')+'</span></div>'+
-      '<div class="tpacts">'+
-        '<button title="'+(f.off?"다시 쓰기":"잠시 쉬기")+'" aria-label="잠시 쉬기" onclick="mnFixOff(\''+f.id+'\')">'+(f.off?"▶":"⏸")+'</button>'+
-        '<button class="dl" title="지우기" aria-label="지우기" onclick="mnFixDel(\''+f.id+'\')">✕</button>'+
-      '</div></div>';
-  }).join("");
-  const left=mnFixedLeft(s,ym);
-  const pd=all.filter(function(f){return f.paid[ym];}).length;
-  const nd=all.filter(function(f){return !f.off&&f.amt>0&&!f.paid[ym];}).length;
-  const canSort=all.filter(function(f){return !f.paid[ym];}).length>1;
-  return '<div class="wsec">'+
-    '<div class="wsh"><b>📌 꼭 나가야 할 돈</b>'+
-      '<span class="wsn">'+pd+' / '+(pd+nd)+' 냄</span>'+
-      '<span class="spacer"></span>'+
-      (left.length?'<em>아직 '+won(mnSum(left))+'원</em>':(all.length?'<em>다 냈어요 ✓</em>':''))+
+function mnPlanRow(x){
+  const f=x.f,c=mcat(f.cat),p=mpay(mS(),f.p||"");
+  const d=+x.due.slice(8,10);
+  const st=x.paid?"":(x.dd<0?"over":(x.dd<=3?"soon":""));
+  return '<div class="mpr '+(x.paid?"done":"")+' '+st+'" data-id="'+f.id+'">'+
+    '<button class="wck '+(x.paid?"on":"")+'" aria-label="냈어요 표시" '+
+      'title="'+(x.paid?"아직 안 낸 걸로 되돌리기":"냈어요 (쓴 돈에 자동으로 들어가요)")+'" '+
+      'onclick="mnFixTog(\''+f.id+'\',\''+x.ym+'\')">✓</button>'+
+    '<span class="mprd">'+d+'일</span>'+
+    '<div class="mprb" onclick="mnFixEdit(\''+f.id+'\')">'+
+      '<span class="tpcat" style="background:'+c.color+'1f;color:'+c.color+'">'+c.emoji+'</span>'+
+      '<b>'+esc(f.name||"(이름 없음)")+'</b>'+
+      (f.rep==="1"?'<span class="mprp one">한 번</span>':'<span class="mprp">매달</span>')+
+      (f.p?'<span class="mnpay" style="background:'+p.color+'1f;color:'+p.color+'">'+p.emoji+'</span>':'')+
+      (x.paid?'<span class="mnpaid">✓ 냈어요</span>'
+        :(x.dd<0?'<span class="mprl">'+(-x.dd)+'일 지남</span>'
+        :(x.dd===0?'<span class="mprl soon">오늘</span>'
+        :(x.dd<=3?'<span class="mprl soon">D-'+x.dd+'</span>':'')))) +
     '</div>'+
-    (rows?'<div class="mflist" id="mflist">'+rows+'</div>':
-      '<div class="tpempty">월세·통신비·구독료처럼<br>매달 꼭 나가는 돈을 적어두세요 📌</div>')+
-    (canSort?'<div class="mfhint">⠿ 를 끌어서 중요한 순서대로 놓을 수 있어요 · ✓ 하면 맨 아래로 내려가요'+
-      '<button type="button" class="btn sm" onclick="mnFixSortDay()">📅 날짜순</button></div>':'')+
-    mnFixPlan(s,ym)+mnFixGrid(s,ym)+
-    '<button class="tpadd" onclick="mnFixEdit()">＋ 고정 지출 추가</button>'+
+    '<span class="mprv">'+(f.amt?won(f.amt)+'원':'금액 적기')+'</span>'+
+    '<div class="tpacts">'+
+      '<button title="'+(f.off?"다시 쓰기":"잠시 쉬기")+'" aria-label="잠시 쉬기" onclick="mnFixOff(\''+f.id+'\')">'+(f.off?"▶":"⏸")+'</button>'+
+      '<button class="dl" title="지우기" aria-label="지우기" onclick="mnFixDel(\''+f.id+'\')">✕</button>'+
+    '</div></div>';
+}
+function mnPlanBox(s,ym){
+  const t=todayStr(),now=ymNow();
+  const start=(ym>now)?ym:now;
+  const n=mnPlanN();
+  const ms=[];for(let i=0;i<n;i++) ms.push(ymAdd(start,i));
+  /* 지난 달에 한 번만 잡아둔 건데 아직 체크 안 한 것 */
+  const back=[];
+  (s.fixed||[]).forEach(function(f){
+    if(f.off||f.rep!=="1"||!f.on) return;
+    const m=f.on.slice(0,7);
+    if(m>=start||(f.paid&&f.paid[m])) return;
+    back.push({f:f,ym:m,due:f.on,dd:mnDDay(t,f.on),paid:false});
+  });
+  back.sort(function(a,b){return a.due<b.due?-1:1;});
+  let grand=0,late=0,lateSum=0;
+  const groups=ms.map(function(m){
+    const rows=mnPlanRows(s,m,t);
+    const open=rows.filter(function(x){return !x.paid;});
+    const sum=mnSum(open.map(function(x){return x.f;}));
+    grand+=sum;
+    open.forEach(function(x){if(x.dd<0){late++;lateSum+=x.f.amt;}});
+    return {ym:m,rows:rows,open:open.length,sum:sum};
+  });
+  back.forEach(function(x){if(x.dd<0){late++;lateSum+=x.f.amt;}});
+  let nx=null;
+  groups.forEach(function(g){g.rows.forEach(function(x){if(!nx&&!x.paid&&x.dd>=0)nx=x;});});
+  const headline=nx
+    ? '다음은 <b>'+(+nx.due.slice(5,7))+'/'+(+nx.due.slice(8,10))+' '+esc(nx.f.name||"예정 지출")+' '+won(nx.f.amt)+'원</b>'+
+      (nx.dd===0?' · <em class="soon">오늘이에요</em>':nx.dd<=3?' · <em class="soon">D-'+nx.dd+'</em>':' · D-'+nx.dd)
+    : ((s.fixed||[]).length?'앞으로 나갈 게 없어요 ✓':'');
+  const backHtml=back.length?'<div class="mpg late"><div class="mpgh"><b>🔴 지난 것</b>'+
+      '<span class="mpgn">'+back.length+'건</span><span class="spacer"></span>'+
+      '<em>'+won(mnSum(back.map(function(x){return x.f;})))+'원</em></div>'+
+      back.map(mnPlanRow).join("")+'</div>':'';
+  const gHtml=groups.filter(function(g){return g.rows.length;}).map(function(g){
+    const lbl=(+g.ym.split("-")[1])+"월";
+    const yr=(g.ym.slice(0,4)!==now.slice(0,4))?('<span class="mpgy">'+g.ym.slice(2,4)+'년</span>'):'';
+    return '<div class="mpg'+(g.ym===now?" now":"")+'"><div class="mpgh"><b>'+lbl+'</b>'+yr+
+      (g.open?'<span class="mpgn">'+g.open+'건 남음</span>':'<span class="mpgn ok">다 냈어요 ✓</span>')+
+      '<span class="spacer"></span><em>'+(g.sum?won(g.sum)+'원':'–')+'</em></div>'+
+      g.rows.map(mnPlanRow).join("")+'</div>';
+  }).join("");
+  const empty='<div class="tpempty">월세·통신비처럼 매달 나가는 돈도,<br>네일·시술처럼 한 번 나갈 돈도 여기에 적어두세요 📆</div>';
+  return '<div class="wsec">'+
+    '<div class="wsh"><b>📆 앞으로 예정된 지출</b>'+
+      (late?'<span class="wsn late">밀린 '+late+'건</span>':'')+
+      '<span class="spacer"></span>'+
+      (grand?'<em>'+n+'개월 '+won(grand)+'원</em>':'')+'</div>'+
+    (headline?'<div class="mpn">'+headline+
+      (late?' · <em class="over">날짜 지난 '+late+'건 '+won(lateSum)+'원</em>':'')+'</div>':'')+
+    (backHtml+gHtml||empty)+
+    ((s.fixed||[]).length?'<div class="mfhint">✓ 를 누르면 그날 「쓴 돈」에 자동으로 들어가요'+
+      (n<12?'<button type="button" class="btn sm" onclick="mnPlanMore()">＋ 3개월 더</button>':'')+
+      (n>3?'<button type="button" class="btn sm" onclick="mnPlanLess()">– 줄이기</button>':'')+
+      '</div>':'')+
+    '<button class="tpadd" onclick="mnFixEdit()">＋ 예정 지출 추가</button>'+
   '</div>';
 }
-/* 📆 앞으로 예정된 지출 — 이번 달부터 6개월, 아직 안 낸 것만 */
-function mnFixPlanOn(){return ui().mnfp!==false;}
-function mnFixPlanTog(){ui().mnfp=!mnFixPlanOn();save();render();}
-function mnDueDate(f,m){
-  const d=Math.min(Math.max(+f.day||1,1),mnLastDay(m));
-  return m+"-"+String(d).padStart(2,"0");
-}
-function mnDDay(a,b){
-  return Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000);
-}
-function mnFixPlan(s,ym){
-  const live=(s.fixed||[]).filter(function(f){return !f.off&&f.amt>0;});
-  if(!live.length) return "";
-  const open=mnFixPlanOn();
-  const now=ymNow(),t=todayStr();
-  const start=(ym>now)?ym:now;
-  const ms=[];for(let i=0;i<6;i++) ms.push(ymAdd(start,i));
-  let grand=0,late=0,lateSum=0;
-  const plan=ms.map(function(m){
-    const items=live.filter(function(f){return !(f.paid&&f.paid[m]);})
-      .map(function(f){
-        const due=mnDueDate(f,m);
-        return {f:f,due:due,dd:mnDDay(t,due)};
-      }).sort(function(a,b){return a.due<b.due?-1:a.due>b.due?1:0;});
-    const sum=items.reduce(function(n,x){return n+x.f.amt;},0);
-    grand+=sum;
-    items.forEach(function(x){ if(x.dd<0){late++;lateSum+=x.f.amt;} });
-    return {ym:m,items:items,sum:sum};
-  });
-  /* 가장 먼저 나갈 것 */
-  let nx=null;
-  plan.forEach(function(p){p.items.forEach(function(x){ if(!nx&&x.dd>=0) nx=x; });});
-  const headline=nx
-    ? '다음은 <b>'+(+nx.due.slice(5,7))+'/'+(+nx.due.slice(8,10))+' '+esc(nx.f.name||"고정 지출")+' '+won(nx.f.amt)+'원</b>'+
-      (nx.dd===0?' · <em class="soon">오늘이에요</em>':nx.dd<=3?' · <em class="soon">D-'+nx.dd+'</em>':' · D-'+nx.dd)
-    : '앞으로 나갈 게 없어요 ✓';
-  const hd='<div class="mfghd"><button type="button" class="mfgt" onclick="mnFixPlanTog()" '+
-    'aria-expanded="'+(open?"true":"false")+'">'+(open?"▾":"▸")+' 📆 앞으로 예정된 지출</button>'+
-    '<span class="spacer"></span><em>6개월 '+won(grand)+'원</em></div>';
-  const note='<div class="mfpn">'+headline+
-    (late?' · <em class="over">날짜 지난 '+late+'건 '+won(lateSum)+'원</em>':'')+'</div>';
-  if(!open) return '<div class="mfg mfp">'+hd+note+'</div>';
-  const rows=plan.map(function(p){
-    const mm=(+p.ym.split("-")[1])+"월";
-    const chips=p.items.map(function(x){
-      const c=mcat(x.f.cat);
-      const st=(x.dd<0)?"over":(x.dd<=3?"soon":"");
-      return '<button type="button" class="mfpc '+st+'" '+
-        'style="background:'+c.color+'14;color:'+c.color+'" '+
-        'title="'+esc((x.f.name||"")+" · "+won(x.f.amt)+"원 · "+ymLabel(p.ym)+" "+(+x.due.slice(8,10))+"일"+
-          (x.dd<0?" · "+(-x.dd)+"일 지났어요":x.dd===0?" · 오늘":" · D-"+x.dd))+
-          '\u000a눌러서 냈어요 표시" '+
-        'onclick="mnFixTog(\''+x.f.id+'\',\''+p.ym+'\')">'+
-        '<i>'+(+x.due.slice(8,10))+'일</i>'+esc(x.f.name||"고정 지출")+'</button>';
-    }).join("");
-    return '<div class="mfpr'+(p.ym===now?" now":"")+(p.items.length?"":" clr")+'">'+
-      '<span class="mfpm">'+mm+'</span>'+
-      '<div class="mfpi">'+(chips||'<span class="mfpz">다 냈어요 ✓</span>')+'</div>'+
-      '<b>'+(p.sum?won(p.sum)+'원':'–')+'</b></div>';
-  }).join("");
-  return '<div class="mfg mfp">'+hd+note+'<div class="mfpw">'+rows+'</div>'+
-    '<div class="mfghint2">칸을 누르면 그 달에 낸 걸로 바뀌어요 · 쉬는 중인 항목은 빠져 있어요</div></div>';
-}
-/* 🗓 항목 × 최근 6개월 체크표 — 어느 달에 냈는지 한눈에, 칸을 눌러 바로 체크 */
-function mnFixGridOn(){return ui().mnfg!==false;}
-function mnFixGridTog(){ui().mnfg=!mnFixGridOn();save();render();}
-function mnFixMonths(s,ym,n){
-  const now=ymNow();
-  const end=(ym<now)?ym:now;                 /* 낸 기록은 미래까지 볼 필요가 없어요 */
-  const a=[];for(let i=n-1;i>=0;i--)a.push(ymAdd(end,-i));return a;
-}
-function mnFixGrid(s,ym){
-  const all=(s.fixed||[]).filter(function(f){return !!f;});
-  if(all.length<1) return "";
-  const open=mnFixGridOn();
-  const ms=mnFixMonths(s,ym,6);
-  const hd='<div class="mfghd"><button type="button" class="mfgt" onclick="mnFixGridTog()" '+
-    'aria-expanded="'+(open?"true":"false")+'">'+(open?"▾":"▸")+' 🗓 달별로 낸 것 (지난 6개월)</button>'+
-    '<span class="spacer"></span>'+
-    (open?'<em>○ 를 누르면 그 달에 낸 걸로 바뀌어요</em>':'')+'</div>';
-  if(!open) return '<div class="mfg">'+hd+'</div>';
-  const now=ymNow();
-  const head='<div class="mfgr mfgh"><span class="mfgn">항목</span>'+
-    ms.map(function(m){
-      const mm=(+m.split("-")[1])+"월";
-      return '<span class="mfgc'+(m===ym?" sel":"")+(m===now?" now":"")+'" title="'+esc(ymLabel(m))+'">'+mm+'</span>';
-    }).join("")+'<span class="mfgs">낸 달</span></div>';
-  const rows=all.map(function(f){
-    const c=mcat(f.cat);
-    let done=0;
-    const cells=ms.map(function(m){
-      const paid=!!(f.paid&&f.paid[m]);
-      if(paid)done++;
-      return '<button type="button" class="mfgb'+(paid?" on":"")+(m===ym?" sel":"")+'" '+
-        'style="'+(paid?"--mfgc:"+c.color+";":"")+'" '+
-        'title="'+esc(ymLabel(m)+" · "+(f.name||"고정 지출")+" · "+(paid?"냈어요 (누르면 되돌리기)":"아직 안 냈어요 (누르면 냈어요)"))+'" '+
-        'aria-label="'+esc(ymLabel(m)+" "+(f.name||""))+'" '+
-        'onclick="mnFixTog(\''+f.id+'\',\''+m+'\')">'+(paid?"✓":"○")+'</button>';
-    }).join("");
-    return '<div class="mfgr'+(f.off?" moff":"")+'">'+
-      '<span class="mfgn" title="'+esc((f.name||"")+(f.amt?" · "+won(f.amt)+"원":""))+'">'+
-        '<i style="background:'+c.color+'"></i>'+esc(f.name||"(이름 없음)")+'</span>'+
-      cells+
-      '<span class="mfgs'+(done===ms.length?" full":"")+'">'+done+'/'+ms.length+'</span></div>';
-  }).join("");
-  const sums=ms.map(function(m){
-    const tgt=all.filter(function(f){return !f.off&&f.amt>0;});
-    const p=tgt.filter(function(f){return !!(f.paid&&f.paid[m]);}).length;
-    const miss=(m<now)?(tgt.length-p):0;
-    return '<span class="mfgc'+(miss?" miss":"")+(m===ym?" sel":"")+'" '+
-      'title="'+esc(ymLabel(m)+" "+p+"/"+tgt.length+(miss?" · "+miss+"개 빠짐":""))+'">'+p+'</span>';
-  }).join("");
-  const nTgt=all.filter(function(f){return !f.off&&f.amt>0;}).length;
-  const foot='<div class="mfgr mfgf"><span class="mfgn">낸 개수</span>'+sums+'<span class="mfgs">/'+nTgt+'</span></div>';
-  /* 지난 달들 중 빠뜨린 게 있으면 짚어주기 */
-  const late=[];
-  ms.forEach(function(m){
-    if(m>=now)return;
-    all.forEach(function(f){
-      if(f.off||!f.amt)return;
-      if(!(f.paid&&f.paid[m])) late.push({m:m,n:f.name||"고정 지출"});
-    });
-  });
-  const warn=late.length?'<div class="mfghint">지난 달 중 '+late.length+'칸이 비어 있어요 · '+
-    esc(late.slice(0,3).map(function(x){return (+x.m.split("-")[1])+"월 "+x.n;}).join(", "))+
-    (late.length>3?' 외 '+(late.length-3)+'개':'')+'</div>':'';
-  return '<div class="mfg">'+hd+'<div class="mfgw">'+head+rows+foot+'</div>'+warn+'</div>';
-}
-function mnFixSortDay(){
-  const s=mS();if(!s)return;
-  const before=s.fixed.slice();
-  s.fixed=s.fixed.map(function(f,i){return [f,i];})
-    .sort(function(a,b){return ((a[0].day||99)-(b[0].day||99))||(a[1]-b[1]);})
-    .map(function(p){return p[0];});
-  save();render();
-  toastU("📅 나가는 날짜순으로 정렬했어요",function(){
-    const t=mnAny();if(!t)return;t.fixed=before;save();render();toast("↩ 되돌렸어요");
-  });
-}
-/* 실제 배열에서 자리 옮기기 — 화면에 보이는 순서(안 낸 것 → 낸 것) 기준 */
-function mnFixMove(id,to){
-  const s=mS();if(!s)return;
-  const ym=mnYm(s);
-  const un=(s.fixed||[]).filter(function(f){return !f.paid[ym];});
-  const pd=(s.fixed||[]).filter(function(f){return !!f.paid[ym];});
-  const from=un.map(function(f){return f.id;}).indexOf(id);
-  if(from<0)return;
-  to=Math.max(0,Math.min(un.length-1,to));
-  if(to===from)return;
-  un.splice(to,0,un.splice(from,1)[0]);
-  s.fixed=un.concat(pd);
-  save();render();
-}
-function mnGripKey(e,id){
-  if(e.key!=="ArrowUp"&&e.key!=="ArrowDown")return;
-  e.preventDefault();
-  const s=mS();if(!s)return;
-  const ym=mnYm(s);
-  const un=(s.fixed||[]).filter(function(f){return !f.paid[ym];});
-  const i=un.map(function(f){return f.id;}).indexOf(id);
-  if(i<0)return;
-  mnFixMove(id,i+(e.key==="ArrowUp"?-1:1));
-  setTimeout(function(){
-    const el=document.querySelector('.mfrow[data-id="'+id+'"] .mfgrip');
-    if(el&&el.focus)el.focus();
-  },30);
-}
-/* ---- 끌어서 순서 바꾸기 (마우스 · 터치 모두) ---- */
-var MFDRAG=null;
-function mnGripDown(e,id){
-  if(e.pointerType==="mouse"&&e.button!==0)return;
-  const row=(e.target&&e.target.closest)?e.target.closest(".mfrow"):null;
-  if(!row)return;
-  try{e.preventDefault();e.stopPropagation();}catch(x){}
-  MFDRAG={id:id,row:row,x:e.clientX,y:e.clientY,on:false,ph:null,ghost:null};
-  document.addEventListener("pointermove",mnDragMove,{passive:false});
-  document.addEventListener("pointerup",mnDragUp,true);
-  document.addEventListener("pointercancel",mnDragUp,true);
-}
-function mnDragBegin(){
-  const d=MFDRAG;if(!d)return;
-  d.on=true;
-  document.body.classList.add("tpdragging");
-  const ph=document.createElement("div");
-  ph.className="mfph";
-  if(d.row.parentNode)d.row.parentNode.insertBefore(ph,d.row);
-  d.ph=ph;
-  d.row.style.display="none";
-  const g=document.createElement("div");
-  g.id="tpGhost";
-  const t=d.row.querySelector(".w1>b");
-  g.textContent=t?t.textContent:"항목";
-  document.body.appendChild(g);
-  d.ghost=g;
-}
-function mnDragMove(e){
-  const d=MFDRAG;if(!d)return;
-  if(!d.on){
-    if(Math.abs(e.clientX-d.x)<5&&Math.abs(e.clientY-d.y)<5)return;
-    mnDragBegin();
-  }
-  try{e.preventDefault();}catch(x){}
-  if(d.ghost)d.ghost.style.transform="translate("+(e.clientX+14)+"px,"+(e.clientY-16)+"px)";
-  const vh=window.innerHeight||600;
-  if(e.clientY<70)window.scrollBy(0,-16);
-  else if(e.clientY>vh-70)window.scrollBy(0,16);
-  if(d.ghost)d.ghost.style.display="none";
-  const el=document.elementFromPoint?document.elementFromPoint(e.clientX,e.clientY):null;
-  if(d.ghost)d.ghost.style.display="";
-  if(!el||!el.closest||!d.ph)return;
-  const row=el.closest(".mfrow");
-  if(row&&row!==d.row&&row.parentNode&&!row.classList.contains("done")){
-    const rr=row.getBoundingClientRect();
-    const after=(e.clientY>rr.top+rr.height/2);
-    row.parentNode.insertBefore(d.ph,after?row.nextSibling:row);
-    return;
-  }
-  const lw=el.closest("#mflist");
-  if(lw&&d.ph.parentNode!==lw)lw.appendChild(d.ph);
-}
-function mnDragUp(){
-  const d=MFDRAG;
-  document.removeEventListener("pointermove",mnDragMove);
-  document.removeEventListener("pointerup",mnDragUp,true);
-  document.removeEventListener("pointercancel",mnDragUp,true);
-  MFDRAG=null;
-  if(!d)return;
-  document.body.classList.remove("tpdragging");
-  if(d.ghost&&d.ghost.parentNode)d.ghost.parentNode.removeChild(d.ghost);
-  if(!d.on){return;}
-  let to=-1;
-  if(d.ph&&d.ph.parentNode){
-    let n=0,el=d.ph.previousElementSibling;
-    while(el){
-      if(el.classList&&el.classList.contains("mfrow")&&el!==d.row&&!el.classList.contains("done"))n++;
-      el=el.previousElementSibling;
-    }
-    to=n;
-  }
-  if(d.ph&&d.ph.parentNode)d.ph.parentNode.removeChild(d.ph);
-  d.row.style.display="";
-  if(to<0){render();return;}
-  mnFixMove(d.id,to);
-}
-
-/* ---- 일자별 쓴 돈 ---- */
-/* 하루치를 결제수단별로 나눈 조각 (카드 순서 고정 → 색이 날마다 안 바뀜) */
 function mnDaySegs(s,rows,total){
   const by={};
   rows.forEach(function(x){const k=x.p||"";by[k]=(by[k]||0)+x.amt;});
@@ -4548,9 +4337,9 @@ function mnFixTog(id,ymArg){
     delete f.paid[ym];
     save();render();try{toast("↩ "+ymLabel(ym)+" 아직 안 낸 걸로 되돌렸어요");}catch(e){}
   }else{
-    const day=String(Math.min(Math.max(f.day||1,1),mnLastDay(ym))).padStart(2,"0");
+    const dd=mnDueDate(f,ym);
     const sid=uid();
-    s.spend.unshift({id:sid,d:ym+"-"+day,cat:f.cat,amt:f.amt,memo:f.name,p:(f.p||""),fx:f.id});
+    s.spend.unshift({id:sid,d:dd,cat:f.cat,amt:f.amt,memo:f.name,p:(f.p||""),fx:f.id});
     f.paid[ym]=sid;
     save();render();try{toast("✓ "+ymLabel(ym)+" "+won(f.amt)+"원 냈어요 · 지출에 넣었어요");}catch(e){}
   }
@@ -4574,26 +4363,49 @@ function mnFixDel(id){
 function mnFixEdit(id){
   const s=mS();if(!s)return;
   const f=id?(s.fixed||[]).filter(function(x){return x.id===id;})[0]:null;
+  const one=!!(f&&f.rep==="1");
   document.getElementById("mIc").innerHTML=chImg("money");
-  document.getElementById("mTitle").textContent=f?"고정 지출 고치기":"📌 고정 지출 추가";
+  document.getElementById("mTitle").textContent=f?"예정 지출 고치기":"📆 예정 지출 추가";
   document.getElementById("mForm").innerHTML=
     '<div class="field"><label>무엇</label>'+
       '<input id="mf_name" placeholder="예: 월세 / 통신비 / 넷플릭스 / 적금" value="'+esc(f?f.name:"")+'" '+
       'onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveEdit()}"></div>'+
     '<div class="field"><label>얼마 (원)</label>'+
       '<input id="mf_amt" type="number" inputmode="numeric" min="0" step="1000" placeholder="0" value="'+(f&&f.amt?f.amt:"")+'"></div>'+
-    '<div class="field"><label>매달 며칠에 (모르면 비워두세요)</label>'+
-      '<input id="mf_day" type="number" inputmode="numeric" min="1" max="31" placeholder="예: 25" value="'+(f&&f.day?f.day:"")+'"></div>'+
+    '<div class="field"><label>언제 나가나요</label>'+
+      '<div class="mfrep">'+
+        '<button type="button" class="mfrb'+(one?" on":"")+'" onclick="mnRepSet(1)">한 번만</button>'+
+        '<button type="button" class="mfrb'+(one?"":" on")+'" onclick="mnRepSet(0)">매달</button>'+
+      '</div>'+
+      '<div id="mf_onw" style="'+(one?"":"display:none")+'">'+
+        '<input id="mf_on" type="date" value="'+esc(f&&f.on?f.on:todayStr())+'">'+
+      '</div>'+
+      '<div id="mf_dayw" style="'+(one?"display:none":"")+'">'+
+        '<input id="mf_day" type="number" inputmode="numeric" min="1" max="31" placeholder="예: 25" value="'+(f&&f.day?f.day:"")+'">'+
+        '<div class="ehint2">모르면 비워두세요</div>'+
+      '</div></div>'+
     '<div class="field"><label>\ubd84\ub958</label>'+mcPick("mf_cat",f?f.cat:"life")+'</div>'+
     '<div class="field"><label>\uc5b4\ub5a4 \uac78\ub85c \ub098\uac00\ub294\uc9c0</label>'+
       mpPick(s,"mf_pay",f?(f.p||""):"",false)+'</div>'+
     '<div class="field"><label>메모</label>'+
       '<textarea id="mf_memo" rows="2" placeholder="어디로 나가는지, 언제까지인지…">'+esc(f?f.memo:"")+'</textarea></div>'+
-    '<div class="ehint">달마다 왼쪽 ✓ 를 누르면 「쓴 돈」에 자동으로 들어가요.<br>결제수단까지 같이 기록돼요.</div>';
+    '<div class="ehint">✓ 를 누르면 「쓴 돈」에 자동으로 들어가요.<br>결제수단까지 같이 기록돼요.</div>';
   const sv=document.getElementById("mSave");
   sv.style.display="";sv.setAttribute("data-ns","mnf:"+(id||""));
   document.getElementById("overlay").classList.add("on");
   setTimeout(function(){const e=document.getElementById("mf_name");if(e)e.focus();},60);
+}
+/* 한 번만 / 매달 전환 */
+function mnRepSet(one){
+  const bs=document.querySelectorAll(".mfrb");
+  for(let i=0;i<bs.length;i++)bs[i].classList.toggle("on",(i===0)===!!one);
+  const a=document.getElementById("mf_onw"),b=document.getElementById("mf_dayw");
+  if(a)a.style.display=one?"":"none";
+  if(b)b.style.display=one?"none":"";
+}
+function mnRepIs1(){
+  const b=document.querySelectorAll(".mfrb")[0];
+  return !!(b&&b.classList.contains("on"));
 }
 function mnFixSave(id){
   const s=mS();if(!s)return;
@@ -4602,16 +4414,25 @@ function mnFixSave(id){
   if(!name){alert("무엇에 나가는 돈인지 적어주세요.");return;}
   let f=id?(s.fixed||[]).filter(function(x){return x.id===id;})[0]:null;
   const isNew=!f;
-  if(isNew){f={id:uid(),off:false,paid:{}};s.fixed.push(f);}
+  if(isNew){f={id:uid(),off:false,paid:{},rep:"m",on:""};s.fixed.push(f);}
   f.name=name;
   f.amt=Math.max(0,Math.round(+g("mf_amt")||0));
-  f.day=Math.max(0,Math.min(31,Math.round(+g("mf_day")||0)));
+  const one=mnRepIs1();
+  f.rep=one?"1":"m";
+  if(one){
+    const dv=g("mf_on");
+    f.on=/^\d{4}-\d{2}-\d{2}$/.test(dv)?dv:todayStr();
+    f.day=+f.on.slice(8,10);
+  }else{
+    f.on="";
+    f.day=Math.max(0,Math.min(31,Math.round(+g("mf_day")||0)));
+  }
   const cb=document.getElementById("mf_cat");
   f.cat=(cb&&cb.getAttribute("data-v"))||"life";
   f.memo=g("mf_memo")||"";
   f.p=mpHas(s,mpVal("mf_pay"))?mpVal("mf_pay"):"";
   closeEdit();save();render();
-  if(isNew){try{toast("📌 고정 지출에 넣었어요");}catch(e){}}
+  if(isNew){try{toast("📆 예정 지출에 넣었어요");}catch(e){}}
 }
 
 /* ---- 지출 기록 ---- */
