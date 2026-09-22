@@ -2386,8 +2386,15 @@ button.mncpb.on{border-color:currentColor;font-weight:900}
   background:var(--surface-2);padding:6px 8px 8px}
 .mpg.now{border-color:var(--blue-l);background:var(--blue-xl)}
 .mpg.late{border-color:var(--danger);background:var(--danger-xl)}
-.mpgh{display:flex;align-items:center;gap:7px;padding:3px 2px 6px;
-  border-bottom:1px dashed var(--line);margin-bottom:2px;flex-wrap:wrap}
+.mpgh{display:flex;align-items:center;gap:7px;padding:5px 2px;width:100%;
+  border:0;background:transparent;font-family:inherit;text-align:left;
+  cursor:pointer;border-radius:8px;flex-wrap:wrap;color:inherit;
+  transition:background-color .13s}
+.mpgh:hover{background-color:var(--surface-3)}
+.mpgh.as{cursor:default}
+.mpgh.as:hover{background:transparent}
+.mpg.op>.mpgh{border-bottom:1px dashed var(--line);margin-bottom:2px;border-radius:8px 8px 0 0}
+.mpgt{font-size:10px;color:var(--muted);width:10px;flex:none}
 .mpgh>b{font-size:13px;font-weight:900;letter-spacing:-.03em}
 .mpgh>em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--muted);
   white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -2439,6 +2446,14 @@ button.mfrb{flex:1;border:1px solid var(--line);background:var(--surface-2);
 button.mfrb:hover{border-color:var(--blue);color:var(--blue)}
 button.mfrb.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .ehint2{font-size:11px;color:var(--muted);margin-top:5px}
+.mpgz{font-size:11.5px;color:var(--muted);padding:9px 2px;text-align:center}
+button.mpgd{margin-top:4px;width:100%;border:0;background:transparent;padding:6px 2px;
+  font-family:inherit;font-size:11.5px;font-weight:800;color:var(--muted);cursor:pointer;
+  border-top:1px dashed var(--line);border-radius:0 0 8px 8px;text-align:left;
+  transition:color .13s,background-color .13s}
+button.mpgd:hover{color:var(--blue);background-color:var(--surface-3)}
+button.mpgd.on{color:var(--ink-2)}
+.mpgdw{opacity:.75}
 </style>
 <style id="wishcss">
 /* ===================== 🎁 위시리스트 ===================== */
@@ -4151,6 +4166,17 @@ function mcSet(box,v){
    · 손잡이(⠿)를 끌어서 중요한 순서대로 놓을 수 있어요 */
 /* ===== 📆 앞으로 예정된 지출 — 날짜별 체크 목록 하나로 ===== */
 function mnPlanN(){const n=+(ui().mnpn||6);return (n>=3&&n<=12)?n:6;}
+/* 펼쳐둔 달 / 「낸 것」 펼친 달 */
+function mnPlanOpen(){const u=ui();if(!u.mnpo||typeof u.mnpo!=="object")u.mnpo={};return u.mnpo;}
+function mnPlanIsOpen(m){
+  const o=mnPlanOpen();
+  if(typeof o[m]==="boolean") return o[m];
+  return m===ymNow();            /* 기본: 이번 달만 펼침 */
+}
+function mnPlanTog(m){const o=mnPlanOpen();o[m]=!mnPlanIsOpen(m);save();render();}
+function mnPlanDone(){const u=ui();if(!u.mnpd||typeof u.mnpd!=="object")u.mnpd={};return u.mnpd;}
+function mnPlanDoneOn(m){return !!mnPlanDone()[m];}
+function mnPlanDoneTog(m){const d=mnPlanDone();d[m]=!d[m];save();render();}
 function mnPlanMore(){ui().mnpn=Math.min(12,mnPlanN()+3);save();render();}
 function mnPlanLess(){ui().mnpn=Math.max(3,mnPlanN()-3);save();render();}
 /* 한 달치 줄 — 안 낸 것 먼저, 낸 것은 아래로 */
@@ -4222,17 +4248,31 @@ function mnPlanBox(s,ym){
     ? '다음은 <b>'+(+nx.due.slice(5,7))+'/'+(+nx.due.slice(8,10))+' '+esc(nx.f.name||"예정 지출")+' '+won(nx.f.amt)+'원</b>'+
       (nx.dd===0?' · <em class="soon">오늘이에요</em>':nx.dd<=3?' · <em class="soon">D-'+nx.dd+'</em>':' · D-'+nx.dd)
     : ((s.fixed||[]).length?'앞으로 나갈 게 없어요 ✓':'');
-  const backHtml=back.length?'<div class="mpg late"><div class="mpgh"><b>🔴 지난 것</b>'+
+  const backHtml=back.length?'<div class="mpg late op"><div class="mpgh as"><span class="mpgt"> </span><b>🔴 지난 것</b>'+
       '<span class="mpgn">'+back.length+'건</span><span class="spacer"></span>'+
       '<em>'+won(mnSum(back.map(function(x){return x.f;})))+'원</em></div>'+
       back.map(mnPlanRow).join("")+'</div>':'';
   const gHtml=groups.filter(function(g){return g.rows.length;}).map(function(g){
     const lbl=(+g.ym.split("-")[1])+"월";
     const yr=(g.ym.slice(0,4)!==now.slice(0,4))?('<span class="mpgy">'+g.ym.slice(2,4)+'년</span>'):'';
-    return '<div class="mpg'+(g.ym===now?" now":"")+'"><div class="mpgh"><b>'+lbl+'</b>'+yr+
+    const op=mnPlanIsOpen(g.ym);
+    const done=g.rows.filter(function(x){return x.paid;});
+    const todo=g.rows.filter(function(x){return !x.paid;});
+    const dOn=mnPlanDoneOn(g.ym);
+    const body=op
+      ? (todo.map(mnPlanRow).join("")||'<div class="mpgz">이 달은 다 냈어요 ✓</div>')+
+        (done.length
+          ? '<button type="button" class="mpgd'+(dOn?" on":"")+'" onclick="mnPlanDoneTog(\''+g.ym+'\')">'+
+            (dOn?'▾':'▸')+' ✓ 낸 것 '+done.length+'건'+(dOn?'':' 보기')+'</button>'+
+            (dOn?'<div class="mpgdw">'+done.map(mnPlanRow).join("")+'</div>':'')
+          : '')
+      : '';
+    return '<div class="mpg'+(g.ym===now?" now":"")+(op?" op":"")+'">'+
+      '<button type="button" class="mpgh" aria-expanded="'+(op?"true":"false")+'" '+
+        'onclick="mnPlanTog(\''+g.ym+'\')"><span class="mpgt">'+(op?'▾':'▸')+'</span><b>'+lbl+'</b>'+yr+
       (g.open?'<span class="mpgn">'+g.open+'건 남음</span>':'<span class="mpgn ok">다 냈어요 ✓</span>')+
-      '<span class="spacer"></span><em>'+(g.sum?won(g.sum)+'원':'–')+'</em></div>'+
-      g.rows.map(mnPlanRow).join("")+'</div>';
+      '<span class="spacer"></span><em>'+(g.sum?won(g.sum)+'원':'–')+'</em></button>'+
+      body+'</div>';
   }).join("");
   const empty='<div class="tpempty">월세·통신비처럼 매달 나가는 돈도,<br>네일·시술처럼 한 번 나갈 돈도 여기에 적어두세요 📆</div>';
   return '<div class="wsec">'+
@@ -4243,7 +4283,7 @@ function mnPlanBox(s,ym){
     (headline?'<div class="mpn">'+headline+
       (late?' · <em class="over">날짜 지난 '+late+'건 '+won(lateSum)+'원</em>':'')+'</div>':'')+
     (backHtml+gHtml||empty)+
-    ((s.fixed||[]).length?'<div class="mfhint">✓ 를 누르면 그날 「쓴 돈」에 자동으로 들어가요'+
+    ((s.fixed||[]).length?'<div class="mfhint">달 이름을 누르면 펼쳐져요 · ✓ 를 누르면 그날 「쓴 돈」에 자동으로 들어가요'+
       (n<12?'<button type="button" class="btn sm" onclick="mnPlanMore()">＋ 3개월 더</button>':'')+
       (n>3?'<button type="button" class="btn sm" onclick="mnPlanLess()">– 줄이기</button>':'')+
       '</div>':'')+
