@@ -2169,6 +2169,28 @@ html[data-theme=dark] .titem .x.dt{color:#9dbcff;border-color:#2a3b5c}
   .mdqs{grid-template-columns:1fr 1fr}
 }
 </style>
+<style id="mkcss">
+.dcell2 .mktxt{font-size:9px;font-weight:800;line-height:1.05;letter-spacing:-.04em;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.dcell2 .mktxt.pred{font-weight:700;opacity:.75}
+.dcell2.mkp{border-style:dashed;border-color:var(--mkl)}
+.dcell2.mkp .dnum{color:var(--mkc);opacity:.8}
+.mkbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 10px;
+  padding:9px 12px;border-radius:12px;background:var(--surface-2);
+  border:1px solid var(--line);border-left:4px solid var(--mkc)}
+.mkbn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;
+  letter-spacing:-.02em;white-space:nowrap}
+.mkbn>i{width:9px;height:9px;border-radius:50%;display:block}
+.mkbb{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:-.02em}
+.mkbb b{color:var(--ink-2);font-weight:900}
+.mkbg{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--muted);
+  background:var(--surface-3);border-radius:999px;padding:2px 9px;white-space:nowrap}
+@media(max-width:640px){
+  .mkbar{gap:6px;padding:8px 10px}
+  .mkbg{margin-left:0}
+  .dcell2 .mktxt{font-size:8px}
+}
+</style>
 <style id="moneycss">
 /* ===== 💰 재테크 탭 ===== */
 .mnnav{border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);
@@ -2375,6 +2397,43 @@ button.mncpb.on{border-color:currentColor;font-weight:900}
 @media(max-width:640px){
   .mncp{margin-left:0}
   button.mncpb{font-size:10px;padding:2px 6px}
+}
+
+/* ===== 🗓 고정 지출 달별 체크표 ===== */
+.mfg{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
+.mfghd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mfghd>em{font-style:normal;font-size:11.5px;color:var(--muted)}
+button.mfgt{border:0;background:transparent;color:var(--ink-2);font-family:inherit;
+  font-size:12.5px;font-weight:800;padding:3px 0;cursor:pointer;letter-spacing:-.02em}
+button.mfgt:hover{color:var(--blue)}
+.mfgw{margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mfgr{display:grid;grid-template-columns:minmax(96px,1fr) repeat(6,30px) 38px;
+  gap:4px;align-items:center;min-width:330px}
+.mfgr+.mfgr{margin-top:4px}
+.mfgr.moff{opacity:.45}
+.mfgn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.02em}
+.mfgn>i{width:7px;height:7px;border-radius:50%;flex:none}
+.mfgh .mfgc,.mfgf .mfgc{font-size:10.5px;font-weight:800;color:var(--muted);text-align:center;
+  padding:3px 0;border-radius:7px;white-space:nowrap}
+.mfgh .mfgc.sel,.mfgf .mfgc.sel{background:var(--blue-xl);color:var(--blue)}
+.mfgh .mfgc.now{text-decoration:underline}
+.mfgf .mfgc.miss{color:var(--danger)}
+.mfgs{font-size:10.5px;font-weight:800;color:var(--muted);text-align:right;white-space:nowrap}
+.mfgs.full{color:var(--ok,#0ea472)}
+.mfgh .mfgn,.mfgf .mfgn{font-size:10.5px;color:var(--muted);font-weight:800}
+button.mfgb{height:28px;border:1px solid var(--line);background:var(--surface-2);
+  border-radius:8px;font-family:inherit;font-size:12px;font-weight:900;color:var(--muted);
+  cursor:pointer;padding:0;transition:background .13s,border-color .13s,color .13s}
+button.mfgb:hover{border-color:var(--blue);color:var(--blue)}
+button.mfgb.on{background:var(--mfgc,var(--blue));border-color:var(--mfgc,var(--blue));color:#fff}
+button.mfgb.sel{box-shadow:0 0 0 1.5px var(--blue-l)}
+button.mfgb.fut{opacity:.4}
+.mfghint{margin-top:8px;font-size:11.5px;color:var(--danger);font-weight:700}
+@media(max-width:640px){
+  .mfgr{grid-template-columns:minmax(78px,1fr) repeat(6,27px) 32px;gap:3px;min-width:300px}
+  button.mfgb{height:26px;font-size:11px}
+  .mfgn{font-size:11.5px}
 }
 </style>
 <style id="wishcss">
@@ -4114,8 +4173,73 @@ function mnFixedBox(s,ym){
       '<div class="tpempty">월세·통신비·구독료처럼<br>매달 꼭 나가는 돈을 적어두세요 📌</div>')+
     (canSort?'<div class="mfhint">⠿ 를 끌어서 중요한 순서대로 놓을 수 있어요 · ✓ 하면 맨 아래로 내려가요'+
       '<button type="button" class="btn sm" onclick="mnFixSortDay()">📅 날짜순</button></div>':'')+
+    mnFixGrid(s,ym)+
     '<button class="tpadd" onclick="mnFixEdit()">＋ 고정 지출 추가</button>'+
   '</div>';
+}
+/* 🗓 항목 × 최근 6개월 체크표 — 어느 달에 냈는지 한눈에, 칸을 눌러 바로 체크 */
+function mnFixGridOn(){return ui().mnfg!==false;}
+function mnFixGridTog(){ui().mnfg=!mnFixGridOn();save();render();}
+function mnFixMonths(s,ym,n){
+  const a=[];for(let i=n-1;i>=0;i--)a.push(ymAdd(ym,-i));return a;
+}
+function mnFixGrid(s,ym){
+  const all=(s.fixed||[]).filter(function(f){return !!f;});
+  if(all.length<1) return "";
+  const open=mnFixGridOn();
+  const ms=mnFixMonths(s,ym,6);
+  const hd='<div class="mfghd"><button type="button" class="mfgt" onclick="mnFixGridTog()" '+
+    'aria-expanded="'+(open?"true":"false")+'">'+(open?"▾":"▸")+' 🗓 달별로 낸 것 체크</button>'+
+    '<span class="spacer"></span>'+
+    (open?'<em>칸을 누르면 그 달에 낸 걸로 표시돼요</em>':'')+'</div>';
+  if(!open) return '<div class="mfg">'+hd+'</div>';
+  const now=ymNow();
+  const head='<div class="mfgr mfgh"><span class="mfgn">항목</span>'+
+    ms.map(function(m){
+      const mm=(+m.split("-")[1])+"월";
+      return '<span class="mfgc'+(m===ym?" sel":"")+(m===now?" now":"")+'" title="'+esc(ymLabel(m))+'">'+mm+'</span>';
+    }).join("")+'<span class="mfgs">낸 달</span></div>';
+  const rows=all.map(function(f){
+    const c=mcat(f.cat);
+    let done=0;
+    const cells=ms.map(function(m){
+      const paid=!!(f.paid&&f.paid[m]);
+      if(paid)done++;
+      const fut=(m>now);
+      return '<button type="button" class="mfgb'+(paid?" on":"")+(fut?" fut":"")+(m===ym?" sel":"")+'" '+
+        'style="'+(paid?"--mfgc:"+c.color+";":"")+'" '+
+        'title="'+esc(ymLabel(m)+" · "+(f.name||"고정 지출")+" · "+(paid?"냈어요 (누르면 되돌리기)":"아직 안 냈어요 (누르면 냈어요)"))+'" '+
+        'aria-label="'+esc(ymLabel(m)+" "+(f.name||""))+'" '+
+        'onclick="mnFixTog(\''+f.id+'\',\''+m+'\')">'+(paid?"✓":(fut?"·":""))+'</button>';
+    }).join("");
+    return '<div class="mfgr'+(f.off?" moff":"")+'">'+
+      '<span class="mfgn" title="'+esc((f.name||"")+(f.amt?" · "+won(f.amt)+"원":""))+'">'+
+        '<i style="background:'+c.color+'"></i>'+esc(f.name||"(이름 없음)")+'</span>'+
+      cells+
+      '<span class="mfgs'+(done===ms.length?" full":"")+'">'+done+'/'+ms.length+'</span></div>';
+  }).join("");
+  const sums=ms.map(function(m){
+    const tgt=all.filter(function(f){return !f.off&&f.amt>0;});
+    const p=tgt.filter(function(f){return !!(f.paid&&f.paid[m]);}).length;
+    const miss=(m<now)?(tgt.length-p):0;
+    return '<span class="mfgc'+(miss?" miss":"")+(m===ym?" sel":"")+'" '+
+      'title="'+esc(ymLabel(m)+" "+p+"/"+tgt.length+(miss?" · "+miss+"개 빠짐":""))+'">'+p+'</span>';
+  }).join("");
+  const nTgt=all.filter(function(f){return !f.off&&f.amt>0;}).length;
+  const foot='<div class="mfgr mfgf"><span class="mfgn">낸 개수</span>'+sums+'<span class="mfgs">/'+nTgt+'</span></div>';
+  /* 지난 달들 중 빠뜨린 게 있으면 짚어주기 */
+  const late=[];
+  ms.forEach(function(m){
+    if(m>=now)return;
+    all.forEach(function(f){
+      if(f.off||!f.amt)return;
+      if(!(f.paid&&f.paid[m])) late.push({m:m,n:f.name||"고정 지출"});
+    });
+  });
+  const warn=late.length?'<div class="mfghint">지난 달 중 '+late.length+'칸이 비어 있어요 · '+
+    esc(late.slice(0,3).map(function(x){return (+x.m.split("-")[1])+"월 "+x.n;}).join(", "))+
+    (late.length>3?' 외 '+(late.length-3)+'개':'')+'</div>':'';
+  return '<div class="mfg">'+hd+'<div class="mfgw">'+head+rows+foot+'</div>'+warn+'</div>';
 }
 function mnFixSortDay(){
   const s=mS();if(!s)return;
@@ -4312,22 +4436,22 @@ function mnGoDay(k){
   el.classList.add("flash");
   setTimeout(function(){el.classList.remove("flash");},1400);
 }
-function mnFixTog(id){
+function mnFixTog(id,ymArg){
   const s=mS();if(!s)return;
-  const ym=mnYm(s);
+  const ym=ymArg||mnYm(s);
   const f=(s.fixed||[]).filter(function(x){return x.id===id;})[0];if(!f)return;
   if(!f.amt&&!f.paid[ym]){mnFixEdit(id);try{toast("얼마 나가는지 먼저 적어주세요");}catch(e){}return;}
   if(f.paid[ym]){
     const sid=f.paid[ym];
     s.spend=(s.spend||[]).filter(function(x){return x.id!==sid;});
     delete f.paid[ym];
-    save();render();try{toast("↩ 아직 안 낸 걸로 되돌렸어요");}catch(e){}
+    save();render();try{toast("↩ "+ymLabel(ym)+" 아직 안 낸 걸로 되돌렸어요");}catch(e){}
   }else{
     const day=String(Math.min(Math.max(f.day||1,1),mnLastDay(ym))).padStart(2,"0");
     const sid=uid();
     s.spend.unshift({id:sid,d:ym+"-"+day,cat:f.cat,amt:f.amt,memo:f.name,p:(f.p||""),fx:f.id});
     f.paid[ym]=sid;
-    save();render();try{toast("✓ "+won(f.amt)+"원 냈어요 · 지출에 넣었어요");}catch(e){}
+    save();render();try{toast("✓ "+ymLabel(ym)+" "+won(f.amt)+"원 냈어요 · 지출에 넣었어요");}catch(e){}
   }
 }
 function mnLastDay(ym){const a=ym.split("-");return new Date(+a[0],+a[1],0).getDate();}
@@ -5774,8 +5898,82 @@ function hexA(h,a){
   const r=parseInt(h.slice(0,2),16)||148,g=parseInt(h.slice(2,4),16)||163,b=parseInt(h.slice(4,6),16)||184;
   return "rgba("+r+","+g+","+b+","+a+")";
 }
+
+/* ===== 🔖 기록용 카테고리(생리 시작 등) — 주기·다음 예상일 ===== */
+function mkShort(n){n=String(n||"").trim();return n.length>4?n.slice(0,4):n;}
+/* 기록용 카테고리가 찍힌 날짜들(오름차순) */
+function mkDates(catId){
+  const s=ds(),out=[];
+  Object.keys(s.days||{}).forEach(function(k){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(k))return;
+    if((s.days[k]||[]).some(function(t){return t.cat===catId;})) out.push(k);
+  });
+  return out.sort();
+}
+function dayGap(a,b){return Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000);}
+/* 연속된 날은 한 번으로 묶어서 '시작일'만 남긴다 */
+function mkStarts(catId){
+  const a=mkDates(catId),out=[];
+  a.forEach(function(k,i){ if(i===0||dayGap(a[i-1],k)>3) out.push(k); });
+  return out;
+}
+function mkCycle(catId){
+  const st=mkStarts(catId);
+  if(st.length<2) return {starts:st,gaps:[],avg:0,next:""};
+  const gaps=[];
+  for(let i=1;i<st.length;i++){const g=dayGap(st[i-1],st[i]); if(g>=10&&g<=90) gaps.push(g);}
+  if(!gaps.length) return {starts:st,gaps:[],avg:0,next:""};
+  const use=gaps.slice(-6);
+  const avg=Math.round(use.reduce(function(n,g){return n+g;},0)/use.length);
+  return {starts:st,gaps:use,avg:avg,next:addDays(st[st.length-1],avg)};
+}
+/* 그 달에 그려줄 예상일 목록 */
+function mkPredict(y,m){
+  const out={days:{},color:"#e11d48",name:""};
+  const cs=(ds().cats||[]).filter(function(c){return c.mark;});
+  if(!cs.length) return out;
+  const c=cs[0];
+  out.color=c.color; out.name=c.name;
+  const cy=mkCycle(c.id);
+  if(!cy.next) return out;
+  const pre=String(y)+"-"+String(m+1).padStart(2,"0");
+  let d=cy.next,guard=0;
+  while(d.slice(0,7)<=pre&&guard++<40){
+    if(d.slice(0,7)===pre) out.days[d]=1;
+    d=addDays(d,cy.avg);
+  }
+  return out;
+}
+function mkBar(y,m){
+  const cs=(ds().cats||[]).filter(function(c){return c.mark;});
+  if(!cs.length) return "";
+  const pre=String(y)+"-"+String(m+1).padStart(2,"0");
+  const t=todayStr();
+  return cs.map(function(c){
+    const cy=mkCycle(c.id);
+    const here=cy.starts.filter(function(k){return k.slice(0,7)===pre;});
+    const last=cy.starts[cy.starts.length-1]||"";
+    const bits=[];
+    if(here.length) bits.push("<b>"+here.map(function(k){return (+k.slice(5,7))+"/"+(+k.slice(8,10));}).join(", ")+"</b> 시작");
+    else if(last) bits.push("이번 달 기록 없음 · 마지막 <b>"+(+last.slice(5,7))+"/"+(+last.slice(8,10))+"</b>");
+    else bits.push("아직 기록이 없어요");
+    if(cy.avg) bits.push("주기 평균 <b>"+cy.avg+"일</b>");
+    if(cy.next){
+      const dd=dayGap(t,cy.next);
+      bits.push("다음 예상 <b>"+(+cy.next.slice(5,7))+"/"+(+cy.next.slice(8,10))+"</b>"+
+        (dd===0?" (오늘)":dd>0?" (D-"+dd+")":" ("+(-dd)+"일 지남)"));
+    }
+    return '<div class="mkbar" style="--mkc:'+c.color+'">'+
+      '<span class="mkbn"><i style="background:'+c.color+'"></i>'+esc(c.name)+' 🔖</span>'+
+      '<span class="mkbb">'+bits.join(" · ")+'</span>'+
+      (cy.gaps.length?'<span class="mkbg" title="최근 주기">'+cy.gaps.join("·")+'일</span>':'')+
+    '</div>';
+  }).join("");
+}
+
 function dailyMonth(){
   const total=monthDays(calY,calM),start=firstIdx(calY,calM),t=todayStr();
+  const mkPred=mkPredict(calY,calM);
   const one=(filter!=="ALL")?catById(filter):null;      /* 카테고리를 고르면 그것만 크게 */
   let cells="",dn=0,ddone=0,hit=0,hitDays=[];
   for(let i=0;i<start;i++) cells+=`<div class="dcell2 off"></div>`;
@@ -5803,10 +6001,17 @@ function dailyMonth(){
       const show=ordered.slice(0,4);
       dots=`<span class="dots">${show.map(function(c){
         return `<i class="${c.mark?"mkdot":""}" style="background:${c.color}"></i>`;}).join("")}${ordered.length>4?'<b class="dmore2">+</b>':""}</span>`;
+      /* 🔖 기록용은 이름을 글자로 바로 보여준다 — 하나하나 눌러보지 않아도 되게 */
+      if(mks.length) dots+=`<span class="mktxt" style="color:${mks[0].color}">${esc(mkShort(mks[0].name))}</span>`;
     }
     const bar=(r>=0)?`<span class="drate ${r===100?"full":""}"><i style="width:${Math.max(4,r)}%"></i></span>`:"";
     let tip=cs.length?cs.map(function(c){return c.name;}).join(" · ")+(r>=0?" · "+r+"%":""):"";
     if(away) tip=(tip?tip+" · ":"")+"미완료 "+away+"개는 오늘로 옮겨짐";
+    if(!mks.length&&mkPred.days[k]){
+      cls+=" mkp";
+      st="--mkc:"+mkPred.color+";--mkl:"+hexA(mkPred.color,.5)+";";
+      dots+=`<span class="mktxt pred" style="color:${mkPred.color}">${esc(mkShort(mkPred.name))} 예상</span>`;
+    }
     const styleAttr=(st||one)?` style="${st}${one?"--cchit:"+one.color+";":""}"`:"";
     cells+=`<div class="dcell2 ${k===daySel?"sel":""} ${k===t?"today":""}${cls}"${styleAttr}
       title="${esc(tip)}" onclick="setDay('${k}')">
@@ -5823,6 +6028,7 @@ function dailyMonth(){
           : `<span><i style="background:${c.color}"></i>${esc(c.name)}</span>`;}).join("")}
         <span class="rt2"><b></b>아래 띠 = 달성률</span></div>`;
   return `<div class="mcal">
+    ${mkBar(calY,calM)}
     <div class="monthnav">
       <button class="btn sm" onclick="shiftMonth(-1)">‹</button>
       <div class="m">${calY}. ${String(calM+1).padStart(2,"0")}</div>
