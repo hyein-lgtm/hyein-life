@@ -2540,6 +2540,73 @@ button.wsh.mnsh:hover{background:var(--surface-3)}
   .mnpast{font-size:11.5px;padding:9px 10px;margin:0 8px 8px}
   button.wsh.mnsh{padding:10px 4px 8px}
 }
+
+
+/* ===== 🏷 카테고리 관리 ===== */
+.mcmr{display:grid;grid-template-columns:30px 58px 1fr 76px 28px 28px 28px;gap:6px;
+  align-items:center;margin-bottom:7px}
+.mcmv{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;font-size:14px;color:#fff}
+.mcmr>select,.mcmr>input{min-width:0}
+.mcmc{font-size:11px}
+button.mcmu{border:1px solid var(--line);background:var(--surface-2);color:var(--muted);
+  border-radius:8px;padding:5px 0;font-size:11px;cursor:pointer;font-family:inherit}
+button.mcmu:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ===== 💸 맨 위 큰 숫자 ===== */
+.mnhero{margin-top:11px;padding:15px 16px 13px;border-radius:15px;
+  border:1px solid var(--line);background:var(--surface-2)}
+.mnhero.near{border-color:var(--amber,#f59e0b);background:var(--amber-xl,rgba(245,158,11,.08))}
+.mnhero.over{border-color:var(--danger);background:var(--danger-xl)}
+.mnhl{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:-.02em}
+.mnhv{font-size:38px;font-weight:900;letter-spacing:-.045em;line-height:1.08;
+  margin:2px 0 1px;font-variant-numeric:tabular-nums}
+.mnhv>small{font-size:17px;font-weight:800;margin-left:3px;letter-spacing:-.03em}
+.mnhero.over .mnhv{color:var(--danger)}
+.mnhc{font-size:11.5px;font-weight:800;letter-spacing:-.02em;margin-bottom:9px}
+.mnhc.up{color:var(--danger)}
+.mnhc.down{color:var(--st-done-fg,#0ea472)}
+.mnhero .tpbar{margin-top:4px}
+.mnhn{font-size:12px;font-weight:700;color:var(--ink-2);letter-spacing:-.02em;margin-top:7px}
+.mnhn b{font-weight:900}
+.mnhb{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.mnhb>.btn{flex:1;min-width:120px}
+
+/* ===== 📅 주간 예산 ===== */
+.mnwk{margin:0 12px 10px;padding:11px 13px;border-radius:13px;
+  border:1px solid var(--line);background:var(--surface-2)}
+.mnwk.near{border-color:var(--amber,#f59e0b)}
+.mnwk.over{border-color:var(--danger);background:var(--danger-xl)}
+.mnwkh{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px}
+.mnwkh>b{font-size:13px;letter-spacing:-.02em}
+.mnwkh>.spacer{flex:1}
+.mnwkh>em{font-style:normal;font-size:12px;font-weight:900;letter-spacing:-.03em;
+  white-space:nowrap;font-variant-numeric:tabular-nums}
+.mnwk.over .mnwkh>em{color:var(--danger)}
+.mnwkd{font-size:10.5px;font-weight:800;color:var(--muted);background:var(--surface-3);
+  border-radius:999px;padding:2px 8px;white-space:nowrap}
+.mnwkn{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:-.02em;margin-top:6px}
+.mnwk.over .mnwkn{color:var(--danger)}
+
+/* ===== 📍 오늘 쓴 돈 ===== */
+.mntd{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 12px 9px;
+  padding:9px 13px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface-2);font-size:13px;font-weight:800;letter-spacing:-.02em}
+.mntd b{font-weight:900;font-variant-numeric:tabular-nums}
+.mntd>span{font-size:11.5px;font-weight:700;color:var(--muted);margin-left:auto;
+  text-align:right;letter-spacing:-.02em}
+.mntd.zero{border-color:var(--st-done-fg,#0ea472);background:var(--st-done-bg,rgba(14,164,114,.09))}
+.mntd.hot{border-color:var(--danger);background:var(--danger-xl);color:var(--danger)}
+.mntd.hot>span{color:var(--danger)}
+
+@media(max-width:640px){
+  .mnhv{font-size:32px}
+  .mnhb>.btn{min-width:0}
+  .mcmr{grid-template-columns:26px 50px 1fr 24px 24px 24px;gap:4px}
+  .mcmr>.mcmc{display:none}
+  .mnwk,.mntd{margin-left:8px;margin-right:8px}
+  .mntd>span{margin-left:0;width:100%;text-align:left}
+}
 </style>
 <style id="wishcss">
 /* ===================== 🎁 위시리스트 ===================== */
@@ -3940,7 +4007,10 @@ function wsStats(s){
    💰 재테크 — 이번 달 한눈에 · 매일 지출 기록 · 곧 나갈 돈
    위시리스트(이번 달 · 아직 안 이룬 것)와 연동됩니다.
    =========================================================== */
-const MCAT=[
+const MCEMO=["🍚","☕","🍻","🛍","💅","🏠","🚗","💪","🎬","🎁","✏️","🍔","🍰","🚕","📚","🐾","💊","🎮","✈️","💡"];
+const MCCOL=["#e11d48","#b4772e","#c2410c","#d81b60","#a21caf","#7c3aed","#5b7cfa","#0ea472","#0891b2","#f59e0b","#64748b"];
+const MCETC={id:"etc",name:"기타",emoji:"✏️",color:"#64748b"};
+const MCDEF=[
   {id:"food",  name:"식비",    emoji:"🍚", color:"#e11d48"},
   {id:"cafe",  name:"카페",    emoji:"☕", color:"#b4772e"},
   {id:"drink", name:"술·모임",  emoji:"🍻", color:"#c2410c"},
@@ -3953,7 +4023,12 @@ const MCAT=[
   {id:"gift",  name:"선물·경조", emoji:"🎁", color:"#f59e0b"},
   {id:"etc",   name:"기타",    emoji:"✏️", color:"#64748b"}
 ];
-function mcat(id){for(let i=0;i<MCAT.length;i++)if(MCAT[i].id===id)return MCAT[i];return MCAT[MCAT.length-1];}
+/* 실제로 쓰이는 목록 — mnNorm 이 저장된 값으로 바꿔 끼웁니다 */
+let MCAT=MCDEF.map(function(c){return {id:c.id,name:c.name,emoji:c.emoji,color:c.color};});
+function mcat(id){
+  for(let i=0;i<MCAT.length;i++)if(MCAT[i].id===id)return MCAT[i];
+  return MCAT.length?MCAT[MCAT.length-1]:MCETC;
+}
 
 /* ---- 결제수단 (직접 추가·수정할 수 있어요) ---- */
 const MPEMO=["\uD83D\uDCB3","\uD83D\uDCF1","\uD83D\uDCB5","\uD83C\uDFE6","\uD83C\uDFAB","\uD83E\uDE99","\uD83E\uDDFE","\uD83C\uDF81"];
@@ -3975,10 +4050,27 @@ function mpay(s,id){
 }
 function mpHas(s,id){const a=mnPays(s);for(let i=0;i<a.length;i++)if(a[i].id===id)return true;return false;}
 function mHas(id){for(let i=0;i<MCAT.length;i++)if(MCAT[i].id===id)return true;return false;}
+function mnCats(s){return (s&&Array.isArray(s.cat))?s.cat:MCAT;}
+/* 카테고리가 지워졌을 때 흘려보낼 곳 */
+function mcFb(pref){if(pref&&mHas(pref))return pref;return MCAT.length?MCAT[MCAT.length-1].id:"etc";}
 
 /* ---- 저장된 값 다듬기 ---- */
 function mnNorm(s){
   s.label=s.label||"💰 재테크"; s.icon=s.icon||"💰";
+  /* 카테고리: 처음 한 번만 기본 목록을 넣고, 그 뒤로는 내가 고친 대로 */
+  if(!Array.isArray(s.cat)||!s.cat.length) s.cat=MCDEF.map(function(c){
+    return {id:c.id,name:c.name,emoji:c.emoji,color:c.color};});
+  const _cseen={};
+  s.cat=s.cat.filter(Boolean).map(function(c,i){
+    let id=String(c.id||"")||uid();
+    if(_cseen[id])id=uid();
+    _cseen[id]=1;
+    return {id:id,
+      name:String(c.name||"").trim()||"카테고리",
+      emoji:String(c.emoji||"✏️").slice(0,4),
+      color:/^#[0-9a-fA-F]{6}$/.test(String(c.color||""))?c.color:MCCOL[i%MCCOL.length]};
+  });
+  MCAT=s.cat;
   s.budget=(s.budget&&typeof s.budget==="object")?s.budget:{};
   /* 결제수단: 처음 한 번만 기본 목록을 넣어준다 (다 지우면 빈 채로 둔다) */
   if(!Array.isArray(s.pay)) s.pay=MPDEF.map(function(p,i){
@@ -3996,7 +4088,7 @@ function mnNorm(s){
   s.spend=(Array.isArray(s.spend)?s.spend:[]).filter(Boolean).map(function(x){
     return {id:x.id||uid(),
       d:/^\d{4}-\d{2}-\d{2}$/.test(String(x.d||""))?x.d:todayStr(),
-      cat:mHas(x.cat)?x.cat:"etc",
+      cat:mHas(x.cat)?x.cat:mcFb("etc"),
       amt:Math.max(0,Math.round(+x.amt||0)),
       memo:String(x.memo||""),
       p:mpHas(s,x.p)?x.p:"",
@@ -4007,10 +4099,16 @@ function mnNorm(s){
     return {id:f.id||uid(),name:String(f.name||""),
       amt:Math.max(0,Math.round(+f.amt||0)),
       day:Math.max(0,Math.min(31,Math.round(+f.day||0))),
-      cat:mHas(f.cat)?f.cat:"life",
+      cat:mHas(f.cat)?f.cat:mcFb("life"),
       memo:String(f.memo||""),p:mpHas(s,f.p)?f.p:"",off:!!f.off,paid:p,
       rep:(f.rep==="1")?"1":"m",
       on:/^\d{4}-\d{2}-\d{2}$/.test(String(f.on||""))?f.on:""};
+  });
+  /* 이번 달 목표 금액 */
+  s.goal=(s.goal&&typeof s.goal==="object")?s.goal:{};
+  Object.keys(s.goal).forEach(function(k){
+    if(!/^\d{4}-\d{2}$/.test(k)) delete s.goal[k];
+    else{ s.goal[k]=Math.max(0,Math.round(+s.goal[k]||0)); if(!s.goal[k])delete s.goal[k]; }
   });
   /* 카테고리별 한 달 한도 */
   s.lim=(s.lim&&typeof s.lim==="object")?s.lim:{};
@@ -4022,7 +4120,7 @@ function mnNorm(s){
   s.cool=(Array.isArray(s.cool)?s.cool:[]).filter(Boolean).map(function(c){
     return {id:c.id||uid(),name:String(c.name||""),
       amt:Math.max(0,Math.round(+c.amt||0)),
-      cat:mHas(c.cat)?c.cat:"shop",
+      cat:mHas(c.cat)?c.cat:mcFb("shop"),
       d:/^\d{4}-\d{2}-\d{2}$/.test(String(c.d||""))?c.d:todayStr()};
   });
   /* 참은 돈 */
@@ -4063,6 +4161,10 @@ function mnDueDate(f,m){
 }
 function mnDDay(a,b){
   return Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000);
+}
+function mnAvgDay(s,ym){
+  const n=(ym===ymNow())?(+todayStr().slice(8,10)):mnLastDay(ym);
+  return n?Math.round(mnSum(mnSpendM(s,ym))/n):0;
 }
 function mnBudget(s,ym){return Math.max(0,Math.round(+((s.budget||{})[ym])||0));}
 
@@ -4189,24 +4291,20 @@ function mnView(){
       '<b onclick="mnBudgetEdit()">'+esc(ymLabel(ym))+'</b>'+
       '<button type="button" class="mnnav" onclick="mnShift(1)" aria-label="다음 달">›</button>'+
       (isNow?'<span class="wnow">이번 달</span>':'<button type="button" class="btn sm" onclick="mnThis()">이번 달로</button>')+
-      '<span class="spacer"></span>'+
-      '<button type="button" class="btn sm" onclick="mnBudgetEdit()">'+(bud?'예산 고치기':'＋ 예산 정하기')+'</button>'+
     '</div>'+
-    '<div class="tmsum" style="margin-top:11px">'+
+    mnHero(s,ym)+
+    '<div class="tmsum" style="margin-top:10px">'+
       '<div><span>'+(left<0?"넘었어요":"남은 돈")+'</span><b class="'+(left<0?"over":"")+'">'+won(Math.abs(left))+'원</b></div>'+
-      '<div><span>이번 달 쓴 돈</span><b>'+won(spent)+'원</b></div>'+
       '<div><span>곧 나갈 돈</span><b class="'+(fsum?"wait":"")+'">'+won(fsum)+'원</b></div>'+
+      '<div><span>하루 평균</span><b>'+won(mnAvgDay(s,ym))+'원</b></div>'+
     '</div>'+
-    (bud?'<div class="tpbar '+(pct>=100?"over":"")+'" style="margin-top:10px"><i style="width:'+pct+'%"></i>'+
-       '<span>'+won(spent+fsum)+' / '+won(bud)+'원 ('+pct+'%)</span></div>'
-      :'<div class="tphp" style="margin-top:9px">이번 달 쓸 수 있는 돈을 정해두면 남은 돈이 계산돼요.</div>')+
     (wsum?'<div class="mnwish" onclick="mnGoWish()">🎁 위시리스트에 이번 달 <b>'+mnWish(ym).length+'개</b> · 예상 <b>'+won(wsum)+'원</b>'+
         '<em>'+(bud?(left-wsum<0?"다 사면 "+won(wsum-left)+"원 모자라요":"다 사도 "+won(left-wsum)+"원 남아요"):"예산을 정하면 비교해 드릴게요")+'</em></div>':'')+
   '</div>';
 
   if(mnVw()==="month") return head+mnViewTabs()+mnMonthBox(s);
   const nowOnly=isNow
-    ? (mnQuick(s,ym)+mnLimBox(s,ym)+mnCoolBox(s,ym)+mnZeroBox(s,ym))
+    ? (mnTodayLine(s,ym)+mnWeekBox(s,ym)+mnQuick(s,ym)+mnLimBox(s,ym)+mnCoolBox(s,ym)+mnZeroBox(s,ym))
     : (mnLimBox(s,ym)+'<div class="mnpast">📁 지난 달을 보고 있어요 · 기록·식히기는 이번 달에서만 보여요'+
        '<button type="button" class="btn sm" onclick="mnThis()">이번 달로</button></div>');
   return head+mnViewTabs()+nowOnly+
@@ -4226,7 +4324,7 @@ function mnQuick(s,ym){
       '<input id="mq_date" type="date" value="'+esc(d)+'">'+
       '<button type="button" class="btn primary" onclick="mnQuickAdd()">넣기</button>'+
     '</div>'+
-    mcPick("mq_cat",(ui().mqcat&&mHas(ui().mqcat))?ui().mqcat:"food")+
+    mcPick("mq_cat",(ui().mqcat&&mHas(ui().mqcat))?ui().mqcat:(MCAT.length?MCAT[0].id:""),true)+
     (mnPays(s).length?mpPick(s,"mq_pay",(ui().mqpay&&mpHas(s,ui().mqpay))?ui().mqpay:"",true)
       :'<div class="tcpick mppick"><button type="button" class="mpman" onclick="mnPayMan()">\u2699 \uacb0\uc81c\uc218\ub2e8 \ub9cc\ub4e4\uae30</button></div>')+
   '</div>';
@@ -4248,12 +4346,14 @@ function mnQuickAdd(){
   setTimeout(function(){mnLimWarn(s,d.slice(0,7),cat);},900);
   setTimeout(function(){const e=document.getElementById("mq_amt");if(e)e.focus();},60);
 }
-function mcPick(id,sel){
+function mcPick(id,sel,man){
   return '<div class="tcpick mcpick" id="'+id+'" data-v="'+sel+'">'+MCAT.map(function(c){
     return '<button type="button" data-v="'+c.id+'" class="'+(c.id===sel?"on":"")+'"'+
       (c.id===sel?' style="background:'+c.color+'"':'')+
       ' onclick="mcSet(\''+id+'\',\''+c.id+'\')">'+c.emoji+' '+c.name+'</button>';
-  }).join("")+'</div>';
+  }).join("")+
+  (man?'<button type="button" class="mpman" title="카테고리 고치기" aria-label="카테고리 관리" onclick="mnCatMan()">⚙</button>':'')+
+  '</div>';
 }
 /* 결제수단 고르개 */
 function mpPick(s,id,sel,man){
@@ -4340,10 +4440,94 @@ function mnPaySave(){
   closeEdit();save();render();
   try{toast("\uD83D\uDCB3 \uacb0\uc81c\uc218\ub2e8 "+out.length+"\uac1c\ub85c \uc800\uc7a5\ud588\uc5b4\uc694"+(lost?" \u00b7 "+lost+"\uac74\uc740 \ubbf8\uc9c0\uc815\uc73c\ub85c":""));}catch(e){}
 }
+/* ===== 카테고리 관리 (추가 · 이름/이모지/색 고치기 · 순서 · 지우기) ===== */
+function mnCatMan(){
+  const s=mS();if(!s)return;
+  document.getElementById("mIc").innerHTML=chImg("money");
+  document.getElementById("mTitle").textContent="🏷 카테고리 관리";
+  document.getElementById("mForm").innerHTML=
+    '<div id="mc_list">'+mnCats(s).map(mcManRow).join("")+'</div>'+
+    '<button type="button" class="tpadd" onclick="mcManAdd()">＋ 카테고리 추가</button>'+
+    '<div class="ehint">이름·아이콘·색을 마음대로 바꾸세요. ↑↓ 로 순서도 바꿀 수 있어요.<br>'+
+    '지우면 그 카테고리로 적어둔 기록은 맨 아래 칸으로 옮겨가요. <b>금액과 내용은 그대로 남아요.</b></div>';
+  const sv=document.getElementById("mSave");
+  sv.style.display="";sv.setAttribute("data-ns","mnc:");
+  document.getElementById("overlay").classList.add("on");
+}
+function mcManRow(c){
+  c=c||{};
+  const col=c.color||MCCOL[0];
+  return '<div class="mcmr" data-id="'+esc(c.id||"")+'">'+
+    '<span class="mcmv" style="background:'+col+'">'+esc(c.emoji||"✏️")+'</span>'+
+    '<select class="mcme" aria-label="아이콘" onchange="mcManSync(this)">'+MCEMO.map(function(e){
+      return '<option value="'+e+'"'+(e===(c.emoji||"")?' selected':'')+'>'+e+'</option>';}).join("")+'</select>'+
+    '<input class="mcmn" value="'+esc(c.name||"")+'" placeholder="예: 식비" '+
+      'onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveEdit()}">'+
+    '<select class="mcmc" aria-label="색" onchange="mcManSync(this)">'+MCCOL.map(function(x){
+      return '<option value="'+x+'"'+(x===col?' selected':'')+'>'+x+'</option>';}).join("")+'</select>'+
+    '<button type="button" class="mcmu" title="위로" aria-label="위로" onclick="mcManMove(this,-1)">↑</button>'+
+    '<button type="button" class="mcmu" title="아래로" aria-label="아래로" onclick="mcManMove(this,1)">↓</button>'+
+    '<button type="button" class="dl" title="지우기" aria-label="지우기" onclick="mcManDel(this)">✕</button>'+
+  '</div>';
+}
+function mcManSync(el){
+  const r=(el&&el.closest)?el.closest(".mcmr"):null; if(!r)return;
+  const e=r.querySelector(".mcme"),c=r.querySelector(".mcmc"),v=r.querySelector(".mcmv");
+  if(v){v.textContent=(e&&e.value)||"✏️";v.style.background=(c&&c.value)||MCCOL[0];}
+}
+function mcManAdd(){
+  const l=document.getElementById("mc_list");if(!l)return;
+  const n=l.querySelectorAll(".mcmr").length;
+  const d=document.createElement("div");
+  d.innerHTML=mcManRow({id:"",emoji:MCEMO[n%MCEMO.length],name:"",color:MCCOL[n%MCCOL.length]});
+  l.appendChild(d.firstChild);
+  const ins=l.querySelectorAll(".mcmn");
+  if(ins.length&&ins[ins.length-1].focus)ins[ins.length-1].focus();
+}
+function mcManDel(b){
+  const r=(b&&b.closest)?b.closest(".mcmr"):null;
+  if(r&&r.parentNode)r.parentNode.removeChild(r);
+}
+function mcManMove(b,dir){
+  const r=(b&&b.closest)?b.closest(".mcmr"):null; if(!r)return;
+  const l=r.parentNode; if(!l)return;
+  if(dir<0){ const pv=r.previousElementSibling; if(pv)l.insertBefore(r,pv); }
+  else{ const nx=r.nextElementSibling; if(nx)l.insertBefore(nx,r); }
+}
+function mnCatSave(){
+  const s=mS();if(!s)return;
+  const old=mnCats(s).slice();
+  const rows=[].slice.call(document.querySelectorAll("#mc_list .mcmr"));
+  const out=[],seen={};
+  rows.forEach(function(r,i){
+    const ne=r.querySelector(".mcmn"),ee=r.querySelector(".mcme"),ce=r.querySelector(".mcmc");
+    const nm=((ne&&ne.value)||"").trim();
+    if(!nm)return;
+    let id=r.getAttribute("data-id")||"";
+    if(!id||seen[id])id=uid();
+    seen[id]=1;
+    out.push({id:id,name:nm,emoji:((ee&&ee.value)||"✏️"),
+      color:/^#[0-9a-fA-F]{6}$/.test((ce&&ce.value)||"")?ce.value:MCCOL[i%MCCOL.length]});
+  });
+  if(!out.length){ try{toast("⚠ 카테고리는 하나는 있어야 해요");}catch(e){} return; }
+  s.cat=out; MCAT=s.cat;
+  const live={};out.forEach(function(c){live[c.id]=1;});
+  const fb=out[out.length-1].id;
+  let lost=0;
+  (s.spend||[]).forEach(function(x){if(!live[x.cat]){x.cat=fb;lost++;}});
+  (s.fixed||[]).forEach(function(f){if(!live[f.cat])f.cat=fb;});
+  (s.cool||[]).forEach(function(c){if(!live[c.cat])c.cat=fb;});
+  Object.keys(s.lim||{}).forEach(function(k){if(!live[k])delete s.lim[k];});
+  if(filter.indexOf("c:")===0&&!live[filter.slice(2)])filter="ALL";
+  if(!live[ui().mqcat||""])ui().mqcat="";
+  closeEdit();save();render();
+  try{toast("🏷 카테고리 "+out.length+"개로 저장했어요"+(lost?" · "+lost+"건은 「"+out[out.length-1].name+"」로":""));}catch(e){}
+}
 function mcSet(box,v){
   const b=document.getElementById(box);if(!b)return;
   b.setAttribute("data-v",v);
   Array.prototype.forEach.call(b.children,function(el){
+    if(el.classList.contains("mpman"))return;
     const on=el.getAttribute("data-v")===v;
     el.classList.toggle("on",on);
     el.style.background=on?mcat(v).color:"";
@@ -4915,6 +5099,7 @@ function mnCatBox(s,ym,listAll){
       '원까지 치면 총 <b>'+won(tot+fxtot)+'원</b></div>':'')+
     '<div class="mfhint" style="border:0;padding-top:2px">막대 색은 결제수단이에요 · 카드나 카테고리를 누르면 그것만 보여요 · '+
       (filter!=="ALL"?'<button type="button" class="lnk" onclick="setF(\'ALL\')">전체 보기</button> · ':'')+
+      '<button type="button" class="lnk" onclick="mnCatMan()">🏷 카테고리 관리</button>'+
       '<button type="button" class="lnk" onclick="mnPayMan()">⚙ 결제수단 관리</button></div>';
   return mnSec("cat",ym,head,body);
 }
@@ -5149,13 +5334,147 @@ function mnStats(s){
   const avg=passed?Math.round(spent/passed):0;
   const left=bud-spent-fsum;
   const z=mnZero(s,ym),o=mnLimOver(s,ym),sv=mnSum(mnSavedM(s,ym));
+  const w=mnWeek(s,ym),g=mnGoal(s,ym);
   return [["이번 달 쓴 돈",won(spent)+"원"],
-          ["하루 평균",won(avg)+"원"],
+          (g?["목표까지",(spent>g?("＋"+won(spent-g)+"원"):(won(g-spent)+"원"))]:["하루 평균",won(avg)+"원"]),
+          (w?["이번 주 남은 돈",(w.left<0?("＋"+won(-w.left)+"원"):(won(w.left)+"원"))]:["하루 평균",won(avg)+"원"]),
           ["무지출 데이",z.n+"일"],
           (o.n?["한도 초과",won(o.amt)+"원"]:["참은 돈",won(sv)+"원"]),
           [(left<0?"넘은 돈":"남은 돈"),won(Math.abs(left))+"원"],
           [(isNow&&rest>0?"하루에 쓸 수 있는 돈":"곧 나갈 돈"),
            (isNow&&rest>0?(won(Math.max(0,Math.round(left/rest)))+"원"):(won(fsum)+"원"))]];
+}
+/* ===== 🎯 이번 달 목표 ===== */
+function mnGoal(s,ym){return Math.max(0,Math.round(+((s.goal||{})[ym])||0));}
+function mnGoalEdit(){
+  const s=mS();if(!s)return;const ym=mnYm(s);
+  document.getElementById("mIc").innerHTML=chImg("money");
+  document.getElementById("mTitle").textContent="🎯 "+ymLabel(ym)+" 목표";
+  document.getElementById("mForm").innerHTML=
+    '<div class="field"><label>이번 달엔 얼마까지만 쓸래요?</label>'+
+      '<input id="mg_amt" type="number" inputmode="numeric" min="0" step="10000" '+
+      'value="'+(mnGoal(s,ym)||"")+'" placeholder="예: 500000" '+
+      'onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveEdit()}"></div>'+
+    '<div class="ehint">예산이 「쓸 수 있는 돈」이면, 목표는 「여기까지만 쓰자」예요.<br>'+
+      '보통 예산보다 조금 낮게 잡아야 의미가 있어요. 비워두면 목표를 끕니다.</div>';
+  const sv=document.getElementById("mSave");
+  sv.style.display="";sv.setAttribute("data-ns","mng:");
+  document.getElementById("overlay").classList.add("on");
+}
+function mnGoalSave(){
+  const s=mS();if(!s)return;const ym=mnYm(s);
+  const e=document.getElementById("mg_amt");
+  const v=Math.max(0,Math.round(+((e&&e.value)||0)));
+  s.goal=s.goal||{};
+  if(v)s.goal[ym]=v; else delete s.goal[ym];
+  closeEdit();save();render();
+  try{toast(v?("🎯 목표 "+won(v)+"원으로 잡았어요"):"목표를 껐어요");}catch(x){}
+}
+
+/* ===== 📅 주간 예산 ===== */
+function mnMon(d){
+  const a=d.split("-"),dt=new Date(+a[0],+a[1]-1,+a[2]);
+  const w=(dt.getDay()+6)%7;           /* 월=0 */
+  dt.setDate(dt.getDate()-w);
+  return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+}
+function mnWeek(s,ym){
+  const isNow=(ym===ymNow());
+  if(!isNow) return null;
+  const t=todayStr(), last=ym+"-"+String(mnLastDay(ym)).padStart(2,"0");
+  const mon=mnMon(t);
+  const goal=mnGoal(s,ym);
+  const base=goal||mnBudget(s,ym);
+  if(!base) return null;
+  const all=mnSpendM(s,ym);
+  const before=mnSum(all.filter(function(x){return x.d<mon;}));
+  const inWeek=all.filter(function(x){return x.d>=mon&&x.d<=t;});
+  const used=mnSum(inWeek);
+  /* 목표는 생활비 기준이라 곧 나갈 돈을 빼지 않는다 */
+  const fsum=goal?0:mnSum(mnFixedLeft(s,ym));
+  /* 이번 주 월요일부터 말일까지 남은 주 수 */
+  const from=(mon.slice(0,7)===ym)?(+mon.slice(8,10)):1;
+  const weeks=Math.max(1,Math.ceil((mnLastDay(ym)-from+1)/7));
+  const raw=base-fsum-before;
+  const pool=Math.max(0,raw);
+  const cap=Math.round(pool/weeks);
+  const dleft=Math.max(0,7-((new Date(+t.slice(0,4),+t.slice(5,7)-1,+t.slice(8,10)).getDay()+6)%7)-1);
+  return {mon:mon,cap:cap,used:used,left:cap-used,weeks:weeks,dry:raw<=0,
+    pct:cap?Math.min(100,Math.round(used/cap*100)):100,dleft:dleft,n:inWeek.length};
+}
+function mnWeekBox(s,ym){
+  const w=mnWeek(s,ym); if(!w) return "";
+  const over=w.dry||w.left<0;
+  const near=!over&&w.cap&&w.used>=w.cap*0.8;
+  return '<div class="mnwk'+(over?" over":(near?" near":""))+'">'+
+    '<div class="mnwkh"><b>📅 이번 주</b>'+
+      '<span class="mnwkd">'+(w.dleft?("오늘 포함 "+(w.dleft+1)+"일 남음"):"오늘이 마지막 날")+'</span>'+
+      '<span class="spacer"></span>'+
+      '<em>'+(w.dry?"쓸 돈 없음":(w.left<0?("＋"+won(-w.left)+"원 넘음"):(won(w.left)+"원 남음")))+'</em></div>'+
+    '<div class="tpbar '+(over?"over":"")+'"><i style="width:'+w.pct+'%"></i>'+
+      '<span>'+won(w.used)+' / '+won(w.cap)+'원</span></div>'+
+    '<div class="mnwkn">'+
+      (w.dry?"이번 달 쓸 돈을 이미 다 썼어요. 남은 "+w.weeks+"주는 0원이 기준이에요."
+        :(w.left<0?"이번 주는 여기서 멈추세요. 다음 주 몫까지 당겨 쓴 거예요."
+        :(near?"주간 한도의 "+w.pct+"%를 썼어요. 조심할 때예요."
+          :(w.dleft?("남은 "+(w.dleft+1)+"일 동안 하루 "+won(Math.round(Math.max(0,w.left)/(w.dleft+1)))+"원"):"오늘까지 잘 지켰어요"))))+
+    '</div></div>';
+}
+
+/* ===== 📍 오늘 쓴 돈 알림줄 ===== */
+function mnTodayLine(s,ym){
+  if(ym!==ymNow()) return "";
+  const t=todayStr();
+  const l=(s.spend||[]).filter(function(x){return x.d===t;});
+  const v=mnSum(l);
+  const y=addDays(t,-1);
+  const yv=mnSum((s.spend||[]).filter(function(x){return x.d===y;}));
+  if(!v) return '<div class="mntd zero">🌱 <b>오늘 아직 0원</b>'+
+    '<span>이대로 자면 무지출 데이예요'+(yv?(" · 어제는 "+won(yv)+"원"):"")+'</span></div>';
+  const z=mnZero(s,ym);
+  const avg=z.upto?Math.round(mnSum(mnSpendM(s,ym))/z.upto):0;
+  const hot=avg&&v>avg*1.5;
+  return '<div class="mntd'+(hot?" hot":"")+'">'+(hot?"⚠":"📍")+' 오늘 <b>'+won(v)+'원</b>'+
+    '<span>'+l.length+'건'+(avg?(" · 하루 평균 "+won(avg)+"원"):"")+
+      (hot?" · 평소보다 많아요":"")+'</span></div>';
+}
+
+/* ===== 💸 맨 위 큰 숫자 ===== */
+function mnHero(s,ym){
+  const spent=mnSum(mnSpendM(s,ym));
+  const bud=mnBudget(s,ym), goal=mnGoal(s,ym);
+  const fsum=mnSum(mnFixedLeft(s,ym));
+  const base=goal||bud;
+  const pct=base?Math.min(100,Math.round(spent/base*100)):0;
+  const over=base&&spent>base;
+  const near=!over&&base&&spent>=base*0.8;
+  const prev=ymAdd(ym,-1);
+  const isNow=(ym===ymNow());
+  const dd=isNow?(+todayStr().slice(8,10)):mnLastDay(ym);
+  const pl=(s.spend||[]).filter(function(x){
+    return String(x.d||"").slice(0,7)===prev && (+String(x.d).slice(8,10))<=dd;});
+  let pv=mnSum(pl), diff=spent-pv, cmp="지난달 같은 때보다";
+  if(!pv){
+    pv=mnSum((s.spend||[]).filter(function(x){return String(x.d||"").slice(0,7)===prev;}));
+    diff=spent-pv; cmp="지난달 한 달 전체보다";
+  }
+  return '<div class="mnhero'+(over?" over":(near?" near":""))+'">'+
+    '<div class="mnhl">'+(isNow?"이번 달 지금까지 쓴 돈":esc(ymLabel(ym))+"에 쓴 돈")+'</div>'+
+    '<div class="mnhv">'+won(spent)+'<small>원</small></div>'+
+    (pv?'<div class="mnhc '+(diff>0?"up":"down")+'">'+cmp+' '+
+       (diff>0?("＋"+won(diff)):("－"+won(-diff)))+'원</div>':'')+
+    (base
+      ? '<div class="tpbar '+(over?"over":"")+'"><i style="width:'+pct+'%"></i>'+
+          '<span>'+(goal?"목표":"예산")+' '+won(base)+'원 중 '+pct+'%</span></div>'+
+        '<div class="mnhn">'+
+          (over?("⚠ "+(goal?"목표":"예산")+"를 <b>"+won(spent-base)+"원</b> 넘겼어요")
+            :("아직 <b>"+won(base-spent)+"원</b> 쓸 수 있어요"))+
+          (fsum?(' · 곧 나갈 돈 '+won(fsum)+'원'):'')+'</div>'
+      : '<div class="mnhn">목표나 예산을 정하면 얼마나 썼는지 한눈에 보여드려요.</div>')+
+    '<div class="mnhb">'+
+      '<button type="button" class="btn sm" onclick="mnGoalEdit()">'+(goal?'🎯 목표 '+won(goal)+'원':'🎯 목표 정하기')+'</button>'+
+      '<button type="button" class="btn sm" onclick="mnBudgetEdit()">'+(bud?'💰 예산 '+won(bud)+'원':'💰 예산 정하기')+'</button>'+
+    '</div></div>';
 }
 function mnSay(s){
   const ym=mnYm(s),spent=mnSum(mnSpendM(s,ym)),bud=mnBudget(s,ym);
@@ -5166,7 +5485,10 @@ function mnSay(s){
   const rest=isNow?(mnLastDay(ym)-passed):0;
   /* 이 속도면 이번 달 얼마 */
   const pace=passed?Math.round(spent/passed*mnLastDay(ym)):0;
-  if(!bud) return "이번 달 <b>쓸 수 있는 돈</b>부터 정하세요. 기준이 없으면 안 줄어요.";
+  const goal=mnGoal(s,ym);
+  if(goal&&spent>goal) return "\u26a0 목표 <b>"+won(goal)+"원</b>을 <b>"+won(spent-goal)+"원</b> 넘겼어요. 오늘은 그만 쓰세요.";
+  if(!bud&&!goal) return "이번 달 <b>목표</b>부터 정하세요. 기준이 없으면 안 줄어요.";
+  if(!bud) return "목표 <b>"+won(goal)+"원</b> 중 <b>"+won(spent)+"원</b> 썼어요. <b>"+won(goal-spent)+"원</b> 남았어요.";
   if(left<0) return "\u26a0 예산을 <b>"+won(-left)+"원</b> 넘겼어요. 이번 달은 여기서 멈추세요.";
   if(o.n) return "\u26a0 한도 넘은 카테고리가 <b>"+o.n+"개</b>, 초과 <b>"+won(o.amt)+"원</b>. 거기부터 끊으세요.";
   if(isNow&&rest>0&&bud&&pace>bud)
@@ -8914,6 +9236,8 @@ function saveEdit(){
     if(tag.indexOf("mnb:")===0)return mnBudgetSave();
     if(tag.indexOf("mnp:")===0)return mnPaySave();
     if(tag.indexOf("mnl:")===0)return mnLimSave();
+    if(tag.indexOf("mnc:")===0)return mnCatSave();
+    if(tag.indexOf("mng:")===0)return mnGoalSave();
   }
   const s=DATA[cur],g=id=>document.getElementById(id);
   const title=(g("f_title").value||"").trim();
